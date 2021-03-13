@@ -7,3 +7,6 @@
 - added config.yaml to main directory
 - added Domains/* to main dir
 - added include as to the dir (and removed it from .gitignore)
+
+##v 0.00002k
+- updated build instructions in readme.md

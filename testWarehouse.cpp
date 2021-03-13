@@ -194,8 +194,7 @@ void WarehouseSimulation(string config_file, int thrds){
       WarehouseSimulationIterRL(15,configs);
     }
     exit(0);
-  }else if (algo == "nueroevo"){
-
+  }else if (algo == "nueroevo" || true){
     if (mode.compare("train") == 0){
       // Start the training runs
       for (int r = 0; r < runs; r++)
@@ -214,6 +213,10 @@ void WarehouseSimulation(string config_file, int thrds){
       std::cout << "Error: unknown mode! Exiting.\n" ;
       exit(1) ;
     }
+  }
+  else{
+    std::cout << "Error: unknown algo! Exiting.\n" ;
+    exit(1) ;
   }
 
 }
