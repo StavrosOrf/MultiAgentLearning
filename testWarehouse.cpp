@@ -15,9 +15,11 @@
 #include "Domains/WarehouseCentralised.h"
 #include "threadpool.hpp"
 
-using std::vector ;
-using std::string ;
-using namespace Eigen ;
+using std::vector;
+using std::string;
+using namespace Eigen;
+
+Warehouse* create_warehouse(std::string agentType, YAML::Node configs);
 
 void WarehouseSimulationSingleRun(int r, YAML::Node configs){
   srand(r+1); // increment random seed
@@ -25,29 +27,7 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
   // Initialise appropriate domain
   size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
   string agentType = configs["domain"]["agents"].as<string>();
-  Warehouse * trainDomain ;
-  if (agentType.compare("intersection_t") == 0){
-    trainDomain = new WarehouseIntersectionsTime(configs) ;
-  }
-  else if (agentType.compare("intersection") == 0){
-    trainDomain = new WarehouseIntersections(configs) ;
-  }
-  else if (agentType.compare("link_t") == 0){
-    trainDomain = new WarehouseLinksTime(configs) ;
-  }
-  else if (agentType.compare("link") == 0){
-    trainDomain = new WarehouseLinks(configs) ;
-  }
-  else if (agentType.compare("centralised_t") == 0){
-    trainDomain = new WarehouseCentralisedTime(configs) ;
-  }
-  else if (agentType.compare("centralised") == 0){
-    trainDomain = new WarehouseCentralised(configs) ;
-  }
-  else{
-    std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
-    exit(1) ;
-  }
+  Warehouse * trainDomain = create_warehouse(agentType, configs);
   trainDomain->InitialiseMATeam() ;
   
   // Create results folder
@@ -109,29 +89,7 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 
   // Initialise appropriate domain
   string agentType = configs["domain"]["agents"].as<string>();
-  Warehouse * testDomain ;
-  if (agentType.compare("intersection_t") == 0){
-    testDomain = new WarehouseIntersectionsTime(configs) ;
-  }
-  else if (agentType.compare("intersection") == 0){
-    testDomain = new WarehouseIntersections(configs) ;
-  }
-  else if (agentType.compare("link_t") == 0){
-    testDomain = new WarehouseLinksTime(configs) ;
-  }
-  else if (agentType.compare("link") == 0){
-    testDomain = new WarehouseLinks(configs) ;
-  }
-  else if (agentType.compare("centralised_t") == 0){
-    testDomain = new WarehouseCentralisedTime(configs) ;
-  }
-  else if (agentType.compare("centralised") == 0){
-    testDomain = new WarehouseCentralised(configs) ;
-  }
-  else{
-    std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
-    exit(1) ;
-  }
+  Warehouse * testDomain = create_warehouse(agentType, configs); ;
   testDomain->InitialiseMATeam() ;
   
   // Create results folder
@@ -209,35 +167,14 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 }
 
 void WarehouseSimulationIterRL(int r, YAML::Node configs){
-  rand(r+1); // increment random seed
+  srand(r+1); // increment random seed
 
   // Initialise appropriate domain
   size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
   string agentType = configs["domain"]["agents"].as<string>();
-  Warehouse * trainDomain ;
-  if (agentType.compare("intersection_t") == 0){
-    trainDomain = new WarehouseIntersectionsTime(configs) ;
-  }
-  else if (agentType.compare("intersection") == 0){
-    trainDomain = new WarehouseIntersections(configs) ;
-  }
-  else if (agentType.compare("link_t") == 0){
-    trainDomain = new WarehouseLinksTime(configs) ;
-  }
-  else if (agentType.compare("link") == 0){
-    trainDomain = new WarehouseLinks(configs) ;
-  }
-  else if (agentType.compare("centralised_t") == 0){
-    trainDomain = new WarehouseCentralisedTime(configs) ;
-  }
-  else if (agentType.compare("centralised") == 0){
-    trainDomain = new WarehouseCentralised(configs) ;
-  }
-  else{
-    std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
-    exit(1) ;
-  }
+  Warehouse * trainDomain = create_warehouse(agentType, configs); ;
   trainDomain->InitialiseMATeam() ;
+  exit(0);
 
 
 }
@@ -281,8 +218,31 @@ void WarehouseSimulation(string config_file, int thrds){
 
 }
 
-static void show_usage(std::string name)
-{
+/************************************************************************************************
+ * *Input: A string named [agentType] which indicates the type of the Warehouse			*
+ * *Output:A Warehouse of that type								*
+ ************************************************************************************************/
+Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
+  if (agentType.compare("intersection_t") == 0)
+    return new WarehouseIntersectionsTime(configs);
+  else if (agentType.compare("intersection") == 0)
+    return new WarehouseIntersections(configs);
+  else if (agentType.compare("link_t") == 0)
+    return new WarehouseLinksTime(configs);
+  else if (agentType.compare("link") == 0)
+    return new WarehouseLinks(configs);
+  else if (agentType.compare("centralised_t") == 0)
+    return new WarehouseCentralisedTime(configs);
+  else if (agentType.compare("centralised") == 0)
+    return new WarehouseCentralised(configs);
+  else{
+    std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
+    exit(1) ;
+  }
+}
+
+
+static void show_usage(std::string name){
     std::cerr << "Usage: " << name << " -c CONFIG_FILE <options>\n"
               << "options:\n"
               << "\t-h, --help\t\t\tShow this help message\n"

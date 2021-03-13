@@ -1,0 +1,26 @@
+mode:
+  algo: neuroevo
+  type: train
+# NOTE: agent_policies and eval_file are only used if [mode][type] = test
+  agent_policies: ../Domains/Small_120_AGVs_SS_link_time/Results/neural_nets.csv # file containing agent policies
+  eval_file: ../Domains/Small_120_AGVs_SS_link_time/Results/evaluation_29.csv # file containing best teams
+domain:
+  folder: ../Domains/Small_120_AGVs_SS_link_time/
+  agents: link_t
+graph:
+  vertices: vertices.csv
+  edges: edges.csv
+  capacities: capacities.csv
+neuroevo:
+  learn: true
+  population_size: 10
+  epochs: 1 # set to 1 in test mode
+  runs: 1
+simulation:
+  steps: 200
+  agvs: origins.csv
+  goals: goals.csv
+results:
+  folder: Results/
+  evaluation: evaluation
+  policies: neural_nets.csv

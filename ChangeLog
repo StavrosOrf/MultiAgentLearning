@@ -1,2 +1,9 @@
 
 -Added (structure for) new Learning Algorithm IterRL
+
+##v 0.00001k
+- added create_warehouse function
+- fixed typos in testWarehouse.cpp
+- added config.yaml to main directory
+- added Domains/* to main dir
+- added include as to the dir (and removed it from .gitignore)

@@ -1,0 +1,39 @@
+# POMDP for policy expertise introspection
+
+discount: 0.95
+values: reward
+states: N E
+actions: noAsk ask
+observations: poorReward avgReward highReward
+
+T: noAsk
+0.99 0.01
+0.01 0.99
+
+T: ask
+0.9	0.1
+0.1	0.9
+
+O: noAsk
+0.85 0.1 0.05
+0.05 0.1 0.85
+
+O: ask
+0.1 0.3 0.6
+0.05 0.1 0.85
+
+R: noAsk : N : * : poorReward -2000
+R: noAsk : N : * : avgReward -100
+R: noAsk : N : * : highReward 50
+
+R: ask : N : * : poorReward -1000
+R: ask : N : * : avgReward -100
+R: ask : N : * : highReward 300
+
+R: noAsk : E : * : poorReward -1000
+R: noAsk : E : * : avgReward -100
+R: noAsk : E : * : highReward 500
+
+R: ask : E : * : poorReward -2000
+R: ask : E : * : avgReward -100
+R: ask : E : * : highReward 50
