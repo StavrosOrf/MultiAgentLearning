@@ -44,8 +44,14 @@ void Warehouse::EvolvePolicies(bool init){
 }
 
 void Warehouse::ResetEpochEvals(){
-	for (size_t i = 0; i < nAgents; i++)
-		maTeam[i]->ResetEpochEvals() ;
+	if( algo = algo_type::ddpg ){
+		for (size_t i = 0; i < nAgents; i++)
+			ddpg_maTeam[i]->ResetEpochEvals() ;	
+	} else if( algo = algo_type::neuroevo ){
+		for (size_t i = 0; i < nAgents; i++)
+			maTeam[i]->ResetEpochEvals() ;	
+	}
+	
 }
 
 void Warehouse::OutputPerformance(string eval_str){

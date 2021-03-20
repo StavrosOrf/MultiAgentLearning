@@ -20,6 +20,7 @@ class DDPGAgent{
 	public:
 		DDPGAgent(size_t state_space, size_t action_space);
 		~DDPGAgent();
+		void ResetEpochEvals() ;
 	protected:
 		struct replay
 		{
@@ -30,10 +31,10 @@ class DDPGAgent{
 	
 		};
 
-		NeuralNet q_criticNN;
-		NeuralNet q_target_criticNN;
-		NeuralNet mu_actorNN;
-		NeuralNet mu_target_actorNN;
+		NeuralNet * q_criticNN;
+		NeuralNet * q_target_criticNN;
+		NeuralNet * mu_actorNN;
+		NeuralNet * mu_target_actorNN;
 
 		vector<replay> replay_buffer; //TODO kallinteris se t alocator
 		//TODO add "INITIALIZE random process N"

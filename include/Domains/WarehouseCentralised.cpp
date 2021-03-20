@@ -388,18 +388,19 @@ void WarehouseCentralised::InitialiseMATeam(){
 	whAgents.push_back(agent) ;
 	
 	if( algo = algo_type::ddpg ){
-
+		DDPGAgent * da = new DDPGAgent(28,28);
+		ddpg_maTeam.push_back(da);
 	}else if( algo = algo_type::neuroevo ){
-
+		size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
+		size_t nIn = nOut ; // NN input is current #AGVs on all edges
+	//	size_t nHid = 16 ; // fixed to compare against link agent formulation
+		size_t nHid = 4*nIn ; // control for relative representational capacity
+		Agent * neAgent ;
+		neAgent = new Intersection(nPop, nIn, nOut, nHid) ;// only one centralised agent
+		maTeam.push_back(neAgent) ;
 	}
 
-	size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
-	size_t nIn = nOut ; // NN input is current #AGVs on all edges
-//	size_t nHid = 16 ; // fixed to compare against link agent formulation
-	size_t nHid = 4*nIn ; // control for relative representational capacity
-	Agent * neAgent ;
-	neAgent = new Intersection(nPop, nIn, nOut, nHid) ;// only one centralised agent
-	maTeam.push_back(neAgent) ;
+
 	nAgents = whAgents.size() ;
 }
 

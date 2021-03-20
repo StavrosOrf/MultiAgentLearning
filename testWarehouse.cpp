@@ -169,11 +169,20 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 void WarehouseSimulationDDPG(YAML::Node configs){
 
 	// Initialise appropriate domain
+	size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();
 	Warehouse * trainDomain = create_warehouse(agentType, configs);
-	if (agentType == "centralised_t" || agentType == "centralised"){
+	trainDomain->InitialiseMATeam();
 
+		//TODO create results folder
+
+	for (size_t n = 0; n < nEps; n++){
+		//TODO initialize a random process N
+		// trainDomain->ResetEpochEvals() ; // reset domain
+		trainDomain->InitialiseNewEpoch();
+		trainDomain->SimulateEpoch() ;					// simulate
 	}
+
 	exit(0);
 
 
@@ -226,7 +235,7 @@ void WarehouseSimulation(string config_file, int thrds){
  * *Output:A Warehouse of that type								*
  ************************************************************************************************/
 Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
-  Warehouse* new_warehouse;
+	Warehouse* new_warehouse;
 	if (agentType.compare("intersection_t") == 0)
 		new_warehouse = new WarehouseIntersectionsTime(configs);
 	else if (agentType.compare("intersection") == 0)
@@ -243,8 +252,13 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 		std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
 		exit(1) ;
 	}
-  new_warehouse->SetAlgo();
-  return new_warehouse;
+	if(configs["mode"]["algo"].as<string>().compare("DDPG")){
+		new_warehouse->SetTrainingAlgo(algo_type::ddpg);  
+	}else if(configs["mode"]["algo"].as<string>().compare("neuroevo")){
+		new_warehouse->SetTrainingAlgo(algo_type::neuroevo);  
+	}
+	
+	return new_warehouse;
 }
 
 
