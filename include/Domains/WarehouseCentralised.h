@@ -18,6 +18,7 @@ class WarehouseCentralised : public Warehouse {
 		
 		void SimulateEpoch(bool train = true) ;
 		void SimulateEpoch(vector<size_t> team) ;
+		void SimulateEpochDDPG();
 		
 		void InitialiseMATeam() ; // create agents for each vertex in graph
 		

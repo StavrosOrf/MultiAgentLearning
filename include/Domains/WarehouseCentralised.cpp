@@ -23,6 +23,93 @@ WarehouseCentralised::~WarehouseCentralised(void){
 		agentActionFile.close() ;
 	}
 }
+void WarehouseCentralised::SimulateEpochDDPG(){
+	InitialiseNewEpoch();
+	//TODO INITIALIZE noise process N
+	VectorXd input(28) ;
+	VectorXd test = ddpg_maTeam[0]->EvaluateActorNN_DDPG(input);
+	std::cout<<"--";
+	for (size_t n = 0; n < 28; n++){
+		std::cout<<"VectorXd Output: "<<test[n]<< " "<<std::endl;	
+	}
+	
+	return ;
+	// for (size_t t = 0; t < nSteps; t++){ // each timestep
+	// 	// Get agent actions and update graph costs
+
+	// 	//Evaluate actor mu
+	// 	ddpg_maTeam[0].
+
+	// 	vector<double> a = baseCosts ;
+	// 	vector<size_t> s(whGraph->GetNumEdges(),0) ;
+	// 	QueryMATeam(memberIDs, a, s) ;
+	// 	UpdateGraphCosts(a) ;
+		
+	// 	// Replan AGVs as necessary
+	// 	for (size_t k = 0; k < nAGVs; k++){
+	// 		whAGVs[k]->CompareCosts(a) ; // set replanning flags
+		
+	// 		if (whAGVs[k]->GetIsReplan()){ // replanning needed
+	// 			whAGVs[k]->PlanAGV(a) ;
+	// 		}
+			
+	// 		// Identify any new AGVs that need to cross an intersection
+	// 		if (whAGVs[k]->GetT2V() == 0){
+	// 			size_t agentID = 0 ; // only one agent
+	// 			bool onWaitList = false ;
+	// 			for (list<size_t>::iterator it = whAgents[agentID]->agvIDs.begin(); it!=whAgents[agentID]->agvIDs.end(); ++it){
+	// 				if (k == *it){
+	// 					onWaitList = true ;
+	// 					break ;
+	// 				}
+	// 			}
+	// 			if (!onWaitList){ // only add if not already on wait list
+	// 				whAgents[agentID]->agvIDs.push_back(k) ;
+	// 			}
+	// 		}
+	// 	}
+		
+	// 	// Attempt to move any transitioning AGVs on to new edges (according to wait list order)
+	// 	for (size_t k = 0; k < nAgents; k++){
+	// 		vector<size_t> toRemove ;
+	// 		for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
+	// 			size_t curAGV = *it ;
+	// 			size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()) ; // next edge ID
+				
+	// 			bool edgeFull = false ;
+	// 			if (nextID < 0 || nextID >= s.size()){
+	// 				std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n" ;
+	// 				std::cout << "	t2v: " << whAGVs[curAGV]->GetT2V() << "\n" ;
+	// 				std::cout << "	itsQueue: " << (whAGVs[curAGV]->GetAGVPlanner()->GetQueue() != 0) << "\n" ;
+	// 			}
+	// 			if (s[nextID] >= capacities[nextID]){ // check if next edge is full
+	// 				edgeFull = true ;
+	// 			}
+	// 			if (!edgeFull){ // transfer to new edge and update agv counters
+	// 				size_t curID = whGraph->GetEdgeID(whAGVs[curAGV]->GetCurEdge()) ;
+	// 				whAGVs[curAGV]->EnterNewEdge() ;
+	// 				size_t newID = whGraph->GetEdgeID(whAGVs[curAGV]->GetCurEdge()) ;
+	// 				if (curID < s.size()){ // if moving off an edge
+	// 					s[curID]-- ; // remove from old edge
+	// 				}
+	// 				s[newID]++ ; // add to new edge (note that nextID and newID should be equal!)
+	// 				if (nextID != newID){
+	// 					std::cout << "Warning: nextID [" << nextID << "] != newID [" << newID << "]\n" ;
+	// 				}
+	// 				toRemove.push_back(curAGV) ; // remember to remove from agent wait list
+	// 			}
+	// 		}
+	// 		for (size_t w = 0; w < toRemove.size(); w++){
+	// 			whAgents[k]->agvIDs.remove(toRemove[w]) ;
+	// 		}
+	// 	}
+		
+	// 	// Traverse
+	// 	for (size_t k = 0; k < nAGVs; k++){
+	// 		whAGVs[k]->Traverse() ;
+	// 	}
+	// }
+}
 
 void WarehouseCentralised::SimulateEpoch(bool train){
 	size_t teamSize ;

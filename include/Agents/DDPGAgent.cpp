@@ -14,14 +14,30 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	//Possibly already implemented
 	//TODO targets equal with critics(memcpy)
 
-
-
 }
 
 DDPGAgent::~DDPGAgent(){
+
 }
 
 
 void DDPGAgent::ResetEpochEvals(){
 	
 }
+
+VectorXd DDPGAgent::EvaluateActorNN_DDPG(VectorXd s){
+	return mu_actorNN->EvaluateNN(s);
+}
+
+VectorXd DDPGAgent::EvaluateCriticNN_DDPG(VectorXd s){
+	return q_criticNN->EvaluateNN(s);
+}
+
+VectorXd DDPGAgent::EvaluateTargetActorNN_DDPG(VectorXd s){
+	return mu_target_actorNN->EvaluateNN(s);
+}
+
+VectorXd DDPGAgent::EvaluateTargetCriticNN_DDPG(VectorXd s){
+	return q_target_criticNN->EvaluateNN(s);
+}	
+

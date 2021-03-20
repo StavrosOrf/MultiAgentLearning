@@ -57,6 +57,8 @@ class Warehouse{
 
 		void LoadPolicies(YAML::Node) ;
 		void SetTrainingAlgo(algo_type algo){algo = algo;}
+        virtual void SimulateEpochDDPG(){;}
+
 	protected:
 		size_t nSteps ;
 		size_t nPop ;

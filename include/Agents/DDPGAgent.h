@@ -16,10 +16,15 @@ using std::string ;
 #define TAU 0.01
 #define BATCH_SIZE 50
 
+
 class DDPGAgent{
 	public:
 		DDPGAgent(size_t state_space, size_t action_space);
 		~DDPGAgent();
+		VectorXd EvaluateCriticNN_DDPG(VectorXd s);
+		VectorXd EvaluateActorNN_DDPG(VectorXd s);
+		VectorXd EvaluateTargetActorNN_DDPG(VectorXd s);
+		VectorXd EvaluateTargetCriticNN_DDPG(VectorXd s);		
 		void ResetEpochEvals() ;
 	protected:
 		struct replay
