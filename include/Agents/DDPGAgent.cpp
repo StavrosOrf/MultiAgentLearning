@@ -22,6 +22,6 @@ DDPGAgent::~DDPGAgent(){
 }
 
 
-void ResetEpochEvals(){
+void DDPGAgent::ResetEpochEvals(){
 	
 }

@@ -179,7 +179,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	for (size_t n = 0; n < nEps; n++){
 		//TODO initialize a random process N
 		// trainDomain->ResetEpochEvals() ; // reset domain
-		trainDomain->InitialiseNewEpoch();
+		//trainDomain->InitialiseNewEpoch();
 		trainDomain->SimulateEpoch() ;					// simulate
 	}
 
