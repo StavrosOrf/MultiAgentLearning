@@ -18,12 +18,20 @@
 #include "Planning/Graph.h"
 #include "Planning/Edge.h"
 #include "AGV.h"
+#include "Agents/DDPGAgent.h"
 
 using std::vector ;
 using std::list ;
 using std::string ;
 using std::ifstream ;
 using std::stringstream ;
+
+enum algo_type{
+    ddpg,
+    neuroevo
+};
+
+
 
 class Warehouse{
 	public:
@@ -48,7 +56,7 @@ class Warehouse{
 		void DisableEpisodeReplayOutput(){outputEpReplay = false ;}
 
 		void LoadPolicies(YAML::Node) ;
-		
+		void SetTrainingAlgo(algo_type algo){algo = algo;}
 	protected:
 		size_t nSteps ;
 		size_t nPop ;
@@ -58,12 +66,14 @@ class Warehouse{
 		vector<size_t> capacities ;
 		bool neLearn ;
 		
+        algo_type algo;
 		struct iAgent{
 			size_t vID ;					// graph vertex ID associated with agent (edge ID if link agent)
 			vector<size_t> eIDs ; // graph edge IDs associated with incoming edges to agent vertex (vertex IDs if link agent)
 			list<size_t> agvIDs ; // agv IDs waiting to cross intersection
 		} ;
 		
+        vector<DDPGAgent *> ddpg_maTeam;
 		vector<Agent *> maTeam ; // manage agent NE routines
 		vector<iAgent *> whAgents ; // manage agent vertex and edge lookups from graph
 		Graph * whGraph ; // vertex and edge definitions, access to change edge costs at each step

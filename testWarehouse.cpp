@@ -172,6 +172,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	string agentType = configs["domain"]["agents"].as<string>();
 	Warehouse * trainDomain = create_warehouse(agentType, configs);
 	if (agentType == "centralised_t" || agentType == "centralised"){
+
 	}
 	exit(0);
 
@@ -190,7 +191,7 @@ void WarehouseSimulation(string config_file, int thrds){
 	
 	if (algo == "DDPG") {
 		if(mode.compare("train") == 1){
-			WarehouseSimulationIterDDPG(configs);
+			WarehouseSimulationDDPG(configs);
 		}
 		exit(0);
 	}else if (algo == "nueroevo" || true){
@@ -225,22 +226,25 @@ void WarehouseSimulation(string config_file, int thrds){
  * *Output:A Warehouse of that type								*
  ************************************************************************************************/
 Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
+  Warehouse* new_warehouse;
 	if (agentType.compare("intersection_t") == 0)
-		return new WarehouseIntersectionsTime(configs);
+		new_warehouse = new WarehouseIntersectionsTime(configs);
 	else if (agentType.compare("intersection") == 0)
-		return new WarehouseIntersections(configs);
+		new_warehouse = new WarehouseIntersections(configs);
 	else if (agentType.compare("link_t") == 0)
-		return new WarehouseLinksTime(configs);
+		new_warehouse = new WarehouseLinksTime(configs);
 	else if (agentType.compare("link") == 0)
-		return new WarehouseLinks(configs);
+		new_warehouse = new WarehouseLinks(configs);
 	else if (agentType.compare("centralised_t") == 0)
-		return new WarehouseCentralisedTime(configs);
+		new_warehouse = new WarehouseCentralisedTime(configs);
 	else if (agentType.compare("centralised") == 0)
-		return new WarehouseCentralised(configs);
+		new_warehouse = new WarehouseCentralised(configs);
 	else{
 		std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
 		exit(1) ;
 	}
+  new_warehouse->SetAlgo();
+  return new_warehouse;
 }
 
 

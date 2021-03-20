@@ -387,6 +387,12 @@ void WarehouseCentralised::InitialiseMATeam(){
 	iAgent * agent = new iAgent{0, eIDs} ; // only one centralised agent controlling all traffic
 	whAgents.push_back(agent) ;
 	
+	if( algo = algo_type::ddpg ){
+
+	}else if( algo = algo_type::neuroevo ){
+
+	}
+
 	size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
 	size_t nIn = nOut ; // NN input is current #AGVs on all edges
 //	size_t nHid = 16 ; // fixed to compare against link agent formulation

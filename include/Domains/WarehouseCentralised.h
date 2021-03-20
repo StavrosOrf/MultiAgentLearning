@@ -6,6 +6,7 @@
 #include <Eigen/Eigen>
 #include "Agents/Intersection.h"
 #include "Warehouse.h"
+#include "Agents/DDPGAgent.h"
 
 using std::vector ;
 using std::list ;
