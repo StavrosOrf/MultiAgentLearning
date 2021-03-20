@@ -27,8 +27,9 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 	InitialiseNewEpoch();
 	//TODO INITIALIZE noise process N
 	VectorXd input(28) ;
+	std::cout<<ddpg_maTeam.size()<<std::endl;
 	VectorXd test = ddpg_maTeam[0]->EvaluateActorNN_DDPG(input);
-	std::cout<<"--";
+	std::cout<<"--"<<std::endl;
 	for (size_t n = 0; n < 28; n++){
 		std::cout<<"VectorXd Output: "<<test[n]<< " "<<std::endl;	
 	}
@@ -473,11 +474,12 @@ void WarehouseCentralised::InitialiseMATeam(){
 	}
 	iAgent * agent = new iAgent{0, eIDs} ; // only one centralised agent controlling all traffic
 	whAgents.push_back(agent) ;
-	
-	if( algo = algo_type::ddpg ){
+	std::cout<<"algo "<< algo<<std::endl;
+	if( algo == algo_type::ddpg ){
+		std::cout<<"testt";
 		DDPGAgent * da = new DDPGAgent(28,28);
 		ddpg_maTeam.push_back(da);
-	}else if( algo = algo_type::neuroevo ){
+	}else if( algo == algo_type::neuroevo ){
 		size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
 		size_t nIn = nOut ; // NN input is current #AGVs on all edges
 	//	size_t nHid = 16 ; // fixed to compare against link agent formulation

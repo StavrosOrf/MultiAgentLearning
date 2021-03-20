@@ -172,6 +172,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();
 	Warehouse * trainDomain = create_warehouse(agentType, configs);
+	trainDomain->SetTrainingAlgo(algo_type::ddpg);
 	trainDomain->InitialiseMATeam();
 
 		//TODO create results folder
@@ -181,6 +182,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		//TODO initialize a random process N
 		// trainDomain->ResetEpochEvals() ; // reset domain
 		//trainDomain->InitialiseNewEpoch();
+		std::cout<<"----"<<std::endl;
 		trainDomain->SimulateEpochDDPG() ;// simulate
 		std::cout<<"test3"<<std::endl;
 	}
@@ -260,6 +262,8 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 		new_warehouse->SetTrainingAlgo(algo_type::ddpg);  
 	}else if(configs["mode"]["algo"].as<string>().compare("neuroevo")){
 		new_warehouse->SetTrainingAlgo(algo_type::neuroevo);  
+	}else{
+		std::cout << "ERROR: Currently only configured for 'ddpg' and 'neuroevo'! Exiting.\n" ;
 	}
 	
 	return new_warehouse;

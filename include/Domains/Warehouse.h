@@ -56,7 +56,7 @@ class Warehouse{
 		void DisableEpisodeReplayOutput(){outputEpReplay = false ;}
 
 		void LoadPolicies(YAML::Node) ;
-		void SetTrainingAlgo(algo_type algo){algo = algo;}
+		void SetTrainingAlgo(algo_type algot){algo = algot;}
         virtual void SimulateEpochDDPG(){;}
 
 	protected:
