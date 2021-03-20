@@ -26,13 +26,31 @@ WarehouseCentralised::~WarehouseCentralised(void){
 void WarehouseCentralised::SimulateEpochDDPG(){
 	InitialiseNewEpoch();
 	//TODO INITIALIZE noise process N
-	VectorXd input(28) ;
+	VectorXd input(38) ;
+	
+
+	for( int i = 0; i < whAGVs.size(); i++){
+		Edge* e = whAGVs[i]->GetCurEdge();
+		std::cout<<whGraph->GetEdgeID(e)<<" , ";
+		input(whGraph->GetEdgeID(e)-1) = input(whGraph->GetEdgeID(e)-1) + 1; 
+
+	}
+	for (size_t n = 0; n < 38; n++){
+		std::cout<<"VectorXd input: "<<input[n]<< " "<<std::endl;	
+
+	}
+	
+	vector<Edge *> edgess = whGraph->GetEdges();
+
+
 	std::cout<<ddpg_maTeam.size()<<std::endl;
 	VectorXd test = ddpg_maTeam[0]->EvaluateActorNN_DDPG(input);
 	std::cout<<"--"<<std::endl;
-	for (size_t n = 0; n < 28; n++){
+	for (size_t n = 0; n < 38; n++){
 		std::cout<<"VectorXd Output: "<<test[n]<< " "<<std::endl;	
 	}
+
+
 	
 	return ;
 	// for (size_t t = 0; t < nSteps; t++){ // each timestep
@@ -477,7 +495,7 @@ void WarehouseCentralised::InitialiseMATeam(){
 	std::cout<<"algo "<< algo<<std::endl;
 	if( algo == algo_type::ddpg ){
 		std::cout<<"testt";
-		DDPGAgent * da = new DDPGAgent(28,28);
+		DDPGAgent * da = new DDPGAgent(38,38);
 		ddpg_maTeam.push_back(da);
 	}else if( algo == algo_type::neuroevo ){
 		size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
