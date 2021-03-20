@@ -10,3 +10,7 @@
 
 ##v 0.00002k
 - updated build instructions in readme.md
+
+##v 0.00003k / prep for DDPG
+- changed indent to tabs
+- added new skeleton classes: AgentDDPG

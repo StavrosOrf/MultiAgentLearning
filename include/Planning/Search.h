@@ -18,9 +18,9 @@ class Search
 		Search(Graph * graph, int source, int goal):itsGraph(graph), itsQueue(0), itsSource(source), itsGoal(goal){}
 
 		~Search(){
-	    delete itsQueue ;
-	    itsQueue = 0 ;
-    }
+			delete itsQueue ;
+			itsQueue = 0 ;
+		}
 		
 		Graph * GetGraph() const {return itsGraph ;}
 		Queue * GetQueue() const {return itsQueue ;}

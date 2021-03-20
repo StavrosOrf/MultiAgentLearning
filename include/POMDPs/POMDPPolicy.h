@@ -17,16 +17,16 @@ using std::vector ;
 using namespace Eigen ;
 
 class POMDPPolicy{
-  public:
-    POMDPPolicy(char *) ;
-    ~POMDPPolicy(){}
-    
-    size_t GetBestAction(VectorXd) ;
-    
-    vector<size_t> GetActionVector(){return actionNums ;}
-    vector<VectorXd> GetPolicyMatrix(){return pMatrix ;}
-  private:
-    vector<size_t> actionNums ;
-    vector<VectorXd> pMatrix ;
+	public:
+		POMDPPolicy(char *) ;
+		~POMDPPolicy(){}
+		
+		size_t GetBestAction(VectorXd) ;
+		
+		vector<size_t> GetActionVector(){return actionNums ;}
+		vector<VectorXd> GetPolicyMatrix(){return pMatrix ;}
+	private:
+		vector<size_t> actionNums ;
+		vector<VectorXd> pMatrix ;
 } ;
 #endif // POMDP_POLICY_H_

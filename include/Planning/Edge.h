@@ -8,7 +8,7 @@ class Edge
 {
 	public:
 		Edge(int v1, int v2, double cost):
-		  itsVertex1(v1), itsVertex2(v2), itsCost(cost), itsLength((size_t)cost) {}
+			itsVertex1(v1), itsVertex2(v2), itsCost(cost), itsLength((size_t)cost) {}
 		~Edge(){}
 		
 		int GetVertex1() const {return itsVertex1 ;}
@@ -18,7 +18,7 @@ class Edge
 		size_t GetLength(){return itsLength ;}
 		
 		friend bool operator==(const Edge &lhs, const Edge &rhs){
-		  return lhs.GetVertex1() == rhs.GetVertex1() && lhs.GetVertex2() == rhs.GetVertex2() ;
+			return lhs.GetVertex1() == rhs.GetVertex1() && lhs.GetVertex2() == rhs.GetVertex2() ;
 		}
 	private:
 		int itsVertex1 ;

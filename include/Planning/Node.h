@@ -16,28 +16,28 @@ class Node
 {
 	public:
 		Node(int vertex):
-		  itsVertex(vertex), itsParent(0), itsCost(0.0) {}
+			itsVertex(vertex), itsParent(0), itsCost(0.0) {}
 		
 		Node(int vertex, nodeType n):
 		itsVertex(vertex), itsParent(0)
 		{
-	    switch (n)
-	    {
-		    case SOURCE:
-			    itsCost = 0.0 ;
-			    break ;
-		    default:
-			    itsCost = DBL_MAX ;
-	    }
-    }
-    
+			switch (n)
+			{
+				case SOURCE:
+					itsCost = 0.0 ;
+					break ;
+				default:
+					itsCost = DBL_MAX ;
+			}
+		}
+		
 		Node(Node * parent, Edge * edge):
 		itsParent(parent)
 		{
-	    itsVertex = edge->GetVertex2() ;
-	    itsCost = itsParent->GetCost() + edge->GetCost() ;
-    }
-    
+			itsVertex = edge->GetVertex2() ;
+			itsCost = itsParent->GetCost() + edge->GetCost() ;
+		}
+		
 		~Node(){} ;
 		
 		Node * GetParent() const {return itsParent ;}
@@ -49,7 +49,7 @@ class Node
 		
 		void DisplayPath() ;
 		Node * ReverseList(Node * itsChild) ;
-    
+		
 	private:
 		int itsVertex ;
 		Node * itsParent ;

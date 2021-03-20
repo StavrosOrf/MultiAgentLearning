@@ -12,19 +12,19 @@ using std::vector ;
 class Graph
 {
 	public:
-	  Graph(vector<int> &vertices, vector< vector<int> > &edges, vector<double> &costs): itsVertices(vertices)
-	  {
-	    numVertices = itsVertices.size() ;
-	    GenerateEdges(edges, costs) ;
-    }
-    
+		Graph(vector<int> &vertices, vector< vector<int> > &edges, vector<double> &costs): itsVertices(vertices)
+		{
+			numVertices = itsVertices.size() ;
+			GenerateEdges(edges, costs) ;
+		}
+		
 		~Graph()
 		{
-	    for (unsigned i = 0; i < numEdges; i++){
-		  	delete itsEdges[i] ;
-		  	itsEdges[i] = 0 ;
-    	}
-    }
+			for (unsigned i = 0; i < numEdges; i++){
+				delete itsEdges[i] ;
+				itsEdges[i] = 0 ;
+			}
+		}
 		
 		vector<int> GetVertices() const {return itsVertices ;}
 		vector<Edge *> GetEdges() const {return itsEdges ;}
