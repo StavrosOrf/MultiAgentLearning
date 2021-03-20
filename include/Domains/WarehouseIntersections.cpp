@@ -404,7 +404,7 @@ void WarehouseIntersections::InitialiseMATeam(){
 		size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
 		size_t nIn = nOut ; // NN input is current #AGVs on all incoming edges
 		size_t nHid = nIn*4 ; // set number of hidden nodes to four times the number of input neurons
-		Agent * neAgent ;
+		NeuroEvoAgent * neAgent ;
 		neAgent = new Intersection(nPop, nIn, nOut, nHid) ;
 		
 		whAgents.push_back(agent) ;

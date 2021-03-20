@@ -167,24 +167,20 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 }
 
 void WarehouseSimulationDDPG(YAML::Node configs){
-	std::cout<<"test2"<<std::endl;
 	// Initialise appropriate domain
 	size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();
 	Warehouse * trainDomain = create_warehouse(agentType, configs);
-	trainDomain->SetTrainingAlgo(algo_type::ddpg);
+	//trainDomain->SetTrainingAlgo(algo_type::ddpg);
 	trainDomain->InitialiseMATeam();
 
-		//TODO create results folder
-	std::cout<<"test1"<<std::endl;
+	//TODO create results folder
 	// for (size_t n = 0; n < nEps; n++){
 	for (size_t n = 0; n < 1; n++){
 		//TODO initialize a random process N
 		// trainDomain->ResetEpochEvals() ; // reset domain
 		//trainDomain->InitialiseNewEpoch();
-		std::cout<<"----"<<std::endl;
 		trainDomain->SimulateEpochDDPG() ;// simulate
-		std::cout<<"test3"<<std::endl;
 	}
 
 	exit(0);
@@ -201,15 +197,12 @@ void WarehouseSimulation(string config_file, int thrds){
 	string mode = configs["mode"]["type"].as<string>() ;
 	int runs = configs["neuroevo"]["runs"].as<int>();
 	ThreadPool pool(thrds) ;
-	std::cout<<algo<<std::endl;
 	if (algo == "DDPG") {
-		std::cout<<"ttttt"<<std::endl;
 		if(mode == "train"){
 			WarehouseSimulationDDPG(configs);
 		}
 		exit(0);
 	}else if (algo == "nueroevo"){
-		std::cout<<"default"<<std::endl;
 		if (mode.compare("train") == 0){
 			// Start the training runs
 			for (int r = 0; r < runs; r++)
@@ -263,7 +256,7 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 	}else if(configs["mode"]["algo"].as<string>().compare("neuroevo")){
 		new_warehouse->SetTrainingAlgo(algo_type::neuroevo);  
 	}else{
-		std::cout << "ERROR: Currently only configured for 'ddpg' and 'neuroevo'! Exiting.\n" ;
+		std::cout << "ERROR: Currently only configured for 'DDPG' and 'neuroevo'! Exiting.\n" ;
 	}
 	
 	return new_warehouse;

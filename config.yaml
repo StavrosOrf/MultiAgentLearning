@@ -1,5 +1,5 @@
 mode:
-  algo: neuroevo
+  algo: DDPG
   type: train
 # NOTE: agent_policies and eval_file are only used if [mode][type] = test
   agent_policies: ../Domains/Small_120_AGVs_SS_link_time/Results/neural_nets.csv # file containing agent policies

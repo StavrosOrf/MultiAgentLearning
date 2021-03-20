@@ -12,7 +12,7 @@
 #include <float.h>
 #include <Eigen/Eigen>
 #include <yaml-cpp/yaml.h>
-#include "Agents/Agent.h"
+#include "Agents/NeuroEvoAgent.h"
 #include "Agents/Intersection.h"
 #include "Agents/Link.h"
 #include "Planning/Graph.h"
@@ -75,8 +75,8 @@ class Warehouse{
 			list<size_t> agvIDs ; // agv IDs waiting to cross intersection
 		} ;
 		
-        vector<DDPGAgent *> ddpg_maTeam;
-		vector<Agent *> maTeam ; // manage agent NE routines
+		vector<DDPGAgent *> ddpg_maTeam;
+		vector<NeuroEvoAgent *> maTeam ; // manage agent NE routines
 		vector<iAgent *> whAgents ; // manage agent vertex and edge lookups from graph
 		Graph * whGraph ; // vertex and edge definitions, access to change edge costs at each step
 		vector<AGV *> whAGVs ; // manage AGV A* search and movement through graph

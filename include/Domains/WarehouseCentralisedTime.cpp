@@ -391,7 +391,7 @@ void WarehouseCentralisedTime::InitialiseMATeam(){
 	size_t nIn = nOut*2 ; // NN input is current #AGVs on all edges and time to arrival at next intersection
 //	size_t nHid = 16 ; // fixed to compare against link agent formulation
 	size_t nHid = 2*nIn ; // control for relative representational capacity
-	Agent * neAgent ;
+	NeuroEvoAgent * neAgent ;
 	neAgent = new Intersection(nPop, nIn, nOut, nHid) ;// only one centralised agent
 	maTeam.push_back(neAgent) ;
 	nAgents = whAgents.size() ;

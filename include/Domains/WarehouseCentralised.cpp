@@ -26,32 +26,32 @@ WarehouseCentralised::~WarehouseCentralised(void){
 void WarehouseCentralised::SimulateEpochDDPG(){
 	InitialiseNewEpoch();
 	//TODO INITIALIZE noise process N
-	VectorXd input(38) ;
-	
+	//std::normal_distribution<double> n_process;
+	//std::default_random_engine generator;
+	//TODO i will swear i will fix this
 
-	for( int i = 0; i < whAGVs.size(); i++){
+	VectorXd input(whGraph->GetEdges().size() * 1);
+
+	//gen input 
+	for(int i = 0; i < input.size(); i++)
+		assert(!input[i]);
+	for(int i = 0; i < whAGVs.size(); i++){
 		Edge* e = whAGVs[i]->GetCurEdge();
 		std::cout<<whGraph->GetEdgeID(e)<<" , ";
-		input(whGraph->GetEdgeID(e)-1) = input(whGraph->GetEdgeID(e)-1) + 1; 
-
+		input(whGraph->GetEdgeID(e)-1)++;
 	}
-	for (size_t n = 0; n < 38; n++){
-		std::cout<<"VectorXd input: "<<input[n]<< " "<<std::endl;	
 
-	}
+	for (size_t n = 0; n < 38; n++)
+		std::cout<<"VectorXd input: "<<input[n]<< " "<<std::endl;
 	
 	vector<Edge *> edgess = whGraph->GetEdges();
 
 
 	std::cout<<ddpg_maTeam.size()<<std::endl;
 	VectorXd test = ddpg_maTeam[0]->EvaluateActorNN_DDPG(input);
-	std::cout<<"--"<<std::endl;
-	for (size_t n = 0; n < 38; n++){
-		std::cout<<"VectorXd Output: "<<test[n]<< " "<<std::endl;	
-	}
+	for (size_t n = 0; n < 38; n++)
+		std::cout<<"VectorXd Output: "<<test[n]<< " "<<std::endl;
 
-
-	
 	return ;
 	// for (size_t t = 0; t < nSteps; t++){ // each timestep
 	// 	// Get agent actions and update graph costs
@@ -485,24 +485,22 @@ void WarehouseCentralised::SimulateEpoch(vector<size_t> memberIDs){
 
 void WarehouseCentralised::InitialiseMATeam(){
 	// Initialise NE component and domain housekeeping components of the centralised agent
-	vector<Edge *> e = whGraph->GetEdges() ;
+	vector<Edge *> e = whGraph->GetEdges();
 	vector<size_t> eIDs ;
 	for (size_t j = 0; j < e.size(); j++){
 		eIDs.push_back(j) ;
 	}
 	iAgent * agent = new iAgent{0, eIDs} ; // only one centralised agent controlling all traffic
 	whAgents.push_back(agent) ;
-	std::cout<<"algo "<< algo<<std::endl;
 	if( algo == algo_type::ddpg ){
-		std::cout<<"testt";
-		DDPGAgent * da = new DDPGAgent(38,38);
+		DDPGAgent * da = new DDPGAgent(e.size() * 1, e.size());
 		ddpg_maTeam.push_back(da);
 	}else if( algo == algo_type::neuroevo ){
 		size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
 		size_t nIn = nOut ; // NN input is current #AGVs on all edges
 	//	size_t nHid = 16 ; // fixed to compare against link agent formulation
 		size_t nHid = 4*nIn ; // control for relative representational capacity
-		Agent * neAgent ;
+		NeuroEvoAgent * neAgent ;
 		neAgent = new Intersection(nPop, nIn, nOut, nHid) ;// only one centralised agent
 		maTeam.push_back(neAgent) ;
 	}

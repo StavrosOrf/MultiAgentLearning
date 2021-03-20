@@ -409,7 +409,7 @@ void WarehouseLinksTime::InitialiseMATeam(){
 		size_t nOut = 1 ;
 		size_t nIn = 2 ;
 		size_t nHid = 16 ;
-		Agent * neAgent ;
+		NeuroEvoAgent * neAgent ;
 		neAgent = new Link(nPop, nIn, nOut, nHid) ;
 		whAgents.push_back(agent) ;
 		maTeam.push_back(neAgent) ;

@@ -1,12 +1,12 @@
 #ifndef LINK_H_
 #define LINK_H_
 
-#include "Agent.h"
+#include "NeuroEvoAgent.h"
 
-class Link : public Agent {
+class Link : public NeuroEvoAgent {
 	public:
 		Link(size_t nPop, size_t nIn, size_t nOut, size_t nHidden) :
-			Agent(nPop, nIn, nOut, nHidden){}
+			NeuroEvoAgent(nPop, nIn, nOut, nHidden){}
 };
 
 #endif // LINK_H_

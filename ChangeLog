@@ -14,3 +14,13 @@
 ##v 0.00003k / prep for DDPG
 - changed indent to tabs
 - added new skeleton classes: AgentDDPG
+
+##v 0.00004s
+- Undocumented
+
+##v 0.00005s
+- Refactored Agent to NeuroEvoAgent
+- Deprecated Nightbar Agent Night Bar Domain and Night Bar Test (Not Relevant
+to our code base)
+- General Code Cleanup
+- Made Progress on DDPG init

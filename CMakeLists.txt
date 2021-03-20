@@ -66,9 +66,6 @@ target_link_libraries( generateMultiRoverExperts ${LIBS_TO_LINK} )
 add_executable(multiRoverExpertiseTesting multiRoverExpertiseTesting.cpp)
 target_link_libraries( multiRoverExpertiseTesting ${LIBS_TO_LINK} )
 
-add_executable(testMultiNightBar testMultiNightBar.cpp)
-target_link_libraries( testMultiNightBar ${LIBS_TO_LINK} )
-
 add_executable(testMultiRoverPLearners testMultiRoverPLearners.cpp)
 target_link_libraries( testMultiRoverPLearners ${LIBS_TO_LINK} )
 

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <random>
 #include <Eigen/Eigen>
 #include "Learning/NeuralNet.h"
 
@@ -41,8 +42,7 @@ class DDPGAgent{
 		NeuralNet * mu_actorNN;
 		NeuralNet * mu_target_actorNN;
 
-		vector<replay> replay_buffer; //TODO kallinteris se t alocator
-		//TODO add "INITIALIZE random process N"
+		vector<replay> replay_buffer;
 
 };
 

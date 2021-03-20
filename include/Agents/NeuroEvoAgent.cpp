@@ -1,30 +1,30 @@
-#include "Agent.h"
+#include "NeuroEvoAgent.h"
 
-Agent::Agent(size_t nPop, size_t nIn, size_t nOut, size_t nHidden): popSize(nPop), numIn(nIn), numOut(nOut), numHidden(nHidden){
+NeuroEvoAgent::NeuroEvoAgent(size_t nPop, size_t nIn, size_t nOut, size_t nHidden): popSize(nPop), numIn(nIn), numOut(nOut), numHidden(nHidden){
 	AgentNE = new NeuroEvo(numIn, numOut, numHidden, popSize, LOGISTIC) ;
 }
 
-Agent::~Agent(){
+NeuroEvoAgent::~NeuroEvoAgent(){
 	delete(AgentNE) ;
 	AgentNE = 0 ;
 }
 	
-void Agent::ResetEpochEvals(){
+void NeuroEvoAgent::ResetEpochEvals(){
 	// Re-initialise size of evaluations vector
 	vector<double> evals(2*popSize,0) ;
 	epochEvals = evals ;
 }
 		
-VectorXd Agent::ExecuteNNControlPolicy(size_t i, VectorXd s){
+VectorXd NeuroEvoAgent::ExecuteNNControlPolicy(size_t i, VectorXd s){
 	VectorXd output = AgentNE->GetNNIndex(i)->EvaluateNN(s);
 	return output ;
 }
 
-void Agent::SetEpochPerformance(double G, size_t i){
+void NeuroEvoAgent::SetEpochPerformance(double G, size_t i){
 	epochEvals[i] = G ;
 }
 
-void Agent::EvolvePolicies(bool init){
+void NeuroEvoAgent::EvolvePolicies(bool init){
 	if (!init){
 		AgentNE->EvolvePopulation(epochEvals) ;
 	}
@@ -32,7 +32,7 @@ void Agent::EvolvePolicies(bool init){
 	AgentNE->MutatePopulation() ;
 }
 		
-void Agent::OutputNNs(string A){
+void NeuroEvoAgent::OutputNNs(string A){
 	// Filename to write to stored in A
 	std::ofstream NNFile ;
 	NNFile.open(A.c_str(),std::ios::app) ;
