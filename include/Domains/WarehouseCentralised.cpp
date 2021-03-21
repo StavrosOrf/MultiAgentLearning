@@ -25,21 +25,22 @@ WarehouseCentralised::~WarehouseCentralised(void){
 }
 void WarehouseCentralised::SimulateEpochDDPG(){
 	InitialiseNewEpoch();
-	//TODO INITIALIZE noise process N
-	//std::normal_distribution<double> n_process;
-	//std::default_random_engine generator;
-	//TODO i will swear i will fix this
+	const double mean = 0.0;
+	const double stddev = 0.1;
+	std::normal_distribution<double> n_process(0.0, stddev);
+	std::default_random_engine generator;
 
 	VectorXd input(whGraph->GetEdges().size() * 1);
 
 	//gen input 
 	for(int i = 0; i < input.size(); i++)
-		assert(!input[i]);
+		input[i] = 0;
 	for(int i = 0; i < whAGVs.size(); i++){
 		Edge* e = whAGVs[i]->GetCurEdge();
 		std::cout<<whGraph->GetEdgeID(e)<<" , ";
 		input(whGraph->GetEdgeID(e)-1)++;
 	}
+
 
 	for (size_t n = 0; n < 38; n++)
 		std::cout<<"VectorXd input: "<<input[n]<< " "<<std::endl;
@@ -458,7 +459,7 @@ void WarehouseCentralised::SimulateEpoch(vector<size_t> memberIDs){
 		totalCommand += whAGVs[k]->GetNumCommanded() ;
 	}
 	double G = (double)(totalSuccess) ; // if number of AGVs is constant then AGV time is constant over runs and only number of successful deliveries counts
-	
+
 	for (size_t j = 0; j < nAgents; j++){ // assign reward to each agent
 		maTeam[j]->SetEpochPerformance(G, memberIDs[j]) ;
 	}
@@ -492,10 +493,11 @@ void WarehouseCentralised::InitialiseMATeam(){
 	}
 	iAgent * agent = new iAgent{0, eIDs} ; // only one centralised agent controlling all traffic
 	whAgents.push_back(agent) ;
-	if( algo == algo_type::ddpg ){
+	if (algo == algo_type::ddpg ){
 		DDPGAgent * da = new DDPGAgent(e.size() * 1, e.size());
 		ddpg_maTeam.push_back(da);
-	}else if( algo == algo_type::neuroevo ){
+		assert(!ddpg_maTeam.empty());
+	}else if (algo == algo_type::neuroevo){
 		size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
 		size_t nIn = nOut ; // NN input is current #AGVs on all edges
 	//	size_t nHid = 16 ; // fixed to compare against link agent formulation
@@ -503,6 +505,9 @@ void WarehouseCentralised::InitialiseMATeam(){
 		NeuroEvoAgent * neAgent ;
 		neAgent = new Intersection(nPop, nIn, nOut, nHid) ;// only one centralised agent
 		maTeam.push_back(neAgent) ;
+	}else{
+		std::cout << "ERROR: InitialiseMATeam invalid also";
+		exit(1);
 	}
 
 

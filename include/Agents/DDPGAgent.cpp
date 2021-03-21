@@ -11,6 +11,7 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	mu_target_actorNN = new NeuralNet(action_space, action_space, action_space*2);
 
 	//TODO Randomize weights of NNs, Possibly already implemented
+	/*
 	for (int i=0; i<q_criticNN->GetWeightsA().size(); i++)
 		assert(!q_criticNN->GetWeightsA()(i));
 	for (int i=0; i<q_criticNN->GetWeightsB().size(); i++)
@@ -19,7 +20,9 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 		assert(!mu_actorNN->GetWeightsA()(i));
 	for (int i=0; i<mu_actorNN->GetWeightsB().size(); i++)
 		assert(!mu_actorNN->GetWeightsB()(i));
+	*/
 	//Hopefully this should confirm if it is random
+	//TODO yes they are not random enough
 
 	q_target_criticNN->SetWeights(mu_actorNN->GetWeightsA(),
 		mu_actorNN->GetWeightsB());

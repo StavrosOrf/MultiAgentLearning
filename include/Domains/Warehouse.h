@@ -57,7 +57,7 @@ class Warehouse{
 
 		void LoadPolicies(YAML::Node) ;
 		void SetTrainingAlgo(algo_type algot){algo = algot;}
-        virtual void SimulateEpochDDPG(){;}
+		virtual void SimulateEpochDDPG(){;}
 
 	protected:
 		size_t nSteps ;
@@ -68,7 +68,7 @@ class Warehouse{
 		vector<size_t> capacities ;
 		bool neLearn ;
 		
-        algo_type algo;
+		algo_type algo;
 		struct iAgent{
 			size_t vID ;					// graph vertex ID associated with agent (edge ID if link agent)
 			vector<size_t> eIDs ; // graph edge IDs associated with incoming edges to agent vertex (vertex IDs if link agent)

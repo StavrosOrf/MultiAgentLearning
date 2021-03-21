@@ -168,16 +168,27 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 
 void WarehouseSimulationDDPG(YAML::Node configs){
 	// Initialise appropriate domain
-	size_t nEps = configs["neuroevo"]["epochs"].as<size_t>();
+	size_t nEps = configs["DDPG"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();
 	Warehouse * trainDomain = create_warehouse(agentType, configs);
 	//trainDomain->SetTrainingAlgo(algo_type::ddpg);
 	trainDomain->InitialiseMATeam();
 
 	//TODO create results folder
+	int runs = configs["neuroevo"]["runs"].as<int>();
+	string domainDir = configs["domain"]["folder"].as<string>() ;
+	string resFolder = configs["results"]["folder"].as<string>() ;
+	std::stringstream ss_eval;
+	std::string r = "debug"; //for testing
+	ss_eval << domainDir << resFolder << configs["results"]["evaluation"].as<string>() << "DDPG_" << r << ".csv" ;
+	string eval_str = ss_eval.str() ;
+	char mkdir[100] ;
+	sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder).c_str()) ;
+	system(mkdir) ;
+	//trainDomain->OutputPerformance(eval_str) ;
+
 	// for (size_t n = 0; n < nEps; n++){
 	for (size_t n = 0; n < 1; n++){
-		//TODO initialize a random process N
 		// trainDomain->ResetEpochEvals() ; // reset domain
 		//trainDomain->InitialiseNewEpoch();
 		trainDomain->SimulateEpochDDPG() ;// simulate
@@ -195,27 +206,24 @@ void WarehouseSimulation(string config_file, int thrds){
 	
 	string algo = configs["mode"]["algo"].as<string>();
 	string mode = configs["mode"]["type"].as<string>() ;
-	int runs = configs["neuroevo"]["runs"].as<int>();
 	ThreadPool pool(thrds) ;
+
 	if (algo == "DDPG") {
 		if(mode == "train"){
 			WarehouseSimulationDDPG(configs);
 		}
 		exit(0);
 	}else if (algo == "nueroevo"){
+		int runs = configs["neuroevo"]["runs"].as<int>();
 		if (mode.compare("train") == 0){
 			// Start the training runs
 			for (int r = 0; r < runs; r++)
-			{
 				pool.schedule(std::bind(WarehouseSimulationSingleRun, r, configs));
-			}
 		}
 		else if (mode.compare("test") == 0){
 			// Start the testing runs
 			for (int r = 0; r < runs; r++)
-			{
 				pool.schedule(std::bind(WarehouseSimulationTestSingleRun, r, configs));
-			}
 		}
 		else{
 			std::cout << "Error: unknown mode! Exiting.\n" ;
@@ -251,9 +259,9 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 		std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
 		exit(1) ;
 	}
-	if(configs["mode"]["algo"].as<string>().compare("DDPG")){
-		new_warehouse->SetTrainingAlgo(algo_type::ddpg);  
-	}else if(configs["mode"]["algo"].as<string>().compare("neuroevo")){
+	if(configs["mode"]["algo"].as<string>() == "DDPG"){
+		new_warehouse->SetTrainingAlgo(algo_type::ddpg);
+	}else if(configs["mode"]["algo"].as<string>() == "neuroevo"){
 		new_warehouse->SetTrainingAlgo(algo_type::neuroevo);  
 	}else{
 		std::cout << "ERROR: Currently only configured for 'DDPG' and 'neuroevo'! Exiting.\n" ;
