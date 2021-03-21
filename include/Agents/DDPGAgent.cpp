@@ -57,3 +57,16 @@ VectorXd DDPGAgent::EvaluateTargetCriticNN_DDPG(VectorXd s){
 	return q_target_criticNN->EvaluateNN(s);
 }	
 
+void DDPGAgent::addToReplayBuffer(replay r){
+	replay_buffer.push_back(r);
+	//TODO check if replay buffer is full
+}
+
+vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
+	std::vector<replay> temp(size);
+	for (size_t i = 0; i < size ; i++){
+		temp.push_back(replay_buffer[i]);
+	}
+	return temp;
+	//TODO get random minibatch
+}

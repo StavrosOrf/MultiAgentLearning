@@ -7,6 +7,7 @@
 #include "Agents/Intersection.h"
 #include "Warehouse.h"
 #include "Agents/DDPGAgent.h"
+#include <algorithm>
 
 using std::vector ;
 using std::list ;

@@ -15,8 +15,16 @@ using std::string ;
 #define REPLAY_BUFFER_SIZE 5000
 #define GAMMA 0.95
 #define TAU 0.01
-#define BATCH_SIZE 50
+#define BATCH_SIZE 5
 
+struct replay
+{
+	VectorXd current_state;
+	VectorXd next_state;
+	VectorXd action;
+	double reward;
+
+};
 
 class DDPGAgent{
 	public:
@@ -27,22 +35,20 @@ class DDPGAgent{
 		VectorXd EvaluateTargetActorNN_DDPG(VectorXd s);
 		VectorXd EvaluateTargetCriticNN_DDPG(VectorXd s);		
 		void ResetEpochEvals() ;
+
+		vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);
+		void addToReplayBuffer(replay r);
+		vector<replay> replay_buffer;
+
 	protected:
-		struct replay
-		{
-			vector<double> current_state;
-			vector<double> next_state;
-			vector<double> action;
-			vector<double> rewards;
-	
-		};
+
 
 		NeuralNet * q_criticNN;
 		NeuralNet * q_target_criticNN;
 		NeuralNet * mu_actorNN;
 		NeuralNet * mu_target_actorNN;
 
-		vector<replay> replay_buffer;
+		
 
 };
 
