@@ -34,6 +34,7 @@ class AGV{
 		Search * GetAGVPlanner(){return agvPlanner ;}
 		
 		void DisplayPath() ;
+		void ResetPerformanceCounters(){nsDel=ncDel=tMove=tEnter=tWait=0;}
 		
 	private:
 		Edge * curEdge ;			// current edge

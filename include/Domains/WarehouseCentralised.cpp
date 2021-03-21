@@ -27,6 +27,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 	InitialiseNewEpoch();
 	const double mean = 0.0;
 	const double stddev = 0.1;
+	double totalDeliveries = 0;
 	std::normal_distribution<double> n_process(0.0, stddev);
 	std::default_random_engine generator;
 
@@ -35,30 +36,33 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 	double reward;
 
 	//Get current state 
-		for(int i = 0; i < cur_state.size(); i++){
-			cur_state[i] = 0;			
-		}
-		for(int i = 0; i < whAGVs.size(); i++){
-			Edge* e = whAGVs[i]->GetCurEdge();
-			// std::cout << "{" << whGraph->GetEdgeID(e) << " , ";
-			// std::cout <<e<<"}, "<<std::endl;	
-			// std::cout << "test0 "<<whGraph->GetEdgeID(e)-1<<std::endl;	
+	for(int i = 0; i < cur_state.size(); i++){
+		cur_state[i] = 0;			
+	}
+	for(int i = 0; i < whAGVs.size(); i++){
+		Edge* e = whAGVs[i]->GetCurEdge();
+		// std::cout << "{" << whGraph->GetEdgeID(e) << " , ";
+		// std::cout <<e<<"}, "<<std::endl;	
+		// std::cout << "test0 "<<whGraph->GetEdgeID(e)-1<<std::endl;	
 
-			//check if AGVs are at an edge
-			if(e != NULL){
-				cur_state(whGraph->GetEdgeID(e))++;
-			}			
-		}
-		for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-			std::cout<<"VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
+		//check if AGVs are at an edge
+		if(e != NULL){
+			cur_state(whGraph->GetEdgeID(e))++;
+			std::cout<<"Edge id-"<<whGraph->GetEdgeID(e)<<
+				 " length: "<<e->GetLength()<< " "<<std::endl;
+		}			
+	}
+	for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
+		std::cout<<"Initial VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
 
-
-	
+	// for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
+	// 	std::cout<<"Edge id-"<<whGraph->GetEdgeID(whGraph->GetEdges()[n])<<
+	// 			 " length: "<<whGraph->GetEdges()[n]->GetLength()<< " "<<std::endl;
 	vector<Edge *> edgess = whGraph->GetEdges();
 
 	// each timestep
-	for (size_t t = 0; t < 11; t++){
-
+	for (size_t t = 0; t < nSteps; t++){
+		std::cout <<"=====================================Step - "<<t<<std::endl;
 		//Select action
 		VectorXd actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
 		// Add Random Noise from process N
@@ -94,8 +98,8 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 		// 	a[whAgents[i]->eIDs[j]] += actions(j)*maxBaseCost ;
 		// }
-		for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-			std::cout<<"VectorXd actions: "<<a[n]<< " "<<std::endl;
+		// for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
+		// 	std::cout<<"VectorXd actions: "<<a[n]<< " "<<std::endl;
 
 		UpdateGraphCosts(a) ;
 		
@@ -162,6 +166,10 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			whAGVs[k]->Traverse() ;
 		}
 
+		// for (size_t k = 0; k < nAGVs; k++){
+		// 	whAGVs[k]->DisplayPath() ;
+		// }
+
 		
 		//Get current state 
 		for(int i = 0; i < cur_state.size(); i++){
@@ -179,34 +187,68 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 				cur_state(whGraph->GetEdgeID(e))++;
 			}			
 		}
-		for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-			std::cout<<"VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
+		// for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
+		// 	std::cout<<"VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
 
+		double maxEval = -1;
+		vector<size_t> travelStats ;
+				// Log data
+		size_t totalMove = 0 ;
+		size_t totalEnter = 0 ;
+		size_t totalWait = 0 ;
+		size_t totalSuccess = 0 ;
+		size_t totalCommand = 0 ;
+		for (size_t k = 0; k < nAGVs; k++){
+			totalMove += whAGVs[k]->GetMoveTime() ;
+			totalEnter += whAGVs[k]->GetEnterTime() ;
+			totalWait += whAGVs[k]->GetWaitTime() ;
+			totalSuccess += whAGVs[k]->GetNumCompleted() ;
+			totalCommand += whAGVs[k]->GetNumCommanded() ;
+		}
+		double G = (double)(totalSuccess) ; // if number of AGVs is constant then AGV time is constant over runs and only number of successful deliveries counts
+			
+		if (G > maxEval){
+			maxEval = G ;
+			travelStats.clear() ;
+			travelStats.push_back(totalMove) ;
+			travelStats.push_back(totalEnter) ;
+			travelStats.push_back(totalWait) ;
+			travelStats.push_back(totalSuccess) ;
+			travelStats.push_back(totalCommand) ;
+		}
+		std::cout<<"Stats: \nTotal Move:"<<totalMove<<" \nTotal Enter:"<<totalEnter<<
+			 "\nTotal wait:"<<totalWait<< "\nTotal Success:"<<totalSuccess<<
+			  "\nTotal Command:"<<totalCommand<<std::endl;
+	 
+	 totalDeliveries += totalSuccess;
+	 //Reset AGVs counters
+		// for (size_t k = 0; k < nAGVs; k++)
+		// 	whAGVs[k]->ResetPerformanceCounters();	  
 		//Create and Save replay to buffer
 		//TODO get reward
 		replay r = {temp_state,cur_state,actions,0};
 		ddpg_maTeam[0]->addToReplayBuffer(r);
 		std::cout << "Saved replay to buffer, new size: "<<
-			ddpg_maTeam[0]->replay_buffer.size()<<std::endl;
-		
-			//TODO
-			if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
-				vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
-			}else{
-				std::cout << "Not enough Replays yet!"<<std::endl;
-			}
+				ddpg_maTeam[0]->replay_buffer.size()<<std::endl;
 			
-			//Update Q critic
+		//TODO
+		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
+			vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
+		}else{
+			std::cout << "Not enough Replays yet!"<<std::endl;
+		}
+		
+		//Update Q critic
 
-			//Update actor critic
+		//Update actor critic
 
-			//Update target Q critic
+		//Update target Q critic
 
-			//Update target actor critic
+		//Update target actor critic
 
 		std::cout << "End of step"<<std::endl;
 	} 
-	
+	std::cout << "End of Simulation with G: "<<totalDeliveries<<std::endl;
 	return ;
 	// for (size_t t = 0; t < nSteps; t++){ // each timestep
 	// 	// Get agent actions and update graph costs

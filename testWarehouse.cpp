@@ -213,7 +213,7 @@ void WarehouseSimulation(string config_file, int thrds){
 			WarehouseSimulationDDPG(configs);
 		}
 		exit(0);
-	}else if (algo == "nueroevo"){
+	}else if (algo == "neuroevo"){
 		int runs = configs["neuroevo"]["runs"].as<int>();
 		if (mode.compare("train") == 0){
 			// Start the training runs
