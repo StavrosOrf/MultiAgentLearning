@@ -30,15 +30,17 @@ class DDPGAgent{
 	public:
 		DDPGAgent(size_t state_space, size_t action_space);
 		~DDPGAgent();
-		VectorXd EvaluateCriticNN_DDPG(VectorXd s);
+		VectorXd EvaluateCriticNN_DDPG(VectorXd s,VectorXd a);
 		VectorXd EvaluateActorNN_DDPG(VectorXd s);
 		VectorXd EvaluateTargetActorNN_DDPG(VectorXd s);
-		VectorXd EvaluateTargetCriticNN_DDPG(VectorXd s);		
+		VectorXd EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a);		
 		void ResetEpochEvals() ;
 
 		vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);
 		void addToReplayBuffer(replay r);
 		vector<replay> replay_buffer;
+
+		void updateTargetWeights();
 
 	protected:
 

@@ -37,9 +37,11 @@ NeuralNet::NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afTyp
 }
 
 // Evaluate NN output given input vector
-VectorXd NeuralNet::EvaluateNN(VectorXd inputs){
+VectorXd NeuralNet::EvaluateNN(VectorXd inputs){	
+	assert(inputs.size() == GetNumIn());
 	VectorXd hiddenLayer = (this->*ActivationFunction)(inputs, layerActivation[0]) ;
 	VectorXd outputs = (this->*ActivationFunction)(hiddenLayer, layerActivation[1]) ;
+	assert(outputs.size() != 0);
 	return outputs ;
 }
 

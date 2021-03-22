@@ -226,25 +226,43 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		// 	whAGVs[k]->ResetPerformanceCounters();	  
 		//Create and Save replay to buffer
 		//TODO get reward
+		assert(temp_state.size() == cur_state.size() && cur_state.size() == 38);
 		replay r = {temp_state,cur_state,actions,0};
 		ddpg_maTeam[0]->addToReplayBuffer(r);
-		std::cout << "Saved replay to buffer, new size: "<<
-				ddpg_maTeam[0]->replay_buffer.size()<<std::endl;
-			
+
 		//TODO
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
-			vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
+			
+			vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();			
+			vector<double> y(BATCH_SIZE);
+
+			for (size_t i = 0; i < BATCH_SIZE; i++){
+				replay b = miniBatch[i]; 
+								
+				VectorXd na = ddpg_maTeam[0]-> EvaluateTargetActorNN_DDPG(b.next_state);				
+				//d::cout<<ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na)[0]<<std::endl;
+				assert(b.next_state.size() == 38 && na.size() == 38);
+				assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na).size() ==1);				
+				y[i] = b.reward + GAMMA * 
+					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na)[0];							
+				std::cout<< "Y(i)= "<< y[i] << std::endl;					
+			}
+
+			//Update Q critic
+			//Update actor critic
+
+			
+			//Update target Q critic and Update target actor critic
+			ddpg_maTeam[0]->updateTargetWeights();
+
+
+
+	
+
 		}else{
 			std::cout << "Not enough Replays yet!"<<std::endl;
 		}
 		
-		//Update Q critic
-
-		//Update actor critic
-
-		//Update target Q critic
-
-		//Update target actor critic
 
 		std::cout << "End of step"<<std::endl;
 	} 

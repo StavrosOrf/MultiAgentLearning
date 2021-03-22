@@ -32,6 +32,8 @@ class NeuralNet{
 		void SetWeights(MatrixXd, MatrixXd) ;
 		MatrixXd GetWeightsA() {return weightsA ;}
 		MatrixXd GetWeightsB() {return weightsB ;}
+		double GetNumIn(){return weightsA.rows();}
+		double GetNumOut(){return weightsB.cols();}
 		void OutputNN(const char *, const char *) ; // write NN weights to file
 		double GetEvaluation() {return evaluation ;}
 		void SetEvaluation(double eval) {evaluation = eval ;}
