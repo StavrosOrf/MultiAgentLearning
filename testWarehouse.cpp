@@ -20,7 +20,11 @@ using std::vector;
 using std::string;
 using namespace Eigen;
 
+char mkdir[100];
+string domainDir;
+string resFolder;
 Warehouse* create_warehouse(std::string agentType, YAML::Node configs);
+void create_results_folder(Warehouse* trainDomain, YAML::Node configs, size_t r);
 
 void WarehouseSimulationSingleRun(int r, YAML::Node configs){
 	srand(r+1); // increment random seed
@@ -31,17 +35,8 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
 	Warehouse * trainDomain = create_warehouse(agentType, configs);
 	trainDomain->InitialiseMATeam() ;
 	
-	// Create results folder
 	int runs = configs["neuroevo"]["runs"].as<int>();
-	string domainDir = configs["domain"]["folder"].as<string>() ;
-	string resFolder = configs["results"]["folder"].as<string>() ;
-	std::stringstream ss_eval ;
-	ss_eval << domainDir << resFolder << configs["results"]["evaluation"].as<string>() << "_" << r << ".csv" ;
-	string eval_str = ss_eval.str() ;
-	char mkdir[100] ;
-	sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder).c_str()) ;
-	system(mkdir) ;
-	trainDomain->OutputPerformance(eval_str) ;
+	create_results_folder(trainDomain, configs, r);
 	
 	// Execute learning episodes of current stat run
 	for (size_t n = 0; n < nEps; n++){
@@ -93,17 +88,8 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 	Warehouse * testDomain = create_warehouse(agentType, configs); ;
 	testDomain->InitialiseMATeam() ;
 	
-	// Create results folder
 	int runs = configs["neuroevo"]["runs"].as<int>();
-	string domainDir = configs["domain"]["folder"].as<string>() ;
-	string resFolder = configs["results"]["folder"].as<string>() ;
-	std::stringstream ss_eval ;
-	ss_eval << domainDir << resFolder << configs["results"]["evaluation"].as<string>() << "_" << r << ".csv" ;
-	string eval_str = ss_eval.str() ;
-	char mkdir[100] ;
-	sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder).c_str()) ;
-	system(mkdir) ;
-	testDomain->OutputPerformance(eval_str) ;
+	create_results_folder(testDomain, configs, r);
 	
 	// Store the final stat run for replay
 	if (r == runs-1){
@@ -167,7 +153,7 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 	std::cout << "Testing complete!\n" ;
 }
 
-void WarehouseSimulationDDPG(YAML::Node configs){
+void WarehouseSimulationDDPG(int r, YAML::Node configs){
 	srand(time(NULL)); // increment random seed
 	// Initialise appropriate domain
 	size_t nEps = configs["DDPG"]["epochs"].as<size_t>();
@@ -176,18 +162,8 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	//trainDomain->SetTrainingAlgo(algo_type::ddpg);
 	trainDomain->InitialiseMATeam();
 
-	//TODO create results folder
 	int runs = configs["DDPG"]["runs"].as<int>();
-	string domainDir = configs["domain"]["folder"].as<string>() ;
-	string resFolder = configs["results"]["folder"].as<string>() ;
-	std::stringstream ss_eval;
-	std::string r = "debug"; //for testing
-	ss_eval << domainDir << resFolder << configs["results"]["evaluation"].as<string>() << "DDPG_" << r << ".csv" ;
-	string eval_str = ss_eval.str() ;
-	char mkdir[100] ;
-	sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder).c_str()) ;
-	system(mkdir) ;
-	//trainDomain->OutputPerformance(eval_str) ;
+	create_results_folder(trainDomain, configs, r);
 
 	// for (size_t n = 0; n < nEps; n++){
 	for (size_t n = 0; n < 1; n++){
@@ -197,8 +173,6 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	}
 
 	exit(0);
-
-
 }
 
 void WarehouseSimulation(string config_file, int thrds){
@@ -212,9 +186,9 @@ void WarehouseSimulation(string config_file, int thrds){
 
 	if (algo == "DDPG") {
 		if(mode == "train"){
-			WarehouseSimulationDDPG(configs);
+			int r = 0;
+			WarehouseSimulationDDPG(r, configs);
 		}
-		exit(0);
 	}else if (algo == "neuroevo"){
 		int runs = configs["neuroevo"]["runs"].as<int>();
 		if (mode.compare("train") == 0){
@@ -261,17 +235,28 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 		std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n" ;
 		exit(1) ;
 	}
-	if(configs["mode"]["algo"].as<string>() == "DDPG"){
+	if(configs["mode"]["algo"].as<string>() == "DDPG")
 		new_warehouse->SetTrainingAlgo(algo_type::ddpg);
-	}else if(configs["mode"]["algo"].as<string>() == "neuroevo"){
+	else if(configs["mode"]["algo"].as<string>() == "neuroevo")
 		new_warehouse->SetTrainingAlgo(algo_type::neuroevo);  
-	}else{
-		std::cout << "ERROR: Currently only configured for 'DDPG' and 'neuroevo'! Exiting.\n" ;
+	else{
+		std::cout << "ERROR: Currently only configured for 'DDPG' and 'neuroevo'! Exiting.\n";
+		exit(1);
 	}
 	
 	return new_warehouse;
 }
 
+void create_results_folder(Warehouse* trainDomain, YAML::Node configs, size_t r){
+	domainDir = configs["domain"]["folder"].as<string>() ;
+	resFolder = configs["results"]["folder"].as<string>() ;
+	std::stringstream ss_eval ;
+	ss_eval << domainDir << resFolder << configs["results"]["evaluation"].as<string>() << "_" << r << ".csv" ;
+	string eval_str = ss_eval.str() ;
+	sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder).c_str()) ;
+	system(mkdir) ;
+	trainDomain->OutputPerformance(eval_str) ;
+}
 
 static void show_usage(std::string name){
 		std::cerr << "Usage: " << name << " -c CONFIG_FILE <options>\n"

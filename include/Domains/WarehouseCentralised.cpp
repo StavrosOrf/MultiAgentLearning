@@ -27,35 +27,16 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 	InitialiseNewEpoch();
 	double totalDeliveries = 0;
 	std::normal_distribution<double> n_process(0.0, 0.1);
-	std::default_random_engine generator;
+	std::default_random_engine n_generator;
 
-	VectorXd cur_state(whGraph->GetEdges().size() * 1);
-	VectorXd temp_state(whGraph->GetEdges().size() * 1);
+	VectorXd cur_state(N_EDGES * 1);
+	VectorXd temp_state(N_EDGES * 1);
 	double reward;
 
-	//Get current state 
-	for(int i = 0; i < cur_state.size(); i++){
-		cur_state[i] = 0;			
-	}
-	for(int i = 0; i < whAGVs.size(); i++){
-		Edge* e = whAGVs[i]->GetCurEdge();
-		// std::cout << "{" << whGraph->GetEdgeID(e) << " , ";
-		// std::cout <<e<<"}, "<<std::endl;	
-		// std::cout << "test0 "<<whGraph->GetEdgeID(e)-1<<std::endl;	
+	for (int i = 0; i != N_EDGES; i++)
+		cur_state[i] = get_edge_utilization()[i];
+	print_warehouse_state();
 
-		//check if AGVs are at an edge
-		if(e != NULL){
-			cur_state(whGraph->GetEdgeID(e))++;
-			std::cout<<"Edge id-"<<whGraph->GetEdgeID(e)<<
-				 " length: "<<e->GetLength()<< " "<<std::endl;
-		}			
-	}
-	for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-		std::cout<<"Initial VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
-
-	// for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-	// 	std::cout<<"Edge id-"<<whGraph->GetEdgeID(whGraph->GetEdges()[n])<<
-	// 			 " length: "<<whGraph->GetEdges()[n]->GetLength()<< " "<<std::endl;
 	vector<Edge *> edgess = whGraph->GetEdges();
 
 	// each timestep
@@ -65,132 +46,88 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		VectorXd actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
 		// Add Random Noise from process N
 		for (size_t n = 0; n < whGraph->GetEdges().size(); n++){
-			actions[n] = std::max(0.0,actions[n]+n_process(generator));
+			actions[n] = std::max(0.0,actions[n]+n_process(n_generator));
 			actions[n] = std::min(1.0,actions[n]);
+			assert(0 <= actions[n] && actions[n] <= 1);
 		}
-		//DO NOT REMOVE COUTs YET, needed for testing
-		// for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-		// 	std::cout<<"VectorXd Output: "<<actions[n]<< " "<<std::endl;
 
-		vector<double> a = baseCosts ;
+		//TODO DEFINED BUT NEVER USED!!!!
+		//TODO DEFINED BUT NEVER USED!!!!
+		//TODO DEFINED BUT NEVER USED!!!!
+		vector<double> a = baseCosts;
 		vector<size_t> s(whGraph->GetNumEdges(),0) ;
 
-		double maxBaseCost ;
-		if (neLearn){
-			maxBaseCost = * std::max_element(baseCosts.begin(), baseCosts.end()) ;
-		}
-		else{
-			maxBaseCost = 0.0 ;
-		}
+		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 		// QueryMATeam(memberIDs, a, s) ;
-		// for (size_t j = 0; j < (size_t)actions.size(); j++){ // actions [0,1] scaled to max base cost
-			
-		for (size_t i = 0; i < nAgents; i++){
+
+		//TODO explain
+		for (size_t i = 0; i < nAgents; i++)
 			for (size_t j = 0; j < (size_t)actions.size(); j++){ // output [0,1] scaled to max base cost
 				a[whAgents[i]->eIDs[j]] += actions[j]*maxBaseCost ;
+				assert(0 <= a[whAgents[i]->eIDs[j]]);
+				//IMPORTANT!!!
+				//IMPORTANT!!!
+				//IMPORTANT!!!
+				//IMPORTANT!!!
+				//IMPORTANT!!!
+				//IMPORTANT!!!
+				//IMPORTANT!!!
+				//TODO uncoment to ASSERT below
+				//assert(a[whAgents[i]->eIDs[j]] <= maxBaseCost);
 			}
-		}
+		assert(a.size() == N_EDGES);
 
-		// for (size_t n = 0; n < a.size(); n++)
-		// 	std::cout<<"a: "<<a[n]<< " "<<std::endl;
-
-		// 	a[whAgents[i]->eIDs[j]] += actions(j)*maxBaseCost ;
-		// }
-		// for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-		// 	std::cout<<"VectorXd actions: "<<a[n]<< " "<<std::endl;
-
-		UpdateGraphCosts(a) ;
-		
-		// Replan AGVs as necessary
-		for (size_t k = 0; k < nAGVs; k++){
-			whAGVs[k]->CompareCosts(a) ; // set replanning flags
-		
-			if (whAGVs[k]->GetIsReplan()){ // replanning needed
-				whAGVs[k]->PlanAGV(a) ;
-			}
-			
-			// Identify any new AGVs that need to cross an intersection
-			if (whAGVs[k]->GetT2V() == 0){
-				size_t agentID = 0 ; // only one agent
-				bool onWaitList = false ;
-				for (list<size_t>::iterator it = whAgents[agentID]->agvIDs.begin(); it!=whAgents[agentID]->agvIDs.end(); ++it){
-					if (k == *it){
-						onWaitList = true ;
-						break ;
-					}
-				}
-				if (!onWaitList){ // only add if not already on wait list
-					whAgents[agentID]->agvIDs.push_back(k) ;
-				}
-			}
-		}
-		// Attempt to move any transitioning AGVs on to new edges (according to wait list order)
+		UpdateGraphCosts(a);
+		replan_AGVs(a);
+		//transition_AGVs(s);
+		//TODO IMPORANT!! DOES NOT affect state
+		//TODO IMPORANT!! DOES NOT affect state
 		for (size_t k = 0; k < nAgents; k++){
-			vector<size_t> toRemove ;
+			vector<size_t> toRemove;
 			for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
 				size_t curAGV = *it ;
 				size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()) ; // next edge ID
-				
-				bool edgeFull = false ;
+			
 				if (nextID < 0 || nextID >= s.size()){
 					std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n" ;
 					std::cout << "	t2v: " << whAGVs[curAGV]->GetT2V() << "\n" ;
 					std::cout << "	itsQueue: " << (whAGVs[curAGV]->GetAGVPlanner()->GetQueue() != 0) << "\n" ;
 				}
-				if (s[nextID] >= capacities[nextID]){ // check if next edge is full
-					edgeFull = true ;
-				}
-				if (!edgeFull){ // transfer to new edge and update agv counters
+				if (s[nextID] < capacities[nextID]){ // check if next edge is full
+					// transfer to new edge and update agv counters
 					size_t curID = whGraph->GetEdgeID(whAGVs[curAGV]->GetCurEdge()) ;
 					whAGVs[curAGV]->EnterNewEdge() ;
 					size_t newID = whGraph->GetEdgeID(whAGVs[curAGV]->GetCurEdge()) ;
-					if (curID < s.size()){ // if moving off an edge
+					if (curID < s.size()) // if moving off an edge
 						s[curID]-- ; // remove from old edge
-					}
 					s[newID]++ ; // add to new edge (note that nextID and newID should be equal!)
-					if (nextID != newID){
+					if (nextID != newID)
 						std::cout << "Warning: nextID [" << nextID << "] != newID [" << newID << "]\n" ;
-					}
 					toRemove.push_back(curAGV) ; // remember to remove from agent wait list
 				}
 			}
-			for (size_t w = 0; w < toRemove.size(); w++){
+			for (size_t w = 0; w < toRemove.size(); w++)
 				whAgents[k]->agvIDs.remove(toRemove[w]) ;
-			}
 		}
+
+
 		
 		// Traverse
-		for (size_t k = 0; k < nAGVs; k++){
-			whAGVs[k]->Traverse() ;
-		}
+		for (size_t k = 0; k < nAGVs; k++)
+			whAGVs[k]->Traverse();
 
-		// for (size_t k = 0; k < nAGVs; k++){
-		// 	whAGVs[k]->DisplayPath() ;
-		// }
+		//for (size_t k = 0; k < nAGVs; k++) whAGVs[k]->DisplayPath();
 
-		
-		//Get current state 
+		//update current state
 		for(int i = 0; i < cur_state.size(); i++){
-			temp_state[i] = cur_state[i];	
-			cur_state[i] = 0;			
+			temp_state[i] = cur_state[i];
+			cur_state[i] = get_edge_utilization()[i];
 		}
-		for(int i = 0; i < whAGVs.size(); i++){
-			Edge* e = whAGVs[i]->GetCurEdge();
-			// std::cout << "{" << whGraph->GetEdgeID(e) << " , ";
-			// std::cout <<e<<"}, "<<std::endl;	
-			// std::cout << "test0 "<<whGraph->GetEdgeID(e)-1<<std::endl;	
-
-			//check if AGVs are at an edge
-			if(e != NULL){
-				cur_state(whGraph->GetEdgeID(e))++;
-			}			
-		}
-		for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-			std::cout<<"VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
+		print_warehouse_state();
 
 		double maxEval = -1;
 		vector<size_t> travelStats ;
-				// Log data
+		// Log data
 		size_t totalMove = 0 ;
 		size_t totalEnter = 0 ;
 		size_t totalWait = 0 ;
@@ -215,81 +152,64 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			travelStats.push_back(totalCommand) ;
 		}
 		std::cout<<"Stats: \nTotal Move:"<<totalMove<<" \nTotal Enter:"<<totalEnter<<
-			 "\nTotal wait:"<<totalWait<< "\nTotal Success:"<<totalSuccess<<
-			  "\nTotal Command:"<<totalCommand<<std::endl;
-	 
-	  totalDeliveries += totalSuccess;
-	  //Reset AGVs counters
+				"\nTotal wait:"<<totalWait<< "\nTotal Success:"<<totalSuccess<<
+				"\nTotal Command:"<<totalCommand<<std::endl;
+		assert(totalMove+totalEnter+totalWait == whAGVs.size());
+
+		totalDeliveries += totalSuccess;
+		//Reset AGVs counters
 		for (size_t k = 0; k < nAGVs; k++)
-			whAGVs[k]->ResetPerformanceCounters();	  
+			whAGVs[k]->ResetPerformanceCounters();
 		//Create and Save replay to buffer
 
-		//TODO get reward
-		assert(temp_state.size() == cur_state.size() && cur_state.size() == 38);
-		replay r = {temp_state,cur_state,actions,(double)totalMove/120.0};
+		assert(temp_state.size() == cur_state.size() && cur_state.size() == N_EDGES);
+		replay r = {temp_state,cur_state,actions,(double)totalMove/whAGVs.size()};
 		ddpg_maTeam[0]->addToReplayBuffer(r);
 
 		//TODO
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
-			
-			vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();			
-			vector<double> y(BATCH_SIZE);
+			std::vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
+			//std::vector<double> y(BATCH_SIZE);
+			std::vector<Eigen::VectorXd> trainInputs;
+			std::vector<Eigen::VectorXd> trainTargets;
 
+			std::cout << "Y = {";
 			for (size_t i = 0; i < BATCH_SIZE; i++){
-				replay b = miniBatch[i]; 
-								
-				VectorXd na = ddpg_maTeam[0]-> EvaluateTargetActorNN_DDPG(b.next_state);				
-				//d::cout<<ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na)[0]<<std::endl;
-				assert(b.next_state.size() == 38 && na.size() == 38);
-				assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na).size() ==1);				
-				y[i] = b.reward + GAMMA * 
-					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na)[0];							
-				std::cout<< "Y(i)= "<< y[i] << std::endl;					
-			}
+				replay b = miniBatch[i];
 
-			//Update Q critic
-			//Generate trainInputs and trainTargets
-			vector<VectorXd> trainInputs;
-			for (size_t i = 0; i < BATCH_SIZE; i++){
+				VectorXd na = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
+				assert(b.next_state.size() == N_EDGES && na.size() == N_EDGES);
+				assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na).size() ==1);
+				double y = b.reward + GAMMA * 
+					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na)[0];
+				std::cout << y << ", ";
+
+				//Generate trainInputs and trainTargets for Q backprop
 				VectorXd input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
 				input << miniBatch[i].action , miniBatch[i].current_state;
 				trainInputs.push_back(input);
-
-			}
-			std::vector<Eigen::VectorXd> trainTargets;
-			for (size_t i = 0; i < BATCH_SIZE; i++){
 				Eigen::VectorXd t(1);
-				t[0] = (y[i]);
+				t[0] = y;
+				assert(t[0] == y && t.size() == 1);
 				trainTargets.push_back(t);
 			}
-			//TODO CLEAN UP
+			std::cout << '}' << std::endl;
+
+			//Update Q critic
 			ddpg_maTeam[0]->updateQCritic(trainInputs, trainTargets);
 
 			//TODO
 			//Update actor critic
 
 			
-			//Update target Q critic and Update target actor critic
+			//Update target Q critic and Mu target actor critic
 			ddpg_maTeam[0]->updateTargetWeights();
 
-		}else{
-			std::cout << "Not enough Replays yet!"<<std::endl;
-		}
-		
-
-		std::cout << "End of step"<<std::endl;
+		}else
+			std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
 	} 
 	std::cout << "End of Simulation with G: "<<totalDeliveries<<std::endl;
-	return ;
-	// for (size_t t = 0; t < nSteps; t++){ // each timestep
-	// 	// Get agent actions and update graph costs
-
-	// 	//Evaluate actor mu
-	// 	ddpg_maTeam[0].
-
-		
-
-	
+	return;
 }
 
 void WarehouseCentralised::SimulateEpoch(bool train){

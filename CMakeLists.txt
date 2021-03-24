@@ -28,7 +28,6 @@ set( LIBS_TO_LINK Utilities
                   Learning
                   Domains
                   Agents
-                  POMDPs
                   Planning
                   yaml-cpp
                   ${CMAKE_THREAD_LIBS_INIT})# -llapack
@@ -38,12 +37,6 @@ target_link_libraries( testNeuralNetEigen ${LIBS_TO_LINK} )
 
 add_executable(testNeuroEvoEigen testNeuroEvoEigen.cpp)
 target_link_libraries( testNeuroEvoEigen ${LIBS_TO_LINK} )
-
-add_executable(testMAPElitesEigen testMAPElitesEigen.cpp)
-target_link_libraries( testMAPElitesEigen ${LIBS_TO_LINK} )
-
-add_executable(testPOMDP testPOMDP.cpp)
-target_link_libraries( testPOMDP ${LIBS_TO_LINK} )
 
 add_executable(testSearch testSearch.cpp)
 target_link_libraries( testSearch ${LIBS_TO_LINK} )

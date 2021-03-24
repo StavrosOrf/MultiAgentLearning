@@ -95,13 +95,13 @@ void NeuralNet::OutputNN(const char * A, const char * B){
 	WriteNN(weightsB, NNFileNameB) ;
 }
 //TODO create unit tests
-void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets){
+void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets, size_t max_iter_count){
 	double sumSquaredError = DBL_MAX ;
 	double threshold = 0.001 ;
 	assert(trainInputs.size() == trainTargets.size());
-	
+
 	size_t step = 0 ;
-	while (sumSquaredError > threshold*trainTargets.size() && step < 10000){
+	while (sumSquaredError > threshold*trainTargets.size() && step < max_iter_count){
 		// Feedforward NN evaluation to compute targets
 		vector<VectorXd> trainOutputs ;
 		vector<VectorXd> hiddenLayers ;
@@ -111,7 +111,7 @@ void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> t
 			hiddenLayers.push_back(hidden) ;
 			trainOutputs.push_back(tt) ;
 		}
-		
+
 		for (size_t t = 0; t < trainInputs.size(); t++){
 			// Calculate error terms for weight matrix B(hidden neurons, output neurons)
 			MatrixXd deltaB(weightsB.rows(),weightsB.cols()) ;
@@ -133,7 +133,7 @@ void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> t
 					deltaB(i,j) = -eta*oi*deltaL(j) ;
 				}
 			}
-			
+
 			// Calculate error terms for weight matrix A(input neurons, hidden neurons)
 			MatrixXd deltaA(weightsA.rows(),weightsA.cols()) ;
 			net = trainInputs[t].transpose()*weightsA ;
@@ -148,21 +148,18 @@ void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> t
 					deltaA(i,j) = -eta*oi*deltaJ*4.0/denom ;
 				}
 			}
-			
+
 			weightsA += deltaA ;
 			weightsB += deltaB ;
-			
+
 //			for (int i = 0; i < weightsA.rows(); i++){
-//				for (int j = 0; j < weightsA.cols(); j++){
+//				for (int j = 0; j < weightsA.cols(); j++)
 //					std::cout << deltaA(i,j) << " " ;
-//				}
 //				std::cout << "\n" ;
 //			}
-//			
-//			for (int i = 0; i < weightsB.rows(); i++){
+//			for (int i = 0; i < weightsB.rows(); i++)
 //				for (int j = 0; j < weightsB.cols(); j++){
 //					std::cout << deltaB(i,j) << " " ;
-//				}
 //				std::cout << "\n" ;
 //			}
 		}
@@ -258,21 +255,19 @@ VectorXd NeuralNet::LogisticFunction(VectorXd input, size_t layer){
 		output = hidden.transpose()*weightsB ;
 	}
 	else{
-		std::printf("Error: second argument must be in {0,1,2}!\n") ;
+		std::printf("Error: second argument must be in {0,1,2}!\n");
 	}
 	
-	return output ;
+	return output;
 }
 
-void NeuralNet::RandomizeWeights(){	
+void NeuralNet::RandomizeWeights(){
 	for (int i = 0; i != weightsA.size(); i++){
-		weightsA(i) = ((double) rand() / RAND_MAX);
+		//weightsA(i) = ((double) rand() / RAND_MAX);
+		weightsA(i) = rand_interval(0,1);
 		assert(weightsA(i) <= 1 && weightsA(i) >= 0 );
 	}
 	for (int i = 0; i != weightsB.size(); i++)
-		weightsB(i) = ((double) rand()/ RAND_MAX);
+		//weightsB(i) = ((double) rand()/ RAND_MAX);
+		weightsB(i) = rand_interval(0,1);
 }
-
-
-
-

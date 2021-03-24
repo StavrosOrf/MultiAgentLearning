@@ -22,11 +22,9 @@ class WarehouseCentralised : public Warehouse {
 		void SimulateEpochDDPG();
 		
 		void InitialiseMATeam() ; // create agents for each vertex in graph
-		
 	private:
 		void QueryMATeam(vector<size_t>, vector<double>&, vector<size_t>&) ; // get current graph costs
 		void GetJointState(vector<Edge *> e, vector<size_t> &eNum) ;
-		
 };
 
 #endif // WAREHOUSE_CENTRALISED_H_

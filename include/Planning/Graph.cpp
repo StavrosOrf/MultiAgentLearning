@@ -1,7 +1,6 @@
 #include "Graph.h"
 
-size_t Graph::GetEdgeID(Edge * e)
-{
+size_t Graph::GetEdgeID(Edge * e){
 	for (size_t i = 0; i < numEdges; i++){
 		if (e == itsEdges[i]){
 			return i ;
@@ -11,8 +10,7 @@ size_t Graph::GetEdgeID(Edge * e)
 	return numEdges ;
 }
 
-vector<Edge *> Graph::GetNeighbours(Node * n) // Do not include parent vertex in list of neighbours
-{
+vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex in list of neighbours
 	vector<Edge *> neighbours ;
 	int v = n->GetVertex() ;
 

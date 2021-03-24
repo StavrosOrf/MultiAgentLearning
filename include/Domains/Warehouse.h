@@ -19,6 +19,7 @@
 #include "Planning/Edge.h"
 #include "AGV.h"
 #include "Agents/DDPGAgent.h"
+#define N_EDGES whGraph->GetEdges().size()
 
 using std::vector ;
 using std::list ;
@@ -30,7 +31,6 @@ enum algo_type{
     ddpg,
     neuroevo
 };
-
 
 
 class Warehouse{
@@ -59,7 +59,12 @@ class Warehouse{
 		void SetTrainingAlgo(algo_type algot){algo = algot;}
 		virtual void SimulateEpochDDPG(){;}
 
+		void print_warehouse_state();
+		vector<size_t> get_edge_utilization(bool verbose = false);
 	protected:
+		void replan_AGVs(std::vector<double> cost_add);
+		void transition_AGVs();
+
 		size_t nSteps ;
 		size_t nPop ;
 		size_t nAgents ;
@@ -105,7 +110,6 @@ class Warehouse{
 		std::ofstream agvEdgeFile ;
 		std::ofstream agentStateFile ;
 		std::ofstream agentActionFile ;
-		
 };
 
 #endif // WAREHOUSE_H_

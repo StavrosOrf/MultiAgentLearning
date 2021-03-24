@@ -37,8 +37,8 @@ class NeuralNet{
 		void OutputNN(const char *, const char *) ; // write NN weights to file
 		double GetEvaluation() {return evaluation ;}
 		void SetEvaluation(double eval) {evaluation = eval ;}
-		void BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets) ;
-		void RandomizeWeights();		
+		void BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets, size_t max_iter_count=2001);
+		void RandomizeWeights();
 	private:
 		double bias ;
 		MatrixXd weightsA ;
