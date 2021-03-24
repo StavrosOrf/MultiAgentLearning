@@ -38,6 +38,7 @@ class NeuralNet{
 		double GetEvaluation() {return evaluation ;}
 		void SetEvaluation(double eval) {evaluation = eval ;}
 		void BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets) ;
+		void RandomizeWeights();		
 	private:
 		double bias ;
 		MatrixXd weightsA ;

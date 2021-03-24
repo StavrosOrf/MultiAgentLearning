@@ -185,8 +185,8 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 				cur_state(whGraph->GetEdgeID(e))++;
 			}			
 		}
-		// for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
-		// 	std::cout<<"VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
+		for (size_t n = 0; n < whGraph->GetEdges().size(); n++)
+			std::cout<<"VectorXd cur_state: "<<cur_state[n]<< " "<<std::endl;
 
 		double maxEval = -1;
 		vector<size_t> travelStats ;
@@ -218,14 +218,15 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			 "\nTotal wait:"<<totalWait<< "\nTotal Success:"<<totalSuccess<<
 			  "\nTotal Command:"<<totalCommand<<std::endl;
 	 
-	 totalDeliveries += totalSuccess;
-	 //Reset AGVs counters
-		// for (size_t k = 0; k < nAGVs; k++)
-		// 	whAGVs[k]->ResetPerformanceCounters();	  
+	  totalDeliveries += totalSuccess;
+	  //Reset AGVs counters
+		for (size_t k = 0; k < nAGVs; k++)
+			whAGVs[k]->ResetPerformanceCounters();	  
 		//Create and Save replay to buffer
+
 		//TODO get reward
 		assert(temp_state.size() == cur_state.size() && cur_state.size() == 38);
-		replay r = {temp_state,cur_state,actions,0};
+		replay r = {temp_state,cur_state,actions,(double)totalMove/120.0};
 		ddpg_maTeam[0]->addToReplayBuffer(r);
 
 		//TODO
@@ -247,15 +248,29 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			}
 
 			//Update Q critic
+			//Generate trainInputs and trainTargets
+			vector<VectorXd> trainInputs;
+			for (size_t i = 0; i < BATCH_SIZE; i++){
+				VectorXd input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
+				input << miniBatch[i].action , miniBatch[i].current_state;
+				trainInputs.push_back(input);
+
+			}
+			std::vector<Eigen::VectorXd> trainTargets;
+			for (size_t i = 0; i < BATCH_SIZE; i++){
+				Eigen::VectorXd t(1);
+				t[0] = (y[i]);
+				trainTargets.push_back(t);
+			}
+			//TODO CLEAN UP
+			ddpg_maTeam[0]->updateQCritic(trainInputs, trainTargets);
+
+			//TODO
 			//Update actor critic
 
 			
 			//Update target Q critic and Update target actor critic
 			ddpg_maTeam[0]->updateTargetWeights();
-
-
-
-	
 
 		}else{
 			std::cout << "Not enough Replays yet!"<<std::endl;

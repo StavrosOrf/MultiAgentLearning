@@ -94,10 +94,11 @@ void NeuralNet::OutputNN(const char * A, const char * B){
 	WriteNN(weightsA, NNFileNameA) ;
 	WriteNN(weightsB, NNFileNameB) ;
 }
-
+//TODO create unit tests
 void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets){
 	double sumSquaredError = DBL_MAX ;
 	double threshold = 0.001 ;
+	assert(trainInputs.size() == trainTargets.size());
 	
 	size_t step = 0 ;
 	while (sumSquaredError > threshold*trainTargets.size() && step < 10000){
@@ -120,6 +121,8 @@ void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> t
 			hidden.head(hiddenLayers[t].size()) = hiddenLayers[t] ;
 			hidden(hiddenLayers[t].size()) = bias ;
 			MatrixXd net = hidden.transpose()*weightsB ;
+			assert(hiddenLayers[t].size()+1 == weightsB.rows());
+
 			for (int i = 0; i < weightsB.rows(); i++){
 				double oi = hidden(i) ;
 				for (int j = 0; j < weightsB.cols(); j++){
@@ -260,3 +263,16 @@ VectorXd NeuralNet::LogisticFunction(VectorXd input, size_t layer){
 	
 	return output ;
 }
+
+void NeuralNet::RandomizeWeights(){	
+	for (int i = 0; i != weightsA.size(); i++){
+		weightsA(i) = ((double) rand() / RAND_MAX);
+		assert(weightsA(i) <= 1 && weightsA(i) >= 0 );
+	}
+	for (int i = 0; i != weightsB.size(); i++)
+		weightsB(i) = ((double) rand()/ RAND_MAX);
+}
+
+
+
+

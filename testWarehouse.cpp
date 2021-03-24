@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <Eigen/Eigen>
 #include <yaml-cpp/yaml.h>
+#include <time.h>
 
 #include "Domains/Warehouse.h"
 #include "Domains/WarehouseIntersectionsTime.h"
@@ -167,6 +168,7 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 }
 
 void WarehouseSimulationDDPG(YAML::Node configs){
+	srand(time(NULL)); // increment random seed
 	// Initialise appropriate domain
 	size_t nEps = configs["DDPG"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();

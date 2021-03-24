@@ -13,11 +13,8 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	assert(q_criticNN->GetNumIn() == action_space + state_space);
 	assert(q_target_criticNN->GetNumIn() == action_space + state_space);
 
-	//TODO Randomize weights of NNs
-	//for (int i = 0; i != q_target_criticNN.GetWeightsA().size(); i++)
-		//q_target_criticNN->GetWeightsA().(i) = ((double) rand());
-	//for (int i = 0; i != q_target_criticNN.size(); i++)
-		//assert(q_target_criticNN(i) => 0 && q_target_criticNN(i) <= 1);
+	q_criticNN->RandomizeWeights();
+	mu_actorNN->RandomizeWeights();
 
 	q_target_criticNN->SetWeights(q_criticNN->GetWeightsA(),
 		q_criticNN->GetWeightsB());
@@ -108,4 +105,8 @@ void DDPGAgent::updateTargetWeights(){
 	MatrixXd MutA = TAU*mu_actorNN->GetWeightsA() + (1-TAU)*mu_target_actorNN->GetWeightsA();
 	MatrixXd MutB = TAU*mu_actorNN->GetWeightsB() + (1-TAU)*mu_target_actorNN->GetWeightsB();
 	mu_target_actorNN->SetWeights(MutA,MutB);
+}
+
+void DDPGAgent::updateQCritic(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets){
+	q_criticNN->BackPropagation(trainInputs,trainTargets);
 }

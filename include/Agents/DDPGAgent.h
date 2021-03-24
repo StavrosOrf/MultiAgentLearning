@@ -41,6 +41,7 @@ class DDPGAgent{
 		vector<replay> replay_buffer;
 
 		void updateTargetWeights();
+		void updateQCritic(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets);
 
 	protected:
 
