@@ -25,3 +25,7 @@ to our code base)
 - General Code Cleanup
 - Made Progress on DDPG init
 - General Control Flow Fix up
+
+##v 0.00006k
+- Deprecated Rovers class (and it's associated domains and tests)
+- Implemented DDPG's deconstructor

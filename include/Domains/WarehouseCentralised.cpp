@@ -25,10 +25,8 @@ WarehouseCentralised::~WarehouseCentralised(void){
 }
 void WarehouseCentralised::SimulateEpochDDPG(){
 	InitialiseNewEpoch();
-	const double mean = 0.0;
-	const double stddev = 0.1;
 	double totalDeliveries = 0;
-	std::normal_distribution<double> n_process(0.0, stddev);
+	std::normal_distribution<double> n_process(0.0, 0.1);
 	std::default_random_engine generator;
 
 	VectorXd cur_state(whGraph->GetEdges().size() * 1);

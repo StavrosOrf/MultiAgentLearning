@@ -13,6 +13,7 @@ graph:
   capacities: capacities.csv
 DDPG:
   epochs: 1 # set to 1 in test mode
+  runs: 1
 neuroevo:
   learn: true
   population_size: 10

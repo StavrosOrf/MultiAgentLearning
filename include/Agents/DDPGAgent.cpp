@@ -13,19 +13,11 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	assert(q_criticNN->GetNumIn() == action_space + state_space);
 	assert(q_target_criticNN->GetNumIn() == action_space + state_space);
 
-	//TODO Randomize weights of NNs, Possibly already implemented
-	/*
-	for (int i=0; i<q_criticNN->GetWeightsA().size(); i++)
-		assert(!q_criticNN->GetWeightsA()(i));
-	for (int i=0; i<q_criticNN->GetWeightsB().size(); i++)
-		assert(!q_criticNN->GetWeightsB()(i));
-	for (int i=0; i<mu_actorNN->GetWeightsA().size(); i++)
-		assert(!mu_actorNN->GetWeightsA()(i));
-	for (int i=0; i<mu_actorNN->GetWeightsB().size(); i++)
-		assert(!mu_actorNN->GetWeightsB()(i));
-	*/
-	//Hopefully this should confirm if it is random
-	//TODO yes they are not random enough
+	//TODO Randomize weights of NNs
+	//for (int i = 0; i != q_target_criticNN.GetWeightsA().size(); i++)
+		//q_target_criticNN->GetWeightsA().(i) = ((double) rand());
+	//for (int i = 0; i != q_target_criticNN.size(); i++)
+		//assert(q_target_criticNN(i) => 0 && q_target_criticNN(i) <= 1);
 
 	q_target_criticNN->SetWeights(q_criticNN->GetWeightsA(),
 		q_criticNN->GetWeightsB());
@@ -36,7 +28,14 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 }
 
 DDPGAgent::~DDPGAgent(){
-
+	delete(q_criticNN);
+	delete(q_target_criticNN);
+	delete(mu_actorNN);
+	delete(mu_target_actorNN);
+	q_criticNN = NULL;
+	q_target_criticNN = NULL;
+	mu_actorNN = NULL;
+	mu_target_actorNN = NULL;
 }
 
 

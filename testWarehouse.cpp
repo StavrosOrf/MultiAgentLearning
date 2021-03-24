@@ -175,7 +175,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	trainDomain->InitialiseMATeam();
 
 	//TODO create results folder
-	int runs = configs["neuroevo"]["runs"].as<int>();
+	int runs = configs["DDPG"]["runs"].as<int>();
 	string domainDir = configs["domain"]["folder"].as<string>() ;
 	string resFolder = configs["results"]["folder"].as<string>() ;
 	std::stringstream ss_eval;

@@ -42,32 +42,8 @@ target_link_libraries( testNeuroEvoEigen ${LIBS_TO_LINK} )
 add_executable(testMAPElitesEigen testMAPElitesEigen.cpp)
 target_link_libraries( testMAPElitesEigen ${LIBS_TO_LINK} )
 
-add_executable(testSingleRoverEigen testSingleRoverEigen.cpp)
-target_link_libraries( testSingleRoverEigen ${LIBS_TO_LINK} )
-
-add_executable(testMAPElitesRoverEigen testMAPElitesRoverEigen.cpp)
-target_link_libraries( testMAPElitesRoverEigen ${LIBS_TO_LINK} )
-
-add_executable(testRover testRover.cpp)
-target_link_libraries( testRover ${LIBS_TO_LINK} )
-
-add_executable(testMultiRover testMultiRover.cpp)
-target_link_libraries( testMultiRover ${LIBS_TO_LINK} )
-
 add_executable(testPOMDP testPOMDP.cpp)
 target_link_libraries( testPOMDP ${LIBS_TO_LINK} )
-
-add_executable(multiRoverIntrospection multiRoverIntrospection.cpp)
-target_link_libraries( multiRoverIntrospection ${LIBS_TO_LINK} )
-
-add_executable(generateMultiRoverExperts generateMultiRoverExperts.cpp)
-target_link_libraries( generateMultiRoverExperts ${LIBS_TO_LINK} )
-
-add_executable(multiRoverExpertiseTesting multiRoverExpertiseTesting.cpp)
-target_link_libraries( multiRoverExpertiseTesting ${LIBS_TO_LINK} )
-
-add_executable(testMultiRoverPLearners testMultiRoverPLearners.cpp)
-target_link_libraries( testMultiRoverPLearners ${LIBS_TO_LINK} )
 
 add_executable(testSearch testSearch.cpp)
 target_link_libraries( testSearch ${LIBS_TO_LINK} )
