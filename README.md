@@ -9,12 +9,24 @@ Top level project files for multiagent learning.
 Install system dependencies:
 ```
 sudo apt install libboost-dev libeigen3-dev libyaml-cpp-dev
+
 ```
 
-In the working folder of your choice, clone the project code:
+In the working folder of your choice, clone the project code
 ```
 git clone git@github.com:stavrosgreece/multiagentlearning.git
 ```
+
+
+install CTorch/LibTorch (C++ version of PyTorch):
+```
+cd multiagentlearning
+wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-latest%2Bcpu.zip
+unzip libtorch-cxx11-abi-shared-with-deps-latest+cpu.zip
+rm libtorch-cxx11-abi-shared-with-deps-latest+cpu.zip
+```
+Note: you can download and install LibTorch with different computer platform (e.g. CUDA on https://pytorch.org/)
+
 
 Build the code:
 ```

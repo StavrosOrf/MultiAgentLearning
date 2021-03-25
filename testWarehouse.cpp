@@ -6,7 +6,7 @@
 #include <Eigen/Eigen>
 #include <yaml-cpp/yaml.h>
 #include <time.h>
-//#include <caffe>
+#include <torch/torch.h>
 
 #include "Domains/Warehouse.h"
 #include "Domains/WarehouseCentralised.h"
@@ -19,6 +19,7 @@ using namespace Eigen;
 char mkdir[100];
 string domainDir;
 string resFolder;
+
 Warehouse* create_warehouse(std::string agentType, YAML::Node configs);
 void create_results_folder(Warehouse* trainDomain, YAML::Node configs, size_t r);
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 project(test_includes)
 
 #There are lots of scripts with cmake
@@ -7,16 +7,24 @@ project(test_includes)
 #find_package(Boost COMPONENTS system filesystem REQUIRED)
 #include_directories( ${Boost_INCLUDE_DIRS} )
 
+set(Torch_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/share/cmake/Torch")
+
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Eigen3 REQUIRED)
-#find_package(Caffe REQUIRED)
+find_package(Torch REQUIRED)
 find_package(yaml-cpp REQUIRED)
+
+if(NOT Torch_FOUND)
+	message(STATUS "FUCK MY LIFE")
+endif()
 
 include_directories( ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
   ${yaml-cpp_INCLUDE_DIR}
+  ${Torch_INCLUDE_DIRS}
   include)
+
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,10 +39,11 @@ set( LIBS_TO_LINK Utilities
                   Agents
                   Planning
                   yaml-cpp
+                  ${TORCH_LIBRARIES}
                   ${CMAKE_THREAD_LIBS_INIT})# -llapack
 
 add_executable(testSearch testSearch.cpp)
-target_link_libraries( testSearch ${LIBS_TO_LINK} )
+target_link_libraries( testSearch ${LIBS_TO_LINK})
 
 add_executable(testWarehouse testWarehouse.cpp threadpool.cpp)
-target_link_libraries( testWarehouse ${LIBS_TO_LINK} )
+target_link_libraries( testWarehouse ${LIBS_TO_LINK})

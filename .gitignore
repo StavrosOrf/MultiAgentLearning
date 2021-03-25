@@ -2,6 +2,7 @@
 *.png
 *.pdf
 *.fig
+libtorch
 build*
 Results*
 *Domains*

@@ -7,6 +7,7 @@
 #include <vector>
 #include <random>
 #include <Eigen/Eigen>
+#include <torch/torch.h>
 #include "Learning/NeuralNet.h"
 
 using std::vector;
@@ -42,10 +43,16 @@ class DDPGAgent{
 		void updateTargetWeights();
 		void updateQCritic(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets);
 	protected:
+
 		NeuralNet * q_criticNN;
 		NeuralNet * q_target_criticNN;
 		NeuralNet * mu_actorNN;
 		NeuralNet * mu_target_actorNN;
+
+		//torch::nn qNN
+		//torch::nn qtNN
+		//torch::nn muNN
+		//torch::nn mutNN
 };
 
 #endif // DDPG_AGENT_H_

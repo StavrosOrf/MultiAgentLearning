@@ -69,3 +69,7 @@ might need to restore some basic ware house functions
 - Changed source formating now all lines that end with ';' do not contain
 white space characters between the last character and ';'
 - added a bunch of function comments
+
+##v 0.00012k / Light up your (c)torches
+- imported the c++ frontent for PyTorch's backend also updated cmake and
+README.md and tested it
