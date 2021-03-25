@@ -19,39 +19,38 @@
 
 #define N_EDGES whGraph->GetEdges().size()
 
-using std::vector ;
-using std::list ;
-using std::string ;
-using std::ifstream ;
-using std::stringstream ;
+using std::vector;
+using std::list;
+using std::string;
+using std::ifstream;
+using std::stringstream;
 
 enum algo_type{
-    ddpg,
-    neuroevo
+    ddpg
 };
 
 
 class Warehouse{
 	public:
-		Warehouse(YAML::Node) ;
-		virtual ~Warehouse(void) ;
+		Warehouse(YAML::Node);
+		virtual ~Warehouse(void);
 
 		virtual void SimulateEpoch(bool train = true){
-			std::cout << "This function simulates a single learning epoch.\n" ;
+			std::cout << "This function simulates a single learning epoch.\n";
 		}
 		virtual void SimulateEpoch(vector<size_t> team){
-			std::cout << "This function simulates a single epoch with a given multiagent team.\n" ;
+			std::cout << "This function simulates a single epoch with a given multiagent team.\n";
 		}
 		virtual void InitialiseMATeam(){ // create agents for the graph
-			std::cout << "This function initialises the multiagent team.\n" ;
+			std::cout << "This function initialises the multiagent team.\n";
 		}
-		void EvolvePolicies(bool init = false) ;
-		void ResetEpochEvals() ;
+		void EvolvePolicies(bool init = false);
+		void ResetEpochEvals();
 
-		void OutputPerformance(string) ;
-		void OutputControlPolicies(string) ;
-		void OutputEpisodeReplay(string, string, string, string) ;
-		void DisableEpisodeReplayOutput(){outputEpReplay = false ;}
+		void OutputPerformance(string);
+		void OutputControlPolicies(string);
+		void OutputEpisodeReplay(string, string, string, string);
+		void DisableEpisodeReplayOutput(){outputEpReplay = false;}
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
 		void SetTrainingAlgo(algo_type algot){algo = algot;}
@@ -61,49 +60,43 @@ class Warehouse{
 		vector<size_t> get_edge_utilization(bool verbose = false) __attribute__ ((pure));
 	protected:
 		void replan_AGVs(std::vector<double> cost_add);
-		void transition_AGVs();
+		void transition_AGVs(bool verbose = false);
+		void GetJointState(vector<Edge *> e, vector<size_t> &s) __attribute__((deprecated));
 
-		size_t nSteps ;
-		size_t nPop ;
-		size_t nAgents ;
-		size_t nAGVs ;
-		//TODO make it const
-		vector<double> baseCosts ;
-		const vector<size_t> capacities ;
-		bool neLearn ;
+		size_t nSteps; //number of steps per simulation
+		size_t nAgents;
+		size_t nAGVs;
+		vector<double> baseCosts;
+		vector<size_t> capacities;
 
 		algo_type algo;
 		struct iAgent{
-			size_t vID ;					// graph vertex ID associated with agent (edge ID if link agent)
-			vector<size_t> eIDs ; // graph edge IDs associated with incoming edges to agent vertex (vertex IDs if link agent)
-			list<size_t> agvIDs ; // agv IDs waiting to cross intersection
-		} ;
+			size_t vID;					// graph vertex ID associated with agent (edge ID if link agent)
+			vector<size_t> eIDs; // graph edge IDs associated with incoming edges to agent vertex (vertex IDs if link agent)
+			list<size_t> agvIDs; // agv IDs waiting to cross intersection
+		};
 
 		vector<DDPGAgent *> ddpg_maTeam;
-		vector<iAgent *> whAgents ; // manage agent vertex and edge lookups from graph
-		Graph * whGraph ; // vertex and edge definitions, access to change edge costs at each step
-		vector<AGV *> whAGVs ; // manage AGV A* search and movement through graph
+		vector<iAgent *> whAgents; // manage agent vertex and edge lookups from graph
+		Graph * whGraph; // vertex and edge definitions, access to change edge costs at each step
+		vector<AGV *> whAGVs; // manage AGV A* search and movement through graph
 
-		void InitialiseGraph(string, string, string, YAML::Node) ; // read in configuration files and construct Graph
-		void InitialiseAGVs(YAML::Node) ; // create AGVs to move in graph
-		void InitialiseNewEpoch() ; // reset simulation for each episode/epoch
+		inline void InitialiseGraph(string, string, string, YAML::Node); // read in configuration files and construct Graph
+		void InitialiseAGVs(YAML::Node); // create AGVs to move in graph
+		void InitialiseNewEpoch(); // reset simulation for each episode/epoch
 
-		vector< vector<size_t> > RandomiseTeams(size_t) ; // shuffle agent populations
+		vector< vector<size_t> > RandomiseTeams(size_t); // shuffle agent populations
 
-		void UpdateGraphCosts(vector<double>) ;
+		void UpdateGraphCosts(vector<double>);
 
-//		virutal void GetJointState(vector<Edge *> e, vector<size_t> &eNum, vector<double> &eTime) ;
-//		virtual void GetJointState(vector<Edge *> e, vector<size_t> &s) ;
-//		virtual size_t GetAgentID(int) ;
+		bool outputEvals;
+		bool outputEpReplay;
 
-		bool outputEvals ;
-		bool outputEpReplay ;
-
-		std::ofstream evalFile ;
-		std::ofstream agvStateFile ;
-		std::ofstream agvEdgeFile ;
-		std::ofstream agentStateFile ;
-		std::ofstream agentActionFile ;
+		std::ofstream evalFile;
+		std::ofstream agvStateFile;
+		std::ofstream agvEdgeFile;
+		std::ofstream agentStateFile;
+		std::ofstream agentActionFile;
 };
 
 #endif // WAREHOUSE_H_

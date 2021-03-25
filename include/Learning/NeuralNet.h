@@ -2,8 +2,8 @@
 #ifndef NEURAL_NET_H_
 #define NEURAL_NET_H_
 
-enum actFun {TANH, LOGISTIC} ; // available activation functions
-enum nnOut {BOUNDED, UNBOUNDED} ; // bounded output will apply activation function on last layer
+enum actFun {TANH, LOGISTIC}; // available activation functions
+enum nnOut {BOUNDED, UNBOUNDED}; // bounded output will apply activation function on last layer
 
 #include <stdio.h>
 #include <iostream>
@@ -17,43 +17,43 @@ enum nnOut {BOUNDED, UNBOUNDED} ; // bounded output will apply activation functi
 #include <Eigen/Eigen>
 #include "Utilities/Utilities.h"
 
-using namespace Eigen ;
-using easymath::rand_interval ;
-using std::vector ;
+using namespace Eigen;
+using easymath::rand_interval;
+using std::vector;
 
 class NeuralNet{
 	public:
-		NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afType=LOGISTIC, nnOut bOut=BOUNDED) ; // single hidden layer
+		NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afType=LOGISTIC, nnOut bOut=BOUNDED); // single hidden layer
 		~NeuralNet(){}
 
-		Eigen::VectorXd EvaluateNN(VectorXd inputs) ;
-		VectorXd EvaluateNN(VectorXd inputs, VectorXd & hiddenLayer) ;
-		void MutateWeights() ;
-		void SetWeights(MatrixXd, MatrixXd) ;
-		MatrixXd GetWeightsA() {return weightsA ;}
-		MatrixXd GetWeightsB() {return weightsB ;}
+		Eigen::VectorXd EvaluateNN(VectorXd inputs);
+		VectorXd EvaluateNN(VectorXd inputs, VectorXd & hiddenLayer);
+		void MutateWeights();
+		void SetWeights(MatrixXd, MatrixXd);
+		MatrixXd GetWeightsA() {return weightsA;}
+		MatrixXd GetWeightsB() {return weightsB;}
 		double GetNumIn(){return weightsA.rows();}
 		double GetNumOut(){return weightsB.cols();}
-		void OutputNN(const char *, const char *) ; // write NN weights to file
-		double GetEvaluation() {return evaluation ;}
-		void SetEvaluation(double eval) {evaluation = eval ;}
+		void OutputNN(const char *, const char *); // write NN weights to file
+		double GetEvaluation() {return evaluation;}
+		void SetEvaluation(double eval) {evaluation = eval;}
 		void BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets, size_t max_iter_count=1);
 		void RandomizeWeights();
 	private:
-		double bias ;
-		MatrixXd weightsA ;
-		MatrixXd weightsB ;
-		double mutationRate ;
-		double mutationStd ;
-		double evaluation ;
-		double eta ;
-		vector<size_t> layerActivation ;
+		double bias;
+		MatrixXd weightsA;
+		MatrixXd weightsB;
+		double mutationRate;
+		double mutationStd;
+		double evaluation;
+		double eta;
+		vector<size_t> layerActivation;
 
-		void InitialiseWeights(MatrixXd &) ;
-		VectorXd (NeuralNet::*ActivationFunction)(VectorXd, size_t) ;
-		VectorXd HyperbolicTangent(VectorXd, size_t) ; // outputs between [-1,1]
-		VectorXd LogisticFunction(VectorXd, size_t) ; // outputs between [0,1]
-		double RandomMutation() ;
-		void WriteNN(MatrixXd, std::stringstream &) ;
-} ;
+		void InitialiseWeights(MatrixXd &);
+		VectorXd (NeuralNet::*ActivationFunction)(VectorXd, size_t);
+		VectorXd HyperbolicTangent(VectorXd, size_t); // outputs between [-1,1]
+		VectorXd LogisticFunction(VectorXd, size_t); // outputs between [0,1]
+		double RandomMutation();
+		void WriteNN(MatrixXd, std::stringstream &);
+};
 #endif // NEURAL_NET_H_

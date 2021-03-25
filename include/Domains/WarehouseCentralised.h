@@ -8,19 +8,18 @@
 #include "Warehouse.h"
 #include "Agents/DDPGAgent.h"
 
-using std::vector ;
-using std::list ;
+using std::vector;
+using std::list;
 
 class WarehouseCentralised : public Warehouse {
 	public:
 		WarehouseCentralised(YAML::Node configs) : Warehouse(configs){}
-		~WarehouseCentralised(void) ;
+		~WarehouseCentralised(void);
 
 		void SimulateEpochDDPG();
 
-		void InitialiseMATeam() ; // create agents for each vertex in graph
+		void InitialiseMATeam(); // create agents for each vertex in graph
 	private:
-		void GetJointState(vector<Edge *> e, vector<size_t> &eNum) ;
 };
 
 #endif // WAREHOUSE_CENTRALISED_H_

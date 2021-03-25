@@ -18,7 +18,7 @@ include_directories( ${Boost_INCLUDE_DIRS}
   ${yaml-cpp_INCLUDE_DIR}
   include)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_FLAGS "-g -Wall -I /usr/local/include/eigen3/")
 add_subdirectory(include)

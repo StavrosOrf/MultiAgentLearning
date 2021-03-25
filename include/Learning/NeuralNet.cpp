@@ -2,65 +2,65 @@
 
 // Constructor: Initialises NN given layer sizes, also initialises NN activation function, currently has hardcoded mutation rates, mutation value std and bias node value
 NeuralNet::NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afType, nnOut bOut){
-	bias = 1.0 ;
-	MatrixXd A(numIn, numHidden) ;
-	weightsA = A ;
-	MatrixXd B(numHidden+1, numOut) ;
-	weightsB = B ;
-	mutationRate = 0.5 ;
-	mutationStd = 1.0 ;
+	bias = 1.0;
+	MatrixXd A(numIn, numHidden);
+	weightsA = A;
+	MatrixXd B(numHidden+1, numOut);
+	weightsB = B;
+	mutationRate = 0.5;
+	mutationStd = 1.0;
 
 	if (afType == TANH){
-		ActivationFunction = &NeuralNet::HyperbolicTangent ;
+		ActivationFunction = &NeuralNet::HyperbolicTangent;
 	}
 	else if (afType == LOGISTIC){
-		ActivationFunction = &NeuralNet::LogisticFunction ;
+		ActivationFunction = &NeuralNet::LogisticFunction;
 	}
 	else{
-		std::cout << "ERROR: Unknown activation function type! Using default hyperbolic tangent function.\n" ;
-		ActivationFunction = &NeuralNet::HyperbolicTangent ;
+		std::cout << "ERROR: Unknown activation function type! Using default hyperbolic tangent function.\n";
+		ActivationFunction = &NeuralNet::HyperbolicTangent;
 	}
 
 	if (bOut == BOUNDED){
-		layerActivation.push_back(0) ;
-		layerActivation.push_back(1) ;
+		layerActivation.push_back(0);
+		layerActivation.push_back(1);
 	}
 	else{
-		layerActivation.push_back(0) ;
-		layerActivation.push_back(2) ;
+		layerActivation.push_back(0);
+		layerActivation.push_back(2);
 	}
 
-	InitialiseWeights(weightsA) ;
-	InitialiseWeights(weightsB) ;
+	InitialiseWeights(weightsA);
+	InitialiseWeights(weightsB);
 
-	eta = 0.0001 ; // learning rate for backprop
+	eta = 0.0001; // learning rate for backprop
 }
 
 // Evaluate NN output given input vector
 VectorXd NeuralNet::EvaluateNN(VectorXd inputs){
 	assert(inputs.size() == GetNumIn());
-	VectorXd hiddenLayer = (this->*ActivationFunction)(inputs, layerActivation[0]) ;
-	VectorXd outputs = (this->*ActivationFunction)(hiddenLayer, layerActivation[1]) ;
+	VectorXd hiddenLayer = (this->*ActivationFunction)(inputs, layerActivation[0]);
+	VectorXd outputs = (this->*ActivationFunction)(hiddenLayer, layerActivation[1]);
 	assert(outputs.size() != 0);
-	return outputs ;
+	return outputs;
 }
 
 // Evaluate NN output given input vector
 VectorXd NeuralNet::EvaluateNN(VectorXd inputs, VectorXd & hiddenLayer){
-	hiddenLayer = (this->*ActivationFunction)(inputs, layerActivation[0]) ;
-	VectorXd outputs = (this->*ActivationFunction)(hiddenLayer, layerActivation[1]) ;
-	return outputs ;
+	hiddenLayer = (this->*ActivationFunction)(inputs, layerActivation[0]);
+	VectorXd outputs = (this->*ActivationFunction)(hiddenLayer, layerActivation[1]);
+	return outputs;
 }
 
 // Mutate the weights of the NN according to the mutation rate and mutation value std
 void NeuralNet::MutateWeights(){
 	for (int i = 0; i < weightsA.rows(); i++)
 		for (int j = 0; j < weightsA.cols(); j++)
-			weightsA(i,j) += RandomMutation() ;
+			weightsA(i,j) += RandomMutation();
 
 	for (int i = 0; i < weightsB.rows(); i++)
 		for (int j = 0; j < weightsB.cols(); j++)
-			weightsB(i,j) += RandomMutation() ;
+			weightsB(i,j) += RandomMutation();
 }
 
 // Adds random amount mutationRate% of the time
@@ -78,121 +78,121 @@ double NeuralNet::RandomMutation() {
 
 // Assign weight matrices
 void NeuralNet::SetWeights(MatrixXd A, MatrixXd B){
-	weightsA = A ;
-	weightsB = B ;
+	weightsA = A;
+	weightsB = B;
 }
 
 // Wrapper for writing NN weight matrices to specified files
 void NeuralNet::OutputNN(const char * A, const char * B){
 	// Write NN weights to txt files
 	// File names stored in A and B
-	std::stringstream NNFileNameA ;
-	NNFileNameA << A ;
-	std::stringstream NNFileNameB ;
-	NNFileNameB << B ;
+	std::stringstream NNFileNameA;
+	NNFileNameA << A;
+	std::stringstream NNFileNameB;
+	NNFileNameB << B;
 
-	WriteNN(weightsA, NNFileNameA) ;
-	WriteNN(weightsB, NNFileNameB) ;
+	WriteNN(weightsA, NNFileNameA);
+	WriteNN(weightsB, NNFileNameB);
 }
 //TODO create unit tests
 void NeuralNet::BackPropagation(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets, size_t max_iter_count){
-	double sumSquaredError = DBL_MAX ;
-	double threshold = 0.001 ;
+	double sumSquaredError = DBL_MAX;
+	double threshold = 0.001;
 	assert(trainInputs.size() == trainTargets.size());
 
-	size_t step = 0 ;
+	size_t step = 0;
 	while (sumSquaredError > threshold*trainTargets.size() && step < max_iter_count){
 		// Feedforward NN evaluation to compute targets
-		vector<VectorXd> trainOutputs ;
-		vector<VectorXd> hiddenLayers ;
+		vector<VectorXd> trainOutputs;
+		vector<VectorXd> hiddenLayers;
 		for (size_t i = 0; i < trainInputs.size(); i++){
-			VectorXd hidden(weightsA.cols()) ;
-			VectorXd tt = EvaluateNN(trainInputs[i], hidden) ;
-			hiddenLayers.push_back(hidden) ;
-			trainOutputs.push_back(tt) ;
+			VectorXd hidden(weightsA.cols());
+			VectorXd tt = EvaluateNN(trainInputs[i], hidden);
+			hiddenLayers.push_back(hidden);
+			trainOutputs.push_back(tt);
 		}
 
 		for (size_t t = 0; t < trainInputs.size(); t++){
 			// Calculate error terms for weight matrix B(hidden neurons, output neurons)
-			MatrixXd deltaB(weightsB.rows(),weightsB.cols()) ;
-			VectorXd deltaL(weightsB.cols()) ; // store for calculating error terms for weight matrix A
+			MatrixXd deltaB(weightsB.rows(),weightsB.cols());
+			VectorXd deltaL(weightsB.cols()); // store for calculating error terms for weight matrix A
 			// Hidden layer neurons
-			VectorXd hidden(hiddenLayers[t].size()+1) ;
-			hidden.head(hiddenLayers[t].size()) = hiddenLayers[t] ;
-			hidden(hiddenLayers[t].size()) = bias ;
-			MatrixXd net = hidden.transpose()*weightsB ;
+			VectorXd hidden(hiddenLayers[t].size()+1);
+			hidden.head(hiddenLayers[t].size()) = hiddenLayers[t];
+			hidden(hiddenLayers[t].size()) = bias;
+			MatrixXd net = hidden.transpose()*weightsB;
 			assert(hiddenLayers[t].size()+1 == weightsB.rows());
 
 			for (int i = 0; i < weightsB.rows(); i++){
-				double oi = hidden(i) ;
+				double oi = hidden(i);
 				for (int j = 0; j < weightsB.cols(); j++){
-					double netj = net(j) ;
-					double oj = trainOutputs[t](j) ;
-					double denom = pow((exp(-netj) + exp(netj)),2) ;
-					deltaL(j) = (oj - trainTargets[t](j))*4.0/denom ;
-					deltaB(i,j) = -eta*oi*deltaL(j) ;
+					double netj = net(j);
+					double oj = trainOutputs[t](j);
+					double denom = pow((exp(-netj) + exp(netj)),2);
+					deltaL(j) = (oj - trainTargets[t](j))*4.0/denom;
+					deltaB(i,j) = -eta*oi*deltaL(j);
 				}
 			}
 
 			// Calculate error terms for weight matrix A(input neurons, hidden neurons)
-			MatrixXd deltaA(weightsA.rows(),weightsA.cols()) ;
-			net = trainInputs[t].transpose()*weightsA ;
+			MatrixXd deltaA(weightsA.rows(),weightsA.cols());
+			net = trainInputs[t].transpose()*weightsA;
 			for (int i = 0; i < weightsA.rows(); i++){
-				double oi = trainInputs[t](i) ;
+				double oi = trainInputs[t](i);
 				for (int j = 0; j < weightsA.cols(); j++){
-					double deltaJ	= 0.0 ;
+					double deltaJ	= 0.0;
 					for (int l = 0; l < weightsB.cols(); l++)
-						deltaJ += deltaL(l)*weightsB(j,l) ;
-					double netj = net(j) ;
-					double denom = pow((exp(-netj) + exp(netj)),2) ;
-					deltaA(i,j) = -eta*oi*deltaJ*4.0/denom ;
+						deltaJ += deltaL(l)*weightsB(j,l);
+					double netj = net(j);
+					double denom = pow((exp(-netj) + exp(netj)),2);
+					deltaA(i,j) = -eta*oi*deltaJ*4.0/denom;
 				}
 			}
 
-			weightsA += deltaA ;
-			weightsB += deltaB ;
+			weightsA += deltaA;
+			weightsB += deltaB;
 
 //			for (int i = 0; i < weightsA.rows(); i++){
 //				for (int j = 0; j < weightsA.cols(); j++)
-//					std::cout << deltaA(i,j) << " " ;
-//				std::cout << "\n" ;
+//					std::cout << deltaA(i,j) << " ";
+//				std::cout << "\n";
 //			}
 //			for (int i = 0; i < weightsB.rows(); i++)
 //				for (int j = 0; j < weightsB.cols(); j++){
-//					std::cout << deltaB(i,j) << " " ;
-//				std::cout << "\n" ;
+//					std::cout << deltaB(i,j) << " ";
+//				std::cout << "\n";
 //			}
 		}
-		sumSquaredError = 0.0 ;
+		sumSquaredError = 0.0;
 		for (size_t i = 0; i < trainInputs.size(); i++){
-			VectorXd tt = EvaluateNN(trainInputs[i]) ;
-			VectorXd d = tt - trainTargets[i] ;
+			VectorXd tt = EvaluateNN(trainInputs[i]);
+			VectorXd d = tt - trainTargets[i];
 			for (int j = 0; j < d.size(); j++){
-				d(j) = pow(d(j),2) ;
-				sumSquaredError += d(j) ;
+				d(j) = pow(d(j),2);
+				sumSquaredError += d(j);
 			}
 		}
 		if (step % 1000 == 0)
-			std::cout << "SSE step" << step << ": " << sumSquaredError << "\n" ;
-		step++ ;
+			std::cout << "SSE step" << step << ": " << sumSquaredError << "\n";
+		step++;
 	}
 }
 
 // Write weight matrix values to file
 void NeuralNet::WriteNN(MatrixXd A, std::stringstream &fileName){
-	std::ofstream NNFile ;
-	NNFile.open(fileName.str().c_str()) ;
+	std::ofstream NNFile;
+	NNFile.open(fileName.str().c_str());
 	for (int i = 0; i < A.rows(); i++){
 		for (int j = 0; j < A.cols(); j++)
-			NNFile << A(i,j) << "," ;
-		NNFile << "\n" ;
+			NNFile << A(i,j) << ",";
+		NNFile << "\n";
 	}
-	NNFile.close() ;
+	NNFile.close();
 }
 
 // Initialise NN weight matrices to random values
 void NeuralNet::InitialiseWeights(MatrixXd & A){
-	double fan_in = A.rows() ;
+	double fan_in = A.rows();
 	for (int i = 0; i < A.rows(); i++){
 		for (int j = 0; j< A.cols(); j++){
 			// For initialization of the neural net weights
@@ -205,54 +205,54 @@ void NeuralNet::InitialiseWeights(MatrixXd & A){
 
 // Hyperbolic tan activation function
 VectorXd NeuralNet::HyperbolicTangent(VectorXd input, size_t layer){
-	VectorXd output ;
+	VectorXd output;
 	if (layer == 0){
-		output = input.transpose()*weightsA ;
+		output = input.transpose()*weightsA;
 		for (int i = 0; i < output.size(); i++)
-			output(i) = tanh(output(i)) ;
+			output(i) = tanh(output(i));
 	}
 	else if (layer == 1){
-		VectorXd hidden(input.size()+1) ;
-		hidden.head(input.size()) = input ;
-		hidden(input.size()) = bias ;
-		output = hidden.transpose()*weightsB ;
+		VectorXd hidden(input.size()+1);
+		hidden.head(input.size()) = input;
+		hidden(input.size()) = bias;
+		output = hidden.transpose()*weightsB;
 		for (int i = 0; i < output.size(); i++)
-			output(i) = tanh(output(i)) ;
+			output(i) = tanh(output(i));
 	}
 	else if (layer == 2){
-		VectorXd hidden(input.size()+1) ;
-		hidden.head(input.size()) = input ;
-		hidden(input.size()) = bias ;
-		output = hidden.transpose()*weightsB ;
+		VectorXd hidden(input.size()+1);
+		hidden.head(input.size()) = input;
+		hidden(input.size()) = bias;
+		output = hidden.transpose()*weightsB;
 	}
 	else{
-		std::printf("Error: second argument must be in {0,1,2}!\n") ;
+		std::printf("Error: second argument must be in {0,1,2}!\n");
 	}
 
-	return output ;
+	return output;
 }
 
 // Logistic function activation function
 VectorXd NeuralNet::LogisticFunction(VectorXd input, size_t layer){
-	VectorXd output ;
+	VectorXd output;
 	if (layer == 0){
-		output = input.transpose()*weightsA ;
+		output = input.transpose()*weightsA;
 		for (int i = 0; i < output.size(); i++)
-			output(i) = 1/(1+exp(-output(i))) ;
+			output(i) = 1/(1+exp(-output(i)));
 	}
 	else if (layer == 1){
-		VectorXd hidden(input.size()+1) ;
-		hidden.head(input.size()) = input ;
-		hidden(input.size()) = bias ;
-		output = hidden.transpose()*weightsB ;
+		VectorXd hidden(input.size()+1);
+		hidden.head(input.size()) = input;
+		hidden(input.size()) = bias;
+		output = hidden.transpose()*weightsB;
 		for (int i = 0; i < output.size(); i++)
-			output(i) = 1/(1+exp(-output(i))) ;
+			output(i) = 1/(1+exp(-output(i)));
 	}
 	else if (layer == 2){
-		VectorXd hidden(input.size()+1) ;
-		hidden.head(input.size()) = input ;
-		hidden(input.size()) = bias ;
-		output = hidden.transpose()*weightsB ;
+		VectorXd hidden(input.size()+1);
+		hidden.head(input.size()) = input;
+		hidden(input.size()) = bias;
+		output = hidden.transpose()*weightsB;
 	}
 	else{
 		std::printf("Error: second argument must be in {0,1,2}!\n");

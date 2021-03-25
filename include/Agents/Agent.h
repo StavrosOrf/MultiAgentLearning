@@ -8,35 +8,28 @@
 #include <Eigen/Eigen>
 #include "Learning/NeuroEvo.h"
 
-using std::vector ;
-using std::string ;
+using std::vector;
+using std::string;
 
 class Agent{
 	public:
-		Agent(size_t nIn, size_t nOut, size_t nHidden) ;
-		~Agent() ;
+		Agent(size_t nIn, size_t nOut, size_t nHidden);
+		~Agent();
 
-		void ResetEpochEvals() ;
+		void ResetEpochEvals();
 
-		VectorXd ExecuteNNControlPolicy(size_t, VectorXd) ;
-		void SetEpochPerformance(double G, size_t i) ;
-		vector<double> GetEpochEvals(){return epochEvals ;}
-
-		//void EvolvePolicies(bool init = false) ;
 		void TrainAgent();
-
-		void OutputNNs(string);
 
 		size_t GetNumIn(){return numIn;}
 		size_t GetNumHidden(){return numHidden;}
 		size_t GetNumOut(){return numOut;}
 
 	protected:
-		size_t numIn ;
-		size_t numOut ;
-		size_t numHidden ;
+		size_t numIn;
+		size_t numOut;
+		size_t numHidden;
 
-		vector<double> epochEvals ;
+		vector<double> epochEvals;
 };
 
 #endif // AGENT_H_

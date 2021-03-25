@@ -38,24 +38,25 @@ DDPGAgent::~DDPGAgent(){
 
 
 void DDPGAgent::ResetEpochEvals(){
-
 }
 
+/************************************************************************************************
+ * *Input:a vector [s] of the input state and a vector [a] of input actions			*
+ * *Method:Does a foward pass of the associated NN						*
+ * *Output:Returns a vector of the final nodes of the NN					*
+ * ************************************************************************************************/
 VectorXd DDPGAgent::EvaluateActorNN_DDPG(VectorXd s){
 	return mu_actorNN->EvaluateNN(s);
 }
-
 VectorXd DDPGAgent::EvaluateCriticNN_DDPG(VectorXd s,VectorXd a){
 	VectorXd input(s.size() + a.size());
 	input << s, a;
 
 	return q_criticNN->EvaluateNN(input);
 }
-
 VectorXd DDPGAgent::EvaluateTargetActorNN_DDPG(VectorXd s){
 	return mu_target_actorNN->EvaluateNN(s);
 }
-
 VectorXd DDPGAgent::EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a){
 	VectorXd input(s.size() + a.size()),output;
 	input << s, a;
@@ -68,15 +69,23 @@ VectorXd DDPGAgent::EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a){
 	return output;
 }
 
+/************************************************************************************************
+ * *Input:	a replay [r]									*
+ * *Method:Adds [r] to the [replay_buffer], if [replay_buffer] is full it evicts a tuple	*
+ * ************************************************************************************************/
 void DDPGAgent::addToReplayBuffer(replay r){
 	assert(r.next_state.size() == r.current_state.size() && r.current_state.size() == 38);
 
-	if(replay_buffer.size() < REPLAY_BUFFER_SIZE)
+	if (replay_buffer.size() < REPLAY_BUFFER_SIZE)
 		replay_buffer.push_back(r);
 	else
 		replay_buffer[rand()%REPLAY_BUFFER_SIZE] = r;
 }
-
+/************************************************************************************************
+ * *Input:[size] of batch to return								*
+ * *Method:Selects a non-inclusive (with unique items) minibanch from the replay buffer		*
+ * *Output:Returns a non-inclusive miniBatch of [size]						*
+ * ************************************************************************************************/
 vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
 	std::vector<replay> temp;
 	assert(replay_buffer.size() >= size);
@@ -86,14 +95,18 @@ vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
 		temp.push_back(replay_buffer[r]);
 		replay_buffer.erase(replay_buffer.begin()+r);
 	}
-	assert(temp.size() == size );
-	for (size_t i = 0; i < size ; i++)
+	assert(temp.size() == size);
+	for (size_t i = 0; i < size; i++)
 		replay_buffer.push_back(temp[i]);
 
 	assert(temp.size() == size);
 	return temp;
 }
 
+/************************************************************************************************
+ * *Method:updates the network parameters (aka network transition weights) of target networks	*
+ * *	by slow updating (with learning rate [TAU]) from non-targer networks			*
+ * ************************************************************************************************/
 void DDPGAgent::updateTargetWeights(){
 	MatrixXd QtA = TAU*q_criticNN->GetWeightsA() + (1-TAU)*q_target_criticNN->GetWeightsA();
 	MatrixXd QtB = TAU*q_criticNN->GetWeightsB() + (1-TAU)*q_target_criticNN->GetWeightsB();

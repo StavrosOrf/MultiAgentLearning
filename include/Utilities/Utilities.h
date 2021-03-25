@@ -12,12 +12,12 @@
 
 namespace easymath{
 // Returns a random number between two values
-double rand_interval(double low, double high) ;
+double rand_interval(double low, double high);
 
 // Normalise angles between +/-PI
-double pi_2_pi(double) ;
+double pi_2_pi(double);
 
 // Sum elements in a vector
-double sum(std::vector<double>) ;
+double sum(std::vector<double>);
 } // namespace easymath
 #endif // UTILITIES_H_

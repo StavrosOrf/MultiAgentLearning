@@ -62,3 +62,10 @@ might need to restore some basic ware house functions
 - added changelog format (top of this file)
 - added testNeuralNet.cpp to cmake list
 - deprecated testNeuralNet.cpp (it is bugged and uses unfished code)
+
+##v 0.00011k
+- deprecated NEUROEVO and everthing associated with it
+- deprecated allmulti agent structures (will bring back later)
+- Changed source formating now all lines that end with ';' do not contain
+white space characters between the last character and ';'
+- added a bunch of function comments
