@@ -43,3 +43,8 @@ GaussianProcess.h, all POMDPs, testLapackInverse.cpp, testMultiRobotROS.cpp
 - assert!, assert?, assert is love assert life, join the cult of asserts
 - Streamlined the results output process in testwarehouse.cpp
 - Found and commented a bunch of bugs
+
+##v 0.00009k
+- Fixed Warehouse Simulation ( Now all edges properly count edges ),
+	might need to restore some basic ware house functions
+- Minor print fixes

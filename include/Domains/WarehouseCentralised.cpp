@@ -41,7 +41,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 	// each timestep
 	for (size_t t = 0; t < nSteps; t++){
-		std::cout <<"=====================================Step - "<<t<<std::endl;
+		std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
 		VectorXd actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
 		// Add Random Noise from process N
@@ -59,6 +59,8 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 		// QueryMATeam(memberIDs, a, s) ;
+		vector<Edge *> e_temp = whGraph->GetEdges() ;
+		GetJointState(e_temp, s) ;
 
 		//TODO explain
 		for (size_t i = 0; i < nAgents; i++)
@@ -163,8 +165,20 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		//Create and Save replay to buffer
 
 		assert(temp_state.size() == cur_state.size() && cur_state.size() == N_EDGES);
-		replay r = {temp_state,cur_state,actions,(double)totalMove/whAGVs.size()};
+		double reward = (double)totalMove/whAGVs.size();
+		std::cout<<"Reward: "<<reward<<std::endl;
+		replay r = {temp_state,cur_state,actions,reward};
 		ddpg_maTeam[0]->addToReplayBuffer(r);
+		//TODO 
+		//Reward idea: (different weight for each type of edge) 
+		//           * (Number of AGVs moving on that edge)
+		// 					 - w1*(Number of AGVs waiting)
+
+		// We need to give incentive to AGVs to prefer moving
+	  // than waiting in heavy traffic nodes 
+	  // ( maybe target Actor update will fix this)
+	  // if not we need to think about that
+
 
 		//TODO
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){

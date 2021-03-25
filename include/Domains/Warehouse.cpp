@@ -326,8 +326,10 @@ void Warehouse::UpdateGraphCosts(vector<double> costs){
 void Warehouse::print_warehouse_state(){
 	vector<size_t> cur_state = get_edge_utilization();
 	std::cout << "Warehouse utilization: {";
-	for (size_t n = 0; n < N_EDGES; n++)
-		std::cout<<"[e_"<< n << ", agv_pop= " << cur_state[n] << "], ";
+	for (size_t n = 0; n < N_EDGES; n++){
+		if (cur_state[n] > 0 )
+			std::cout<<"[e_"<< n << ", pop= " << cur_state[n] << "], ";
+	}
 	std::cout << '}' << std::endl;
 }
 
