@@ -12,13 +12,11 @@
 #include <float.h>
 #include <Eigen/Eigen>
 #include <yaml-cpp/yaml.h>
-#include "Agents/NeuroEvoAgent.h"
-#include "Agents/Intersection.h"
-#include "Agents/Link.h"
 #include "Planning/Graph.h"
 #include "Planning/Edge.h"
 #include "AGV.h"
 #include "Agents/DDPGAgent.h"
+
 #define N_EDGES whGraph->GetEdges().size()
 
 using std::vector ;
@@ -55,7 +53,7 @@ class Warehouse{
 		void OutputEpisodeReplay(string, string, string, string) ;
 		void DisableEpisodeReplayOutput(){outputEpReplay = false ;}
 
-		void LoadPolicies(YAML::Node) ;
+		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
 		void SetTrainingAlgo(algo_type algot){algo = algot;}
 		virtual void SimulateEpochDDPG(){;}
 
@@ -69,8 +67,9 @@ class Warehouse{
 		size_t nPop ;
 		size_t nAgents ;
 		size_t nAGVs ;
+		//TODO make it const
 		vector<double> baseCosts ;
-		vector<size_t> capacities ;
+		const vector<size_t> capacities ;
 		bool neLearn ;
 
 		algo_type algo;
@@ -81,7 +80,6 @@ class Warehouse{
 		} ;
 
 		vector<DDPGAgent *> ddpg_maTeam;
-		vector<NeuroEvoAgent *> maTeam ; // manage agent NE routines
 		vector<iAgent *> whAgents ; // manage agent vertex and edge lookups from graph
 		Graph * whGraph ; // vertex and edge definitions, access to change edge costs at each step
 		vector<AGV *> whAGVs ; // manage AGV A* search and movement through graph
@@ -91,10 +89,6 @@ class Warehouse{
 		void InitialiseNewEpoch() ; // reset simulation for each episode/epoch
 
 		vector< vector<size_t> > RandomiseTeams(size_t) ; // shuffle agent populations
-
-		virtual void QueryMATeam(vector<size_t> memberIDs, vector<double> &a, vector<size_t> &s){
-			std::cout << "This function queries the multiagent team for its graph costs.\n" ;
-		}
 
 		void UpdateGraphCosts(vector<double>) ;
 

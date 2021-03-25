@@ -10,6 +10,7 @@ project(test_includes)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Eigen3 REQUIRED)
+#find_package(Caffe REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 include_directories( ${Boost_INCLUDE_DIRS}
@@ -31,12 +32,6 @@ set( LIBS_TO_LINK Utilities
                   Planning
                   yaml-cpp
                   ${CMAKE_THREAD_LIBS_INIT})# -llapack
-
-add_executable(testNeuralNetEigen testNeuralNetEigen.cpp)
-target_link_libraries( testNeuralNetEigen ${LIBS_TO_LINK} )
-
-add_executable(testNeuroEvoEigen testNeuroEvoEigen.cpp)
-target_link_libraries( testNeuroEvoEigen ${LIBS_TO_LINK} )
 
 add_executable(testSearch testSearch.cpp)
 target_link_libraries( testSearch ${LIBS_TO_LINK} )

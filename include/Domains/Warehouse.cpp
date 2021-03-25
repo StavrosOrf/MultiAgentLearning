@@ -24,12 +24,10 @@ Warehouse::~Warehouse(void){
 	for (size_t i = 0; i < whAgents.size(); i++){
 		delete whAgents[i] ;
 		whAgents[i] = 0 ;
-		delete maTeam[i] ;
-		maTeam[i] = 0 ;
+		//TODO DELETE AGENTS
 	}
-	if (outputEvals){
+	if (outputEvals)
 		evalFile.close() ;
-	}
 	if (outputEpReplay){
 		agvStateFile.close() ;
 		agvEdgeFile.close() ;
@@ -38,20 +36,13 @@ Warehouse::~Warehouse(void){
 	}
 }
 
-void Warehouse::EvolvePolicies(bool init){
-	for (size_t i = 0; i < nAgents; i++)
-		maTeam[i]->EvolvePolicies(init) ;
-}
-
 void Warehouse::ResetEpochEvals(){
-	if( algo = algo_type::ddpg ){
+	if( algo = algo_type::ddpg )
 		for (size_t i = 0; i < nAgents; i++)
 			ddpg_maTeam[i]->ResetEpochEvals() ;
-	} else if( algo = algo_type::neuroevo ){
-		for (size_t i = 0; i < nAgents; i++)
-			maTeam[i]->ResetEpochEvals() ;
+	else{
+		std::cout << "ERROR: Warehouse::ResetEpochEvals() invalid algo" << std::endl;
 	}
-
 }
 
 void Warehouse::OutputPerformance(string eval_str){
@@ -65,9 +56,7 @@ void Warehouse::OutputPerformance(string eval_str){
 }
 
 void Warehouse::OutputControlPolicies(string nn_str){
-	for (size_t i = 0; i < nAgents; i++){
-		maTeam[i]->OutputNNs(nn_str) ;
-	}
+	//TODO
 }
 
 void Warehouse::OutputEpisodeReplay(string agv_s_str, string agv_e_str, string a_s_str, string a_a_str){
@@ -99,71 +88,6 @@ void Warehouse::OutputEpisodeReplay(string agv_s_str, string agv_e_str, string a
 }
 
 void Warehouse::LoadPolicies(YAML::Node configs){
-	// Filename to read NN control policy
-	string nn_str = configs["mode"]["agent_policies"].as<string>() ;
-	std::ifstream nnFile ;
-
-	vector<NeuralNet *> loadedNN ;
-	size_t fPop = 2*nPop ;
-	std::cout << "Reading out " << fPop << " NN control policies for each agent to test...\n" ;
-
-	// Read in NN weight matrices for each agent
-	int kStart = 0 ;
-	int kEnd ;
-	for (size_t n = 0; n < nAgents; n++){
-		// Double population through mutation
-		maTeam[n]->GetNEPopulation()->MutatePopulation() ;
-
-		nnFile.open(nn_str.c_str(),std::ios::in) ;
-		// Get NN matrix parameters for current agent
-		size_t nIn = maTeam[n]->GetNumIn() ;
-		size_t nOut = maTeam[n]->GetNumOut() ;
-		size_t nHid = maTeam[n]->GetNumHidden() ;
-		std::string line ;
-		MatrixXd NNA ;
-		MatrixXd NNB ;
-		NNA.setZero(nIn,nHid) ;
-		NNB.setZero(nHid+1,nOut) ;
-		int nnK = NNA.rows() + NNB.rows() ; // number of lines corresponding to a single NN
-		int popK = nnK * fPop ; // number of lines corresponding to the entire population
-		kEnd = kStart + popK ; // rows corresponding to agent i's NN population
-		size_t m = 0 ; // track member number
-		int k = 0 ; // track line number
-		while (std::getline(nnFile,line)){
-			std::stringstream lineStream(line) ;
-			std::string cell ;
-			if (k >= kStart){
-				if ((k-kStart) % nnK < NNA.rows()){
-					int i = (k-kStart) % nnK ;
-					int j = 0 ;
-					while (std::getline(lineStream,cell,',')){
-						NNA(i,j++) = atof(cell.c_str()) ;
-					}
-				}
-				else {
-					int i = ((k-kStart) % nnK)-NNA.rows() ;
-					int j = 0 ;
-					while (std::getline(lineStream,cell,',')){
-						NNB(i,j++) = atof(cell.c_str()) ;
-					}
-				}
-				if ((k-kStart+1) % nnK == 0){
-					maTeam[n]->GetNEPopulation()->GetNNIndex(m)->SetWeights(NNA,NNB) ;
-					m++ ;
-				}
-			}
-			k++ ;
-			if (k >= kEnd){
-				if (m != fPop){
-					std::cout << "Error: insufficient NN's to fill all population members. Exiting.\n" ;
-					exit(1) ;
-				}
-				kStart = kEnd ;
-				break ;
-			}
-		}
-		nnFile.close() ;
-	}
 }
 
 void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::Node configs){
@@ -222,7 +146,8 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 	}
 	while (getline(capacitiesFile,line))
 	{
-		capacities.push_back((size_t)atoi(line.c_str())) ;
+		//TODO FIX?
+		//capacities.push_back((size_t)atoi(line.c_str())) ;
 	}
 	cout << "complete.\n" ;
 
