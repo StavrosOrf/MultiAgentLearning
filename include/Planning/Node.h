@@ -17,7 +17,7 @@ class Node
 	public:
 		Node(int vertex):
 			itsVertex(vertex), itsParent(0), itsCost(0.0) {}
-		
+
 		Node(int vertex, nodeType n):
 		itsVertex(vertex), itsParent(0)
 		{
@@ -30,26 +30,26 @@ class Node
 					itsCost = DBL_MAX ;
 			}
 		}
-		
+
 		Node(Node * parent, Edge * edge):
 		itsParent(parent)
 		{
 			itsVertex = edge->GetVertex2() ;
 			itsCost = itsParent->GetCost() + edge->GetCost() ;
 		}
-		
+
 		~Node(){} ;
-		
+
 		Node * GetParent() const {return itsParent ;}
 		void SetParent(Node * parent) {itsParent = parent ;}
 		double GetCost() const {return itsCost ;}
 		void SetCost(double cost) {itsCost = cost ;}
 		int GetVertex() const {return itsVertex ;}
 		void SetVertex(int vertex) {itsVertex = vertex ;}
-		
+
 		void DisplayPath() ;
 		Node * ReverseList(Node * itsChild) ;
-		
+
 	private:
 		int itsVertex ;
 		Node * itsParent ;

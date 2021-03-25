@@ -8,13 +8,13 @@ NeuroEvoAgent::~NeuroEvoAgent(){
 	delete(AgentNE) ;
 	AgentNE = 0 ;
 }
-	
+
 void NeuroEvoAgent::ResetEpochEvals(){
 	// Re-initialise size of evaluations vector
 	vector<double> evals(2*popSize,0) ;
 	epochEvals = evals ;
 }
-		
+
 VectorXd NeuroEvoAgent::ExecuteNNControlPolicy(size_t i, VectorXd s){
 	VectorXd output = AgentNE->GetNNIndex(i)->EvaluateNN(s);
 	return output ;
@@ -28,15 +28,15 @@ void NeuroEvoAgent::EvolvePolicies(bool init){
 	if (!init){
 		AgentNE->EvolvePopulation(epochEvals) ;
 	}
-	
+
 	AgentNE->MutatePopulation() ;
 }
-		
+
 void NeuroEvoAgent::OutputNNs(string A){
 	// Filename to write to stored in A
 	std::ofstream NNFile ;
 	NNFile.open(A.c_str(),std::ios::app) ;
-	
+
 	// Write in all policies
 	for (size_t i = 0; i < popSize*2; i++){
 		NeuralNet * NN = AgentNE->GetNNIndex(i) ;
@@ -46,7 +46,7 @@ void NeuroEvoAgent::OutputNNs(string A){
 				NNFile << NNA(j,k) << "," ;
 			NNFile << "\n" ;
 		}
-		
+
 		MatrixXd NNB = NN->GetWeightsB() ;
 		for (int j = 0; j < NNB.rows(); j++){
 			for (int k = 0; k < NNB.cols(); k++)

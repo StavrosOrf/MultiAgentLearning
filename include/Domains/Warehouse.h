@@ -37,7 +37,7 @@ class Warehouse{
 	public:
 		Warehouse(YAML::Node) ;
 		virtual ~Warehouse(void) ;
-		
+
 		virtual void SimulateEpoch(bool train = true){
 			std::cout << "This function simulates a single learning epoch.\n" ;
 		}
@@ -49,7 +49,7 @@ class Warehouse{
 		}
 		void EvolvePolicies(bool init = false) ;
 		void ResetEpochEvals() ;
-		
+
 		void OutputPerformance(string) ;
 		void OutputControlPolicies(string) ;
 		void OutputEpisodeReplay(string, string, string, string) ;
@@ -60,7 +60,7 @@ class Warehouse{
 		virtual void SimulateEpochDDPG(){;}
 
 		void print_warehouse_state();
-		vector<size_t> get_edge_utilization(bool verbose = false);
+		vector<size_t> get_edge_utilization(bool verbose = false) __attribute__ ((pure));
 	protected:
 		void replan_AGVs(std::vector<double> cost_add);
 		void transition_AGVs();
@@ -72,39 +72,39 @@ class Warehouse{
 		vector<double> baseCosts ;
 		vector<size_t> capacities ;
 		bool neLearn ;
-		
+
 		algo_type algo;
 		struct iAgent{
 			size_t vID ;					// graph vertex ID associated with agent (edge ID if link agent)
 			vector<size_t> eIDs ; // graph edge IDs associated with incoming edges to agent vertex (vertex IDs if link agent)
 			list<size_t> agvIDs ; // agv IDs waiting to cross intersection
 		} ;
-		
+
 		vector<DDPGAgent *> ddpg_maTeam;
 		vector<NeuroEvoAgent *> maTeam ; // manage agent NE routines
 		vector<iAgent *> whAgents ; // manage agent vertex and edge lookups from graph
 		Graph * whGraph ; // vertex and edge definitions, access to change edge costs at each step
 		vector<AGV *> whAGVs ; // manage AGV A* search and movement through graph
-		
+
 		void InitialiseGraph(string, string, string, YAML::Node) ; // read in configuration files and construct Graph
 		void InitialiseAGVs(YAML::Node) ; // create AGVs to move in graph
 		void InitialiseNewEpoch() ; // reset simulation for each episode/epoch
-		
+
 		vector< vector<size_t> > RandomiseTeams(size_t) ; // shuffle agent populations
-		
+
 		virtual void QueryMATeam(vector<size_t> memberIDs, vector<double> &a, vector<size_t> &s){
 			std::cout << "This function queries the multiagent team for its graph costs.\n" ;
 		}
 
 		void UpdateGraphCosts(vector<double>) ;
-		
+
 //		virutal void GetJointState(vector<Edge *> e, vector<size_t> &eNum, vector<double> &eTime) ;
 //		virtual void GetJointState(vector<Edge *> e, vector<size_t> &s) ;
 //		virtual size_t GetAgentID(int) ;
-		
+
 		bool outputEvals ;
 		bool outputEpReplay ;
-		
+
 		std::ofstream evalFile ;
 		std::ofstream agvStateFile ;
 		std::ofstream agvEdgeFile ;

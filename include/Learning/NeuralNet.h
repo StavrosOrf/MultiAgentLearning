@@ -25,7 +25,7 @@ class NeuralNet{
 	public:
 		NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afType=LOGISTIC, nnOut bOut=BOUNDED) ; // single hidden layer
 		~NeuralNet(){}
-		
+
 		Eigen::VectorXd EvaluateNN(VectorXd inputs) ;
 		VectorXd EvaluateNN(VectorXd inputs, VectorXd & hiddenLayer) ;
 		void MutateWeights() ;

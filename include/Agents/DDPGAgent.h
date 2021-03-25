@@ -33,7 +33,7 @@ class DDPGAgent{
 		VectorXd EvaluateCriticNN_DDPG(VectorXd s,VectorXd a);
 		VectorXd EvaluateActorNN_DDPG(VectorXd s);
 		VectorXd EvaluateTargetActorNN_DDPG(VectorXd s);
-		VectorXd EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a);		
+		VectorXd EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a);
 		void ResetEpochEvals() ;
 
 		vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);
@@ -51,7 +51,7 @@ class DDPGAgent{
 		NeuralNet * mu_actorNN;
 		NeuralNet * mu_target_actorNN;
 
-		
+
 
 };
 

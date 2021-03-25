@@ -1,4 +1,11 @@
+changelog format:
+##v [semver][k/o depending on who pushed the update]
+- change #0
+- change #1 blablablablablablablablablablablablablablabla
+blablablablablablabla (no tabs after newline)
+[newline after each version]
 
+##v 0.00000
 -Added (structure for) new Learning Algorithm IterRL
 
 ##v 0.00001k
@@ -15,7 +22,7 @@
 - changed indent to tabs
 - added new skeleton classes: AgentDDPG
 
-##v 0.00004s
+##v 0.00004o
 - Undocumented
 
 ##v 0.00005k
@@ -30,7 +37,7 @@ to our code base)
 - Deprecated Rovers class (and it's associated domains and tests)
 - Implemented DDPG's deconstructor
 
-##v 0.00007s
+##v 0.00007o
 - Implented critic back propagations
 - Finished DDPG constructor
 
@@ -44,7 +51,14 @@ GaussianProcess.h, all POMDPs, testLapackInverse.cpp, testMultiRobotROS.cpp
 - Streamlined the results output process in testwarehouse.cpp
 - Found and commented a bunch of bugs
 
-##v 0.00009k
+##v 0.00009o
 - Fixed Warehouse Simulation ( Now all edges properly count edges ),
-	might need to restore some basic ware house functions
+might need to restore some basic ware house functions
 - Minor print fixes
+
+##v 0.00010k
+- sed all the trailing white spaces away
+- minor pefomance tweak
+- added changelog format (top of this file)
+- added testNeuralNet.cpp to cmake list
+- deprecated testNeuralNet.cpp (it is bugged and uses unfished code)

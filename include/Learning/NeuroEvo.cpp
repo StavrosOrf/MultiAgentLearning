@@ -17,18 +17,18 @@ NeuroEvo::~NeuroEvo(){
 	}
 }
 
-// Double population size by adding NN with mutated weights of existing NN 
+// Double population size by adding NN with mutated weights of existing NN
 void NeuroEvo::MutatePopulation(){
 	if (computeMutationNorms){
 		mutationFrobeniusNorm.clear() ;
 	}
-	
+
 	for (size_t i = 0; i < populationSize; i++){
 		size_t j = i + populationSize ;
 		populationNN.push_back(new NeuralNet(numIn, numOut, numHidden, activationFunction)) ;
 		populationNN[j]->SetWeights(populationNN[i]->GetWeightsA(),populationNN[i]->GetWeightsB()) ;
 		populationNN[j]->MutateWeights() ;
-		
+
 		if (computeMutationNorms){
 			mutationFrobeniusNorm.push_back(ComputeFrobeniusNorm(populationNN[i]->GetWeightsA(),populationNN[i]->GetWeightsB(),populationNN[j]->GetWeightsA(),populationNN[j]->GetWeightsB())) ;
 		}
@@ -39,11 +39,11 @@ void NeuroEvo::MutatePopulation(){
 void NeuroEvo::EvolvePopulation(vector<double> evaluation){
 	for (size_t i = 0; i < 2*populationSize; i++)
 		populationNN[i]->SetEvaluation(evaluation[i]) ;
-	
+
 	// Shuffle in preparation for comparisons
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count() ;
 	shuffle(populationNN.begin(), populationNN.end(), std::default_random_engine(seed)) ;
-	
+
 	(this->*SurvivalFunction)() ;
 }
 
@@ -78,12 +78,12 @@ bool NeuroEvo::CompareEvaluations(NeuralNet* NN0, NeuralNet* NN1){
 // Retain the best half of the population
 void NeuroEvo::RetainBestHalf(){
 	std::sort(populationNN.begin(),populationNN.end(),CompareEvaluations) ;
-	
+
 	for (size_t i = populationSize; i < 2*populationSize; i++){
 		delete(populationNN[i]) ;
 		populationNN[i] = 0 ;
 	}
-	
+
 	// Pop from the back
 	for (size_t i = 0; i < populationSize; i++)
 		populationNN.pop_back() ;

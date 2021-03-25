@@ -9,7 +9,7 @@ Warehouse::Warehouse(YAML::Node configs){
 	nPop = configs["neuroevo"]["population_size"].as<size_t>() ;
 	nSteps = configs["simulation"]["steps"].as<size_t>() ;
 	neLearn = configs["neuroevo"]["learn"].as<bool>() ;
-	
+
 	InitialiseGraph(vFile, eFile, cFile, configs) ;
 	outputEvals = false ;
 }
@@ -46,21 +46,21 @@ void Warehouse::EvolvePolicies(bool init){
 void Warehouse::ResetEpochEvals(){
 	if( algo = algo_type::ddpg ){
 		for (size_t i = 0; i < nAgents; i++)
-			ddpg_maTeam[i]->ResetEpochEvals() ;	
+			ddpg_maTeam[i]->ResetEpochEvals() ;
 	} else if( algo = algo_type::neuroevo ){
 		for (size_t i = 0; i < nAgents; i++)
-			maTeam[i]->ResetEpochEvals() ;	
+			maTeam[i]->ResetEpochEvals() ;
 	}
-	
+
 }
 
 void Warehouse::OutputPerformance(string eval_str){
 	if (evalFile.is_open())
 		evalFile.close() ;
 	evalFile.open(eval_str.c_str(),std::ios::app) ;
-	
+
 	outputEvals = true ;
-	
+
 	std::cout << "Writing evaluation outputs to file: " << eval_str << "\n" ;
 }
 
@@ -74,25 +74,25 @@ void Warehouse::OutputEpisodeReplay(string agv_s_str, string agv_e_str, string a
 	if (agvStateFile.is_open())
 		agvStateFile.close() ;
 	agvStateFile.open(agv_s_str.c_str(),std::ios::app) ;
-	
+
 	if (agvEdgeFile.is_open())
 		agvEdgeFile.close() ;
 	agvEdgeFile.open(agv_e_str.c_str(),std::ios::app) ;
-	
+
 	if (agentStateFile.is_open())
 		agentStateFile.close() ;
 	agentStateFile.open(a_s_str.c_str(),std::ios::app) ;
-	
+
 	if (agentActionFile.is_open())
 		agentActionFile.close() ;
 	agentActionFile.open(a_a_str.c_str(),std::ios::app) ;
-	
+
 	outputEpReplay = true ;
-	
+
 	std::cout << "Writing AGV logs to files: " << "\n" ;
 	std::cout << "\t" << agv_s_str << "\n" ;
 	std::cout << "\t" << agv_e_str << "\n" ;
-	
+
 	std::cout << "Writing agent logs to files: " << "\n" ;
 	std::cout << "\t" << a_s_str << "\n" ;
 	std::cout << "\t" << a_a_str << "\n" ;
@@ -102,18 +102,18 @@ void Warehouse::LoadPolicies(YAML::Node configs){
 	// Filename to read NN control policy
 	string nn_str = configs["mode"]["agent_policies"].as<string>() ;
 	std::ifstream nnFile ;
-	
+
 	vector<NeuralNet *> loadedNN ;
 	size_t fPop = 2*nPop ;
 	std::cout << "Reading out " << fPop << " NN control policies for each agent to test...\n" ;
-	
+
 	// Read in NN weight matrices for each agent
 	int kStart = 0 ;
 	int kEnd ;
 	for (size_t n = 0; n < nAgents; n++){
 		// Double population through mutation
 		maTeam[n]->GetNEPopulation()->MutatePopulation() ;
-	
+
 		nnFile.open(nn_str.c_str(),std::ios::in) ;
 		// Get NN matrix parameters for current agent
 		size_t nIn = maTeam[n]->GetNumIn() ;
@@ -170,7 +170,7 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 	vector<int> vertices ;
 	vector< vector<int> > edges ;
 	vector< double > costs ;
-	
+
 	// Read in data from files
 	cout << "Reading vertices from file: " ;
 	ifstream verticesFile(v_str.c_str()) ;
@@ -185,7 +185,7 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 		vertices.push_back(atoi(line.c_str())) ;
 	}
 	cout << "complete. " << vertices.size() << " vertices in graph.\n" ;
-	
+
 	cout << "Reading edges from file: " ;
 	ifstream edgesFile(e_str.c_str()) ;
 	cout << e_str.c_str() << "..." ;
@@ -209,9 +209,9 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 		edges.push_back(e) ;
 	}
 	cout << "complete. " << edges.size() << " edges in graph.\n" ;
-	
+
 	baseCosts = costs ;
-	
+
 	// Read in data from files
 	cout << "Reading capacities from file: " ;
 	ifstream capacitiesFile(c_str.c_str()) ;
@@ -225,12 +225,12 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 		capacities.push_back((size_t)atoi(line.c_str())) ;
 	}
 	cout << "complete.\n" ;
-	
+
 	whGraph = new Graph(vertices, edges, costs) ;
-	
+
 //	std::cout << "Number of graph vertices: " << whGraph->GetNumVertices() << "\n" ;
 //	std::cout << "Number of graph edges: " << whGraph->GetNumEdges() << "\n" ;
-	
+
 //	InitialiseMATeam() ;
 	InitialiseAGVs(configs) ;
 }
@@ -239,7 +239,7 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 	string domainDir = configs["domain"]["folder"].as<string>() ;
 	// Initialise AGV objects
 	string agv_str = domainDir + configs["simulation"]["agvs"].as<string>() ;
-	
+
 	// Read in data from files
 	cout << "Reading AGVs from file: " ;
 	ifstream AGVFile(agv_str.c_str()) ;
@@ -257,12 +257,12 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 		nAGVs++ ;
 	}
 	cout << "complete. Created " << nAGVs << " AGVs.\n" ;
-	
+
 //	std::cout << "Number of AGVs: " << nAGVs << "\n" ;
-	
+
 	// Store valid destination vertex IDs
 	string goal_str = domainDir + configs["simulation"]["goals"].as<string>() ;
-	
+
 	// Read in data from files
 	cout << "Reading goal vertex IDs from file: " ;
 	ifstream goalFile(goal_str.c_str()) ;
@@ -277,9 +277,9 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 		agvGoals.push_back(atoi(line.c_str())) ;
 	}
 	cout << "complete. " << agvGoals.size() << " goal vertices.\n" ;
-	
+
 //	std::cout << "Number of possible goals: " << agvGoals.size() << "\n" ;
-	
+
 	for (size_t i = 0; i < nAGVs; i++){
 		AGV * agv = new AGV(agvOrigins[i], agvGoals, whGraph) ;
 		whAGVs.push_back(agv) ;
@@ -302,14 +302,14 @@ vector< vector<size_t> > Warehouse::RandomiseTeams(size_t n){ // n = number of a
 	for (size_t i = 0; i < n; i++){
 		order.push_back(i) ;
 	}
-	
+
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count() ;
 
 	for (size_t j = 0; j < nAgents; j++){
 		shuffle (order.begin(), order.end(), std::default_random_engine(seed)) ;
 		teams.push_back(order) ;
 	}
-	
+
 	return teams ;
 }
 
@@ -363,10 +363,10 @@ void Warehouse::replan_AGVs(std::vector<double> cost_add){
 	// Replan AGVs as necessary
 	for (size_t k = 0; k < nAGVs; k++){
 		whAGVs[k]->CompareCosts(cost_add) ; // set replanning flags
-	
+
 		if (whAGVs[k]->GetIsReplan()) // replanning needed
 			whAGVs[k]->PlanAGV(cost_add) ;
-		
+
 		// Identify any new AGVs that need to cross an intersection
 		if (whAGVs[k]->GetT2V() == 0){
 			size_t agentID = 0 ; // only one agent
@@ -393,7 +393,7 @@ void Warehouse::transition_AGVs(){
 		for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
 			size_t curAGV = *it ;
 			size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()) ; // next edge ID
-			
+
 			bool edgeFull = false ;
 			if (nextID < 0 || nextID >= s.size()){
 				std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n" ;

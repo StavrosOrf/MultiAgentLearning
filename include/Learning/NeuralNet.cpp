@@ -9,7 +9,7 @@ NeuralNet::NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afTyp
 	weightsB = B ;
 	mutationRate = 0.5 ;
 	mutationStd = 1.0 ;
-	
+
 	if (afType == TANH){
 		ActivationFunction = &NeuralNet::HyperbolicTangent ;
 	}
@@ -20,7 +20,7 @@ NeuralNet::NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afTyp
 		std::cout << "ERROR: Unknown activation function type! Using default hyperbolic tangent function.\n" ;
 		ActivationFunction = &NeuralNet::HyperbolicTangent ;
 	}
-	
+
 	if (bOut == BOUNDED){
 		layerActivation.push_back(0) ;
 		layerActivation.push_back(1) ;
@@ -29,15 +29,15 @@ NeuralNet::NeuralNet(size_t numIn, size_t numOut, size_t numHidden, actFun afTyp
 		layerActivation.push_back(0) ;
 		layerActivation.push_back(2) ;
 	}
-		
+
 	InitialiseWeights(weightsA) ;
 	InitialiseWeights(weightsB) ;
-	
+
 	eta = 0.0001 ; // learning rate for backprop
 }
 
 // Evaluate NN output given input vector
-VectorXd NeuralNet::EvaluateNN(VectorXd inputs){	
+VectorXd NeuralNet::EvaluateNN(VectorXd inputs){
 	assert(inputs.size() == GetNumIn());
 	VectorXd hiddenLayer = (this->*ActivationFunction)(inputs, layerActivation[0]) ;
 	VectorXd outputs = (this->*ActivationFunction)(hiddenLayer, layerActivation[1]) ;
@@ -57,7 +57,7 @@ void NeuralNet::MutateWeights(){
 	for (int i = 0; i < weightsA.rows(); i++)
 		for (int j = 0; j < weightsA.cols(); j++)
 			weightsA(i,j) += RandomMutation() ;
-	
+
 	for (int i = 0; i < weightsB.rows(); i++)
 		for (int j = 0; j < weightsB.cols(); j++)
 			weightsB(i,j) += RandomMutation() ;
@@ -228,7 +228,7 @@ VectorXd NeuralNet::HyperbolicTangent(VectorXd input, size_t layer){
 	else{
 		std::printf("Error: second argument must be in {0,1,2}!\n") ;
 	}
-	
+
 	return output ;
 }
 
@@ -257,7 +257,7 @@ VectorXd NeuralNet::LogisticFunction(VectorXd input, size_t layer){
 	else{
 		std::printf("Error: second argument must be in {0,1,2}!\n");
 	}
-	
+
 	return output;
 }
 

@@ -94,16 +94,16 @@ void AGV::CompareCosts(vector<double> c){
 void AGV::PlanAGV(vector<double> c){
 	size_t nEdges = agvPlanner->GetGraph()->GetNumEdges() ;
 	vector<Edge *> edges = agvPlanner->GetGraph()->GetEdges() ;
-	
+
 	// Assuming agvPlanner is set up with correct start, goal
 	Node * bestPath = agvPlanner->PathSearch() ;
 	int v2 = bestPath->GetVertex() ;
-	
+
 	path.clear() ;
 	while (bestPath->GetParent()){
 		Node * curNode = bestPath->GetParent() ;
 		int v1 = curNode->GetVertex() ;
-		
+
 		bool edgeFound = false ;
 		for (size_t i = 0; i < nEdges; i++){
 			if (edges[i]->GetVertex1() == v1 && edges[i]->GetVertex2() == v2){
@@ -119,7 +119,7 @@ void AGV::PlanAGV(vector<double> c){
 		bestPath = curNode ;
 		v2 = v1 ;
 	}
-	
+
 	costs = c ; // record the set of costs used for most recent plan
 	isReplan = false ;
 }

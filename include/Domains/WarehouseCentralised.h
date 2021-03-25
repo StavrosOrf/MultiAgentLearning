@@ -16,11 +16,11 @@ class WarehouseCentralised : public Warehouse {
 	public:
 		WarehouseCentralised(YAML::Node configs) : Warehouse(configs){}
 		~WarehouseCentralised(void) ;
-		
+
 		void SimulateEpoch(bool train = true) ;
 		void SimulateEpoch(vector<size_t> team) ;
 		void SimulateEpochDDPG();
-		
+
 		void InitialiseMATeam() ; // create agents for each vertex in graph
 	private:
 		void QueryMATeam(vector<size_t>, vector<double>&, vector<size_t>&) ; // get current graph costs

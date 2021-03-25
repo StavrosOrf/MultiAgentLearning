@@ -34,10 +34,10 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
 	string agentType = configs["domain"]["agents"].as<string>();
 	Warehouse * trainDomain = create_warehouse(agentType, configs);
 	trainDomain->InitialiseMATeam() ;
-	
+
 	int runs = configs["neuroevo"]["runs"].as<int>();
 	create_results_folder(trainDomain, configs, r);
-	
+
 	// Execute learning episodes of current stat run
 	for (size_t n = 0; n < nEps; n++){
 		if (r == runs-1){ // store the first and last episodes of the final stat run for replay
@@ -58,7 +58,7 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
 				trainDomain->DisableEpisodeReplayOutput() ;
 			}
 		}
-		
+
 		// Main evolution routine for each episode
 		std::cout << "Epoch " << n << "...\n" ;
 		trainDomain->EvolvePolicies(n==0) ;		 // compete (except on first episode), then mutate
@@ -73,10 +73,10 @@ void WarehouseSimulationSingleRun(int r, YAML::Node configs){
 		trainDomain->OutputControlPolicies(nn_str) ;
 		std::cout << "complete.\n" ;
 	}
-	
+
 	delete trainDomain ;
 	trainDomain = 0 ;
-	
+
 	std::cout << "Training complete!\n" ;
 }
 
@@ -87,10 +87,10 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 	string agentType = configs["domain"]["agents"].as<string>();
 	Warehouse * testDomain = create_warehouse(agentType, configs); ;
 	testDomain->InitialiseMATeam() ;
-	
+
 	int runs = configs["neuroevo"]["runs"].as<int>();
 	create_results_folder(testDomain, configs, r);
-	
+
 	// Store the final stat run for replay
 	if (r == runs-1){
 		sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder + "Replay/").c_str()) ;
@@ -105,7 +105,7 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 		ss_a_a << domainDir << resFolder << "Replay/agent_actions.csv" ;
 		testDomain->OutputEpisodeReplay(ss_agv_s.str(), ss_agv_e.str(), ss_a_s.str(), ss_a_a.str()) ;
 	}
-	
+
 	// Extract the champion team for execution
 	cout << "Reading champion team from file: " ;
 	string ev_str = configs["mode"]["eval_file"].as<string>() ;
@@ -133,7 +133,7 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 		team.push_back(evals[evals.size()-1][i]) ;
 	}
 	cout << "complete.\n" ;
-	
+
 	// Simulate
 	testDomain->LoadPolicies(configs) ;
 	testDomain->ResetEpochEvals() ;
@@ -146,10 +146,10 @@ void WarehouseSimulationTestSingleRun(int r, YAML::Node configs){
 		testDomain->OutputControlPolicies(nn_str) ;
 		std::cout << "complete.\n" ;
 	}
-	
+
 	delete testDomain ;
 	testDomain = 0 ;
-	
+
 	std::cout << "Testing complete!\n" ;
 }
 
@@ -168,7 +168,7 @@ void WarehouseSimulationDDPG(int r, YAML::Node configs){
 	// for (size_t n = 0; n < nEps; n++){
 	for (size_t n = 0; n < 1; n++){
 		// trainDomain->ResetEpochEvals() ; // reset domain
-		
+
 		trainDomain->SimulateEpochDDPG() ;// simulate
 	}
 
@@ -177,9 +177,9 @@ void WarehouseSimulationDDPG(int r, YAML::Node configs){
 
 void WarehouseSimulation(string config_file, int thrds){
 	std::cout << "Reading configuration file: " << config_file << "\n" ;
-	
+
 	YAML::Node configs = YAML::LoadFile(config_file);
-	
+
 	string algo = configs["mode"]["algo"].as<string>();
 	string mode = configs["mode"]["type"].as<string>() ;
 	ThreadPool pool(thrds) ;
@@ -238,12 +238,12 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 	if(configs["mode"]["algo"].as<string>() == "DDPG")
 		new_warehouse->SetTrainingAlgo(algo_type::ddpg);
 	else if(configs["mode"]["algo"].as<string>() == "neuroevo")
-		new_warehouse->SetTrainingAlgo(algo_type::neuroevo);  
+		new_warehouse->SetTrainingAlgo(algo_type::neuroevo);
 	else{
 		std::cout << "ERROR: Currently only configured for 'DDPG' and 'neuroevo'! Exiting.\n";
 		exit(1);
 	}
-	
+
 	return new_warehouse;
 }
 
@@ -272,7 +272,7 @@ int main(int argc, char* argv[]){
 		show_usage(argv[0]) ;
 		return 0 ;
 	}
-	
+
 	string config_file ;
 	int thrds = 2 ; // Default number of threads
 	for (int i = 1; i < argc; ++i){
@@ -294,7 +294,7 @@ int main(int argc, char* argv[]){
 			}
 		}
 		// Number of parallel threads
-		
+
 		else if ((arg == "-t") || (arg == "--threads")){
 			if (i + 1 < argc) {
 				thrds = atoi(argv[++i]) ;
@@ -310,8 +310,8 @@ int main(int argc, char* argv[]){
 			return 1 ;
 		}
 	}
-	
+
 	WarehouseSimulation(config_file, thrds) ;
-	
+
 	return 0 ;
 }

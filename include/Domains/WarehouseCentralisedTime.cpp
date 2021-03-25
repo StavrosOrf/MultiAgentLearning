@@ -30,17 +30,17 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 		teamSize = 2*nPop ;
 	else
 		teamSize = nPop ;
-	
+
 	vector< vector<size_t> > teams = RandomiseTeams(teamSize) ; // each row is the population for a single agent
-	
+
 	double maxEval = 0.0 ;
 	size_t maxTeamID = 0 ;
 	vector<size_t> travelStats ;
 	vector<size_t> championIDs ;
-	
+
 	for (size_t i = 0; i < teamSize; i++){ // looping across the columns of 'teams'
 		InitialiseNewEpoch() ;
-	
+
 		if (outputEpReplay){
 			for (size_t k = 0; k < nAGVs; k++){
 				if (whAGVs[k]->GetNextVertex() < 0){
@@ -54,7 +54,7 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 			}
 			agvStateFile << "\n" ;
 			agvEdgeFile << "\n" ;
-			
+
 			for(size_t n = 0; n < whGraph->GetNumEdges(); n++){
 				agentStateFile << "0," ;
 				agentActionFile << baseCosts[n] << "," ;
@@ -62,27 +62,27 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 			agentStateFile << "\n" ;
 			agentActionFile << "\n" ;
 		}
-		
+
 		vector<size_t> memberIDs ;
 		for (size_t j = 0; j < nAgents; j++){ // extract agent member IDs for this team
 			memberIDs.push_back(teams[j][i]) ;
 		}
-		
+
 		for (size_t t = 0; t < nSteps; t++){ // each timestep
 			// Get agent actions and update graph costs
 			vector<double> a = baseCosts ;
 			vector<size_t> s(whGraph->GetNumEdges(),0) ;
 			QueryMATeam(memberIDs, a, s) ;
 			UpdateGraphCosts(a) ;
-			
+
 			// Replan AGVs as necessary
 			for (size_t k = 0; k < nAGVs; k++){
 				whAGVs[k]->CompareCosts(a) ; // set replanning flags
-			
+
 				if (whAGVs[k]->GetIsReplan()){ // replanning needed
 					whAGVs[k]->PlanAGV(a) ;
 				}
-				
+
 				// Identify any new AGVs that need to cross an intersection
 				if (whAGVs[k]->GetT2V() == 0){
 					size_t agentID = 0 ; // only one agent
@@ -98,14 +98,14 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 					}
 				}
 			}
-			
+
 			// Attempt to move any transitioning AGVs on to new edges (according to wait list order)
 			for (size_t k = 0; k < nAgents; k++){
 				vector<size_t> toRemove ;
 				for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
 					size_t curAGV = *it ;
 					size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()) ; // next edge ID
-					
+
 					bool edgeFull = false ;
 					if (nextID < 0 || nextID >= s.size()){
 						std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n" ;
@@ -133,12 +133,12 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 					whAgents[k]->agvIDs.remove(toRemove[w]) ;
 				}
 			}
-			
+
 			// Traverse
 			for (size_t k = 0; k < nAGVs; k++){
 				whAGVs[k]->Traverse() ;
 			}
-	
+
 			if (outputEpReplay){
 				for (size_t k = 0; k < nAGVs; k++){
 					if (whAGVs[k]->GetNextVertex() < 0){
@@ -152,7 +152,7 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 				}
 				agvStateFile << "\n" ;
 				agvEdgeFile << "\n" ;
-				
+
 				for(size_t k = 0; k < s.size(); k++){
 					agentStateFile << s[k] << "," ;
 					agentActionFile << a[k] << "," ;
@@ -160,9 +160,9 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 				agentStateFile << "\n" ;
 				agentActionFile << "\n" ;
 			}
-			
+
 		} // end simulation timesteps
-		
+
 		// Log data
 		size_t totalMove = 0 ;
 		size_t totalEnter = 0 ;
@@ -177,11 +177,11 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 			totalCommand += whAGVs[k]->GetNumCommanded() ;
 		}
 		double G = (double)(totalSuccess) ; // if number of AGVs is constant then AGV time is constant over runs and only number of successful deliveries counts
-		
+
 		for (size_t j = 0; j < nAgents; j++){ // assign reward to each agent
 			maTeam[j]->SetEpochPerformance(G, memberIDs[j]) ;
 		}
-		
+
 		if (G > maxEval){
 			maxEval = G ;
 			maxTeamID = i ;
@@ -193,15 +193,15 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 			travelStats.push_back(totalCommand) ;
 		}
 	} // end evaluation of one team
-	
+
 	// Champion team members
 	for (size_t j = 0; j < nAgents; j++){ // extract agent member IDs for this team
 		championIDs.push_back(teams[j][maxTeamID]) ;
 	}
-	
+
 	// Print out best team for this learning epoch
 	std::cout << "Best policy: #" << maxTeamID << ", G: " << maxEval << "\n" ;
-	
+
 	if (outputEvals){
 		evalFile << maxTeamID << "," ;
 		evalFile << maxEval << "," ;
@@ -218,7 +218,7 @@ void WarehouseCentralisedTime::SimulateEpoch(bool train){
 void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 	double maxEval = 0.0 ;
 	vector<size_t> travelStats ;
-	
+
 	InitialiseNewEpoch() ;
 
 	if (outputEpReplay){
@@ -234,7 +234,7 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 		}
 		agvStateFile << "\n" ;
 		agvEdgeFile << "\n" ;
-		
+
 		for(size_t n = 0; n < whGraph->GetNumEdges(); n++){
 			agentStateFile << "0," ;
 			agentActionFile << baseCosts[n] << "," ;
@@ -242,22 +242,22 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 		agentStateFile << "\n" ;
 		agentActionFile << "\n" ;
 	}
-	
+
 	for (size_t t = 0; t < nSteps; t++){ // each timestep
 		// Get agent actions and update graph costs
 		vector<double> a = baseCosts ;
 		vector<size_t> s(whGraph->GetNumEdges(),0) ;
 		QueryMATeam(memberIDs, a, s) ;
 		UpdateGraphCosts(a) ;
-		
+
 		// Replan AGVs as necessary
 		for (size_t k = 0; k < nAGVs; k++){
 			whAGVs[k]->CompareCosts(a) ; // set replanning flags
-		
+
 			if (whAGVs[k]->GetIsReplan()){ // replanning needed
 				whAGVs[k]->PlanAGV(a) ;
 			}
-			
+
 			// Identify any new AGVs that need to cross an intersection
 			if (whAGVs[k]->GetT2V() == 0){
 				size_t agentID = 0 ; // only one agent
@@ -273,14 +273,14 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 				}
 			}
 		}
-		
+
 		// Attempt to move any transitioning AGVs on to new edges (according to wait list order)
 		for (size_t k = 0; k < nAgents; k++){
 			vector<size_t> toRemove ;
 			for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
 				size_t curAGV = *it ;
 				size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()) ; // next edge ID
-				
+
 				bool edgeFull = false ;
 				if (nextID < 0 || nextID >= s.size()){
 					std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n" ;
@@ -308,7 +308,7 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 				whAgents[k]->agvIDs.remove(toRemove[w]) ;
 			}
 		}
-		
+
 		// Traverse
 		for (size_t k = 0; k < nAGVs; k++){
 			whAGVs[k]->Traverse() ;
@@ -327,7 +327,7 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 			}
 			agvStateFile << "\n" ;
 			agvEdgeFile << "\n" ;
-			
+
 			for(size_t k = 0; k < s.size(); k++){
 				agentStateFile << s[k] << "," ;
 				agentActionFile << a[k] << "," ;
@@ -335,9 +335,9 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 			agentStateFile << "\n" ;
 			agentActionFile << "\n" ;
 		}
-		
+
 	} // end simulation timesteps
-	
+
 	// Log data
 	size_t totalMove = 0 ;
 	size_t totalEnter = 0 ;
@@ -352,11 +352,11 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 		totalCommand += whAGVs[k]->GetNumCommanded() ;
 	}
 	double G = (double)(totalSuccess) ; // if number of AGVs is constant then AGV time is constant over runs and only number of successful deliveries counts
-	
+
 	for (size_t j = 0; j < nAgents; j++){ // assign reward to each agent
 		maTeam[j]->SetEpochPerformance(G, memberIDs[j]) ;
 	}
-	
+
 	maxEval = G ;
 	travelStats.clear() ;
 	travelStats.push_back(totalMove) ;
@@ -364,10 +364,10 @@ void WarehouseCentralisedTime::SimulateEpoch(vector<size_t> memberIDs){
 	travelStats.push_back(totalWait) ;
 	travelStats.push_back(totalSuccess) ;
 	travelStats.push_back(totalCommand) ;
-	
+
 	// Print out team performance
 	std::cout << "G: " << maxEval << "\n" ;
-	
+
 	if (outputEvals){
 		evalFile << maxEval << "," ;
 		for (size_t i = 0; i < travelStats.size(); i++){
@@ -386,7 +386,7 @@ void WarehouseCentralisedTime::InitialiseMATeam(){
 	}
 	iAgent * agent = new iAgent{0, eIDs} ; // only one centralised agent controlling all traffic
 	whAgents.push_back(agent) ;
-	
+
 	size_t nOut = eIDs.size() ; // NN output is additional cost applied to each edge
 	size_t nIn = nOut*2 ; // NN input is current #AGVs on all edges and time to arrival at next intersection
 //	size_t nHid = 16 ; // fixed to compare against link agent formulation
@@ -401,7 +401,7 @@ void WarehouseCentralisedTime::QueryMATeam(vector<size_t> memberIDs, vector<doub
 	vector<Edge *> e = whGraph->GetEdges() ;
 	vector<double> eTime = baseCosts ;
 	GetJointState(e, s, eTime) ;
-	
+
 	for (size_t i = 0; i < nAgents; i++){
 		VectorXd input(whAgents[i]->eIDs.size()*2) ;
 		for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++){
@@ -409,7 +409,7 @@ void WarehouseCentralisedTime::QueryMATeam(vector<size_t> memberIDs, vector<doub
 			input(2*j+1) = eTime[whAgents[i]->eIDs[j]] ;
 		}
 		VectorXd output = maTeam[i]->ExecuteNNControlPolicy(memberIDs[i], input) ;
-		
+
 		double maxBaseCost ;
 		if (neLearn){
 			maxBaseCost = * std::max_element(baseCosts.begin(), baseCosts.end()) ;

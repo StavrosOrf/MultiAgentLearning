@@ -10,10 +10,10 @@ int main(){
 	size_t numOut = 2 ;
 	size_t numHidden = 4 ;
 	NeuralNet myNN(numIn,numOut,numHidden) ; // numIn, numOut, numHidden
-	
+
 	const char strA[] = "initialA.txt" ;
 	const char strB[] = "initialB.txt" ;
-	
+
 	std::cout << "Saving initial weights...\n" ;
 	myNN.OutputNN(strA,strB) ;
 	MatrixXd A0 = myNN.GetWeightsA() ;
@@ -30,7 +30,7 @@ int main(){
 		}
 		std::cout << std::endl ;
 	}
-	
+
 	std::cout << "Testing input/output calculations...\n" ;
 	VectorXd input(numIn) ;
 	std::cout << "Input values: [" ;
@@ -44,18 +44,18 @@ int main(){
 	for (size_t i = 0; i < numOut; i++)
 		std::cout << output(0) << "," ;
 	std::cout << "]\n" ;
-	
+
 	std::cout << "Testing mutation...\n" ;
 	myNN.MutateWeights() ;
-	
+
 	const char strC[] = "newA.txt" ;
 	const char strD[] = "newB.txt" ;
-	
+
 	std::cout << "Saving new weights...\n" ;
 	myNN.OutputNN(strC,strD) ;
 	MatrixXd A1 = myNN.GetWeightsA() ;
 	MatrixXd B1 = myNN.GetWeightsB() ;
-	
+
 	for (int i = 0; i < A1.rows(); i++){
 		for (int j = 0; j < A1.cols(); j++){
 			std::cout << A1(i,j) << "," ;
@@ -68,12 +68,12 @@ int main(){
 		}
 		std::cout << std::endl ;
 	}
-	
+
 	std::cout << "Resetting to previous weights...\n" ;
 	myNN.SetWeights(A0,B0) ;
 	MatrixXd A2 = myNN.GetWeightsA() ;
 	MatrixXd B2 = myNN.GetWeightsB() ;
-	
+
 	for (int i = 0; i < A2.rows(); i++){
 		for (int j = 0; j < A2.cols(); j++){
 			std::cout << A2(i,j) << "," ;
@@ -86,7 +86,7 @@ int main(){
 		}
 		std::cout << std::endl ;
 	}
-	
+
 	std::cout << "Testing function approximation via backpropagation..\n" ;
 	std::cout << "Initialising neural network...\n" ;
 	size_t newIn = 1 ;
@@ -106,8 +106,8 @@ int main(){
 	}
 	std::cout << "Training via backpropagation...\n" ;
 	backpropNN.BackPropagation(trainInputs,trainTargets) ;
-	
-	
+
+
 	size_t numTest = 10 ;
 	std::cout << "(Truth, approximated, difference, percentage)\n" ;
 	for (size_t i = 0; i < numTest; i++){
@@ -118,7 +118,7 @@ int main(){
 		std::cout << "(" << t << "," << y(0) << "," << t-y(0) << "," << 100.0*(t-y(0))/t << ")\n" ; ;
 	}
 	std::cout << "\n" ;
-	
+
 	std::cout << "Testing complete!\n" ;
 	return 0 ;
 }

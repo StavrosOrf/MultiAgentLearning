@@ -21,7 +21,7 @@ class Search
 			delete itsQueue ;
 			itsQueue = 0 ;
 		}
-		
+
 		Graph * GetGraph() const {return itsGraph ;}
 		Queue * GetQueue() const {return itsQueue ;}
 		void SetQueue(Queue * queue) {itsQueue = queue ;}
@@ -37,7 +37,7 @@ class Search
 		Queue * itsQueue ;
 		int itsSource ;
 		int itsGoal ;
-		
+
 		size_t FindSourceID() ;
 } ;
 

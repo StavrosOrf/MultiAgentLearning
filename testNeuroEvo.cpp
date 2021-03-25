@@ -7,19 +7,19 @@
 
 int main(){
 	std::cout << "Testing NeuroEvo class in NeuroEvo.h\n" ;
-	
+
 	size_t inputs = 4 ;
 	size_t outputs = 2 ;
 	size_t hidden = 4 ;
 	size_t popSize = 10 ;
-	
+
 	std::cout << "Initialising population...\n" ;
 	NeuroEvo myNE(inputs, outputs, hidden, popSize) ;
-	
+
 	for (size_t k = 0; k < 10; k++){
-	
+
 		std::cout << "LOOP " << k << std::endl ;
-	
+
 		std::cout << "Doubling population via mutations...\n" ;
 		myNE.MutatePopulation() ;
 
@@ -43,9 +43,9 @@ int main(){
 		for (size_t i = 0; i < retainedEvals.size(); i++)
 			std::cout << retainedEvals[i] << " " ;
 		std::cout << std::endl ;
-	
+
 	}
-	
+
 	std::cout << "Testing complete!\n" ;
 	return 0 ;
 }

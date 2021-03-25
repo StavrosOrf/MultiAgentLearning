@@ -16,7 +16,7 @@ using std::stringstream ;
 int main(){
 	std::cout << "Testing Search class in Search.h\n" ;
 	std::cout << "Initialising graph...\n" ;
-	
+
 	// Read in data from files
 	char v_str[] = "v_test.txt" ;
 	cout << "Reading vertices from file: " ;
@@ -33,7 +33,7 @@ int main(){
 		vertices.push_back(atoi(line.c_str())) ;
 	}
 	cout << "complete.\n" ;
-	
+
 	char e_str[] = "e_test.txt" ;
 	cout << "Reading edges from file: " ;
 	ifstream edgesFile(e_str) ;
@@ -60,13 +60,13 @@ int main(){
 		edges.push_back(e) ;
 	}
 	cout << "complete.\n" ;
-	
+
 	Graph * testGraph = new Graph(vertices, edges, costs) ;
 	Search * testSearch = new Search(testGraph, 8, 3) ;
 	Node * bestPath = testSearch->PathSearch() ;
 	Node * pathSG = bestPath->ReverseList(0) ;
 	pathSG->DisplayPath() ;
-	
+
 	vector<Edge *> graphEdges = testGraph->GetEdges() ;
 	bool bOut = false ;
 	if (graphEdges[0] == graphEdges[1])
@@ -76,12 +76,12 @@ int main(){
 	if (graphEdges[0] == graphEdges[0])
 		bOut = true ;
 	std::cout << "graphEdges[0] == graphEdges[0]: " << bOut << "\n" ;
-	
+
 	delete testGraph ;
 	testGraph = 0 ;
 	delete testSearch ;
 	testSearch = 0 ;
-	
+
 	while (pathSG->GetParent()){
 		Node * curNode = pathSG->GetParent() ;
 		delete pathSG ;
@@ -89,7 +89,7 @@ int main(){
 	}
 	delete pathSG ;
 	pathSG = 0 ;
-	
+
 	std::cout << "Testing complete!\n" ;
 	return 0 ;
 }

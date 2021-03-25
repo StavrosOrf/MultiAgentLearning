@@ -25,7 +25,7 @@ class Queue
 			itsPQ = new QUEUE ;
 			itsPQ->push(source) ;
 		}
-		
+
 		~Queue(){
 			while (!itsPQ->empty()){
 				Node * temp = itsPQ->top() ;
@@ -40,13 +40,13 @@ class Queue
 				closed[i] = 0 ;
 			}
 		}
-		
+
 		vector<Node *> GetClosed() const {return closed ;}
 		bool EmptyQueue() const {return itsPQ->empty() ;}
 		size_t SizeQueue() const {return itsPQ->size() ;}
 		void UpdateQueue(Node * newNode) ;
 		Node * PopQueue() ;
-		
+
 	private:
 		QUEUE * itsPQ ;
 		vector<Node *> closed ;

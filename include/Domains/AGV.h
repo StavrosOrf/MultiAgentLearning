@@ -14,7 +14,7 @@ class AGV{
 	public:
 		AGV(int, vector<int>, Graph *) ;
 		~AGV() ;
-		
+
 		void ResetAGV() ;
 		void Traverse() ;
 		void EnterNewEdge() ;
@@ -25,17 +25,17 @@ class AGV{
 		size_t GetT2V(){return t2v ;}
 		bool GetIsReplan(){return isReplan ;}
 		Edge * GetNextEdge(){return path.front() ;}
-		
+
 		size_t GetMoveTime(){return tMove ;}
 		size_t GetEnterTime(){return tEnter ;}
 		size_t GetWaitTime(){return tWait ;}
 		size_t GetNumCompleted(){return nsDel ;}
 		size_t GetNumCommanded(){return ncDel ;}
 		Search * GetAGVPlanner(){return agvPlanner ;}
-		
+
 		void DisplayPath() ;
 		void ResetPerformanceCounters(){nsDel=ncDel=tMove=tEnter=tWait=0;}
-		
+
 	private:
 		Edge * curEdge ;			// current edge
 		int nextVertex ;			// next vertex
@@ -49,7 +49,7 @@ class AGV{
 		size_t tWait ;				// time waiting to cross intersections
 		vector<int> agvGoals ;// vector of valid goal vertices
 		bool isReplan ;			 // true if replanning is needed
-		
+
 		Search * agvPlanner ; // planning routine
 		vector<double> costs ;// graph costs used to generate current plan
 		list<Edge *> path ;	 // current path as ordered list of edges

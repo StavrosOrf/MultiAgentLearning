@@ -40,7 +40,7 @@ Node * Search::PathSearch()
 				break ;
 			}
 		}
-		
+
 		return bestPath ;
 	}
 }

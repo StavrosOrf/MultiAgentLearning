@@ -6,7 +6,7 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	q_criticNN = new NeuralNet(state_space + action_space,
 		1, (state_space + action_space) * 2);
 	q_target_criticNN = new NeuralNet(state_space + action_space,
-		1, (state_space + action_space) * 2);	
+		1, (state_space + action_space) * 2);
 	mu_actorNN = new NeuralNet(action_space, action_space, action_space*2);
 	mu_target_actorNN = new NeuralNet(action_space, action_space, action_space*2);
 
@@ -38,7 +38,7 @@ DDPGAgent::~DDPGAgent(){
 
 
 void DDPGAgent::ResetEpochEvals(){
-	
+
 }
 
 VectorXd DDPGAgent::EvaluateActorNN_DDPG(VectorXd s){
@@ -70,7 +70,7 @@ VectorXd DDPGAgent::EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a){
 
 void DDPGAgent::addToReplayBuffer(replay r){
 	assert(r.next_state.size() == r.current_state.size() && r.current_state.size() == 38);
-	
+
 	if(replay_buffer.size() < REPLAY_BUFFER_SIZE)
 		replay_buffer.push_back(r);
 	else
@@ -86,7 +86,7 @@ vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
 		temp.push_back(replay_buffer[r]);
 		replay_buffer.erase(replay_buffer.begin()+r);
 	}
-	assert(temp.size() == size );	
+	assert(temp.size() == size );
 	for (size_t i = 0; i < size ; i++)
 		replay_buffer.push_back(temp[i]);
 
