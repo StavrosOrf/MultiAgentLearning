@@ -37,8 +37,6 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		cur_state[i] = get_edge_utilization()[i];
 	print_warehouse_state();
 
-	vector<Edge *> edgess = whGraph->GetEdges();
-
 	// each timestep
 	for (size_t t = 0; t < nSteps; t++){
 		std::cout <<"==============================================================Step - "<<t<<std::endl;
@@ -51,39 +49,26 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			assert(0 <= actions[n] && actions[n] <= 1);
 		}
 
-		//TODO DEFINED BUT NEVER USED!!!!
-		//TODO DEFINED BUT NEVER USED!!!!
-		//TODO DEFINED BUT NEVER USED!!!!
 		vector<double> a = baseCosts;
 		vector<size_t> s(whGraph->GetNumEdges(),0) ;
 
-		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
-		// QueryMATeam(memberIDs, a, s) ;
+		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());		
 		vector<Edge *> e_temp = whGraph->GetEdges() ;
 		GetJointState(e_temp, s) ;
 
-		//TODO explain
 		for (size_t i = 0; i < nAgents; i++)
-			for (size_t j = 0; j < (size_t)actions.size(); j++){ // output [0,1] scaled to max base cost
+			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++){ // output [0,1] scaled to max base cost
 				a[whAgents[i]->eIDs[j]] += actions[j]*maxBaseCost ;
+
 				assert(0 <= a[whAgents[i]->eIDs[j]]);
-				//IMPORTANT!!!
-				//IMPORTANT!!!
-				//IMPORTANT!!!
-				//IMPORTANT!!!
-				//IMPORTANT!!!
-				//IMPORTANT!!!
-				//IMPORTANT!!!
-				//TODO uncoment to ASSERT below
-				//assert(a[whAgents[i]->eIDs[j]] <= maxBaseCost);
+				assert(a[whAgents[i]->eIDs[j]] <= maxBaseCost + baseCosts[whAgents[i]->eIDs[j]]);
 			}
 		assert(a.size() == N_EDGES);
 
 		UpdateGraphCosts(a);
 		replan_AGVs(a);
 		//transition_AGVs(s);
-		//TODO IMPORANT!! DOES NOT affect state
-		//TODO IMPORANT!! DOES NOT affect state
+		//TODO clean 		
 		for (size_t k = 0; k < nAgents; k++){
 			vector<size_t> toRemove;
 			for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
@@ -111,8 +96,6 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			for (size_t w = 0; w < toRemove.size(); w++)
 				whAgents[k]->agvIDs.remove(toRemove[w]) ;
 		}
-
-
 
 		// Traverse
 		for (size_t k = 0; k < nAGVs; k++)
@@ -142,17 +125,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			totalSuccess += whAGVs[k]->GetNumCompleted() ;
 			totalCommand += whAGVs[k]->GetNumCommanded() ;
 		}
-		double G = (double)(totalSuccess) ; // if number of AGVs is constant then AGV time is constant over runs and only number of successful deliveries counts
 
-		if (G > maxEval){
-			maxEval = G ;
-			travelStats.clear() ;
-			travelStats.push_back(totalMove) ;
-			travelStats.push_back(totalEnter) ;
-			travelStats.push_back(totalWait) ;
-			travelStats.push_back(totalSuccess) ;
-			travelStats.push_back(totalCommand) ;
-		}
 		std::cout<<"Stats: \nTotal Move:"<<totalMove<<" \nTotal Enter:"<<totalEnter<<
 				"\nTotal wait:"<<totalWait<< "\nTotal Success:"<<totalSuccess<<
 				"\nTotal Command:"<<totalCommand<<std::endl;
@@ -164,10 +137,11 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			whAGVs[k]->ResetPerformanceCounters();
 		//Create and Save replay to buffer
 
-		assert(temp_state.size() == cur_state.size() && cur_state.size() == N_EDGES);
-		double reward = (double)totalMove/whAGVs.size();
+		assert(temp_state.size() == N_EDGES && cur_state.size() == N_EDGES);
+		reward = (double)totalMove/whAGVs.size();
 		std::cout<<"Reward: "<<reward<<std::endl;
 		replay r = {temp_state,cur_state,actions,reward};
+		//TODO delete oldest replay when full
 		ddpg_maTeam[0]->addToReplayBuffer(r);
 		//TODO
 		//Reward idea: (different weight for each type of edge)
@@ -183,7 +157,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		//TODO
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
 			std::vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
-			//std::vector<double> y(BATCH_SIZE);
+
 			std::vector<Eigen::VectorXd> trainInputs;
 			std::vector<Eigen::VectorXd> trainTargets;
 
