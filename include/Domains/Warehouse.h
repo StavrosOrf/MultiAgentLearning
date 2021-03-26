@@ -10,7 +10,7 @@
 #include <random>
 #include <algorithm>
 #include <float.h>
-#include <Eigen/Eigen>
+//#include <Eigen/Eigen>
 #include <yaml-cpp/yaml.h>
 #include "Planning/Graph.h"
 #include "Planning/Edge.h"

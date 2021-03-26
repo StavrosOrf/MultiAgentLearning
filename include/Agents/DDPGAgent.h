@@ -19,21 +19,25 @@ using std::string;
 #define BATCH_SIZE 5
 
 struct replay{
-	VectorXd current_state;
-	VectorXd next_state;
-	VectorXd action;
+	//TODO make int later
+	std::vector<double> current_state;
+	std::vector<double> next_state;
+	std::vector<double> action;
 	double reward;
 };
 
 struct Net : torch::nn::Module {
-  Net(int32_t numIn, int32_t numOut, int32_t numHid) {
-    input_N = register_parameter("input", torch::randn({numIn, numHid}));
-    output_N = register_parameter("output", torch::randn({numHid, numOut}));
-  }
-  torch::Tensor forward(torch::Tensor input) {
-    return torch::addmm(input_N, input, output_N);
-  }
-  torch::Tensor input_N, output_N;
+	Net(int32_t numIn, int32_t numOut, int32_t numHid) {
+		weightsA = register_parameter("input", torch::randn({numIn, numHid}));
+		weightsB = register_parameter("output", torch::randn({numHid, numOut}));
+	}
+	torch::Tensor forward(torch::Tensor input) {
+		torch::Tensor hidden_layer, output_layer;
+		hidden_layer = torch::relu(torch::mm(input, weightsA));
+		output_layer = torch::relu(torch::mm(hidden_layer, weightsB));
+		return output_layer;
+	}
+	torch::Tensor weightsA, weightsB;
 };
 
 
@@ -41,10 +45,10 @@ class DDPGAgent{
 	public:
 		DDPGAgent(size_t state_space, size_t action_space);
 		~DDPGAgent();
-		VectorXd EvaluateCriticNN_DDPG(VectorXd s,VectorXd a);
-		VectorXd EvaluateActorNN_DDPG(VectorXd s);
-		VectorXd EvaluateTargetActorNN_DDPG(VectorXd s);
-		VectorXd EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a);
+		std::vector<double> EvaluateCriticNN_DDPG(std::vector<double> s,std::vector<double> a);
+		std::vector<double> EvaluateActorNN_DDPG(std::vector<double> s);
+		std::vector<double> EvaluateTargetActorNN_DDPG(std::vector<double> s);
+		std::vector<double> EvaluateTargetCriticNN_DDPG(std::vector<double> s,std::vector<double> a);
 		void ResetEpochEvals();
 
 		vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);

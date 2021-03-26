@@ -28,8 +28,9 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 	std::normal_distribution<double> n_process(0.0, 0.1);
 	std::default_random_engine n_generator;
 
-	VectorXd cur_state(N_EDGES * 1);
-	VectorXd temp_state(N_EDGES * 1);
+	//TODO change to int later
+	std::vector<double> cur_state(N_EDGES * 1);
+	std::vector<double> temp_state(N_EDGES * 1);
 	double reward;
 
 	for (int i = 0; i != N_EDGES; i++)
@@ -40,16 +41,20 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 	for (size_t t = 0; t < nSteps; t++){
 		std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
-		VectorXd actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
+		vector<double> actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
+		assert(0);
 		// Add Random Noise from process N
 		for (size_t n = 0; n < whGraph->GetEdges().size(); n++){
 			actions[n] = std::max(0.0,actions[n]+n_process(n_generator));
 			actions[n] = std::min(1.0,actions[n]);
 			assert(0 <= actions[n] && actions[n] <= 1);
+			std::cout << "Action[" << n << "] = " << actions[n] << std::endl;
 		}
 
+		exit(0);
+
 		vector<double> final_costs = baseCosts;
-		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());		
+		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
 		for (size_t i = 0; i < nAgents; i++)
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++){ // output [0,1] scaled to max base cost
@@ -122,6 +127,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 
 		//TODO
+		/*
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
 			std::vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
 
@@ -132,7 +138,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			for (size_t i = 0; i < BATCH_SIZE; i++){
 				replay b = miniBatch[i];
 
-				VectorXd na = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
+				std::vector<double> na = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
 				assert(b.next_state.size() == N_EDGES && na.size() == N_EDGES);
 				assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na).size() ==1);
 				double y = b.reward + GAMMA *
@@ -140,7 +146,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 				std::cout << y << ", ";
 
 				//Generate trainInputs and trainTargets for Q backprop
-				VectorXd input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
+				std::vector<double> input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
 				input << miniBatch[i].action , miniBatch[i].current_state;
 				trainInputs.push_back(input);
 				Eigen::VectorXd t(1);
@@ -162,6 +168,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 		}else
 			std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
+		*/
 	}
 	std::cout << "End of Simulation with G: "<<totalDeliveries<<std::endl;
 	return;

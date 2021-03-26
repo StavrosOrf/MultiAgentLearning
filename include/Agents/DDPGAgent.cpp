@@ -5,15 +5,15 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	//Create NNs
 	q_criticNN = new NeuralNet(state_space + action_space,
 		1, (state_space + action_space) * 2);
-	q_target_criticNN = new NeuralNet(state_space + action_space,
-		1, (state_space + action_space) * 2);
+	//q_target_criticNN = (Net*) malloc(sizeof(Net));
 	mu_actorNN = new NeuralNet(action_space, action_space, action_space*2);
 	mu_target_actorNN = new NeuralNet(action_space, action_space, action_space*2);
 	
 	qNN = new Net(state_space + action_space,
 		1, (state_space + action_space) * 2);
-	qtNN = new Net(state_space + action_space,
-		1, (state_space + action_space) * 2);
+	qtNN = (Net*) malloc(sizeof(Net));
+	//qtNN = new Net(state_space + action_space,
+		//1, (state_space + action_space) * 2);
 	muNN = new Net(action_space, action_space, action_space*2);
 	mutNN = new Net(action_space, action_space, action_space*2);
 
@@ -24,8 +24,11 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	//mu_actorNN->RandomizeWeights();
 
 	//copy {Q', Mu'} <- {Q, Mu}
-	assert (sizeof(qNN) > sizeof(size_t));
+	assert (sizeof(*qNN) > sizeof(size_t));
 	std::copy(qNN, qNN+sizeof(qNN), qtNN);
+	std::copy(muNN, muNN+sizeof(muNN), mutNN);
+	assert(0);
+	//TODO test this
 	/*
 	q_target_criticNN->SetWeights(q_criticNN->GetWeightsA(),
 		q_criticNN->GetWeightsB());
@@ -37,15 +40,11 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 }
 
 DDPGAgent::~DDPGAgent(){
-	//TODO Ctorch
-	delete(q_criticNN);
-	delete(q_target_criticNN);
-	delete(mu_actorNN);
-	delete(mu_target_actorNN);
-	q_criticNN = NULL;
-	q_target_criticNN = NULL;
-	mu_actorNN = NULL;
-	mu_target_actorNN = NULL;
+	delete(qNN);
+	delete(qtNN);
+	delete(muNN);
+	delete(mutNN);
+	qNN = qtNN = muNN = mutNN = NULL;
 }
 
 
@@ -57,28 +56,46 @@ void DDPGAgent::ResetEpochEvals(){
  * *Method:Does a foward pass of the associated NN						*
  * *Output:Returns a vector of the final nodes of the NN					*
  * ************************************************************************************************/
-VectorXd DDPGAgent::EvaluateActorNN_DDPG(VectorXd s){
-	return mu_actorNN->EvaluateNN(s);
-}
-VectorXd DDPGAgent::EvaluateCriticNN_DDPG(VectorXd s,VectorXd a){
-	VectorXd input(s.size() + a.size());
-	input << s, a;
+std::vector<double> DDPGAgent::EvaluateActorNN_DDPG(std::vector<double> s){
+	//TODO HIRE A MAID
+	torch::Tensor t = torch::from_blob(s.data(), s.size());
+	assert(0);
 
-	return q_criticNN->EvaluateNN(input);
+	
+
+	torch::Tensor t1 = muNN->forward(t);
+	//std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
+	std::vector<double> to_return;
+	for (int i = 0; i != t1.numel(); i++)
+			to_return.push_back(t1[i].item<double>());
+	assert(to_return.size() == t1.numel());
+	return to_return;
 }
-VectorXd DDPGAgent::EvaluateTargetActorNN_DDPG(VectorXd s){
-	return mu_target_actorNN->EvaluateNN(s);
+std::vector<double> DDPGAgent::EvaluateCriticNN_DDPG(std::vector<double> s,std::vector<double> a){
+	//std::vector<double> input(s.size() + a.size());
+	//input << s, a;
+
+	//return q_criticNN->EvaluateNN(input);
+	//return qNN->forward(input);
+	
 }
-VectorXd DDPGAgent::EvaluateTargetCriticNN_DDPG(VectorXd s,VectorXd a){
-	VectorXd input(s.size() + a.size()),output;
+std::vector<double> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<double> s){
+	//return mu_target_actorNN->EvaluateNN(s);
+	//return mutNN->forward(s);
+}
+std::vector<double> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<double> s,  std::vector<double> a){
+	/*
+	std::vector<double> input(s.size() + a.size()),output;
 	input << s, a;
 	assert(input.size() == s.size()+a.size());
 	for (int i = 0; i != s.size(); i++)
 		assert(input[i] == s[i]);
 	for (int i = 0; i != a.size(); i++)
 		assert(input[i+s.size()] == a[i]);
-	output = q_target_criticNN->EvaluateNN(input);
-	return output;
+	//return q_target_criticNN->EvaluateNN(input);
+	//return qtNN->forward(input);
+	return input;
+	*/
 }
 
 /************************************************************************************************
@@ -120,6 +137,7 @@ vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
  * *	by slow updating (with learning rate [TAU]) from non-targer networks			*
  * ************************************************************************************************/
 void DDPGAgent::updateTargetWeights(){
+	/*
 	MatrixXd QtA = TAU*q_criticNN->GetWeightsA() + (1-TAU)*q_target_criticNN->GetWeightsA();
 	MatrixXd QtB = TAU*q_criticNN->GetWeightsB() + (1-TAU)*q_target_criticNN->GetWeightsB();
 	q_target_criticNN->SetWeights(QtA,QtB);
@@ -127,8 +145,10 @@ void DDPGAgent::updateTargetWeights(){
 	MatrixXd MutA = TAU*mu_actorNN->GetWeightsA() + (1-TAU)*mu_target_actorNN->GetWeightsA();
 	MatrixXd MutB = TAU*mu_actorNN->GetWeightsB() + (1-TAU)*mu_target_actorNN->GetWeightsB();
 	mu_target_actorNN->SetWeights(MutA,MutB);
+	*/
 }
 
 void DDPGAgent::updateQCritic(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets){
-	q_criticNN->BackPropagation(trainInputs,trainTargets);
+	//TODO 
+	//q_criticNN->BackPropagation(trainInputs,trainTargets);
 }
