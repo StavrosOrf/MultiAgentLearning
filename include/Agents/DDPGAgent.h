@@ -23,8 +23,19 @@ struct replay{
 	VectorXd next_state;
 	VectorXd action;
 	double reward;
-
 };
+
+struct Net : torch::nn::Module {
+  Net(int32_t numIn, int32_t numOut, int32_t numHid) {
+    input_N = register_parameter("input", torch::randn({numIn, numHid}));
+    output_N = register_parameter("output", torch::randn({numHid, numOut}));
+  }
+  torch::Tensor forward(torch::Tensor input) {
+    return torch::addmm(input_N, input, output_N);
+  }
+  torch::Tensor input_N, output_N;
+};
+
 
 class DDPGAgent{
 	public:
@@ -44,15 +55,15 @@ class DDPGAgent{
 		void updateQCritic(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets);
 	protected:
 
-		NeuralNet * q_criticNN;
-		NeuralNet * q_target_criticNN;
-		NeuralNet * mu_actorNN;
-		NeuralNet * mu_target_actorNN;
+		NeuralNet * q_criticNN __attribute__ ((deprecated));
+		NeuralNet * q_target_criticNN __attribute__ ((deprecated));;
+		NeuralNet * mu_actorNN __attribute__ ((deprecated));;
+		NeuralNet * mu_target_actorNN __attribute__ ((deprecated));
 
-		//torch::nn qNN
-		//torch::nn qtNN
-		//torch::nn muNN
-		//torch::nn mutNN
+		Net* qNN;
+		Net* qtNN;
+		Net* muNN;
+		Net* mutNN;
 };
 
 #endif // DDPG_AGENT_H_

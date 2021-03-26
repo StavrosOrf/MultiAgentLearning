@@ -9,23 +9,35 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 		1, (state_space + action_space) * 2);
 	mu_actorNN = new NeuralNet(action_space, action_space, action_space*2);
 	mu_target_actorNN = new NeuralNet(action_space, action_space, action_space*2);
+	
+	qNN = new Net(state_space + action_space,
+		1, (state_space + action_space) * 2);
+	qtNN = new Net(state_space + action_space,
+		1, (state_space + action_space) * 2);
+	muNN = new Net(action_space, action_space, action_space*2);
+	mutNN = new Net(action_space, action_space, action_space*2);
 
-	assert(q_criticNN->GetNumIn() == action_space + state_space);
-	assert(q_target_criticNN->GetNumIn() == action_space + state_space);
+	//assert(q_criticNN->GetNumIn() == action_space + state_space);
+	//assert(q_target_criticNN->GetNumIn() == action_space + state_space);
 
-	q_criticNN->RandomizeWeights();
-	mu_actorNN->RandomizeWeights();
+	//q_criticNN->RandomizeWeights();
+	//mu_actorNN->RandomizeWeights();
 
 	//copy {Q', Mu'} <- {Q, Mu}
+	assert (sizeof(qNN) > sizeof(size_t));
+	std::copy(qNN, qNN+sizeof(qNN), qtNN);
+	/*
 	q_target_criticNN->SetWeights(q_criticNN->GetWeightsA(),
 		q_criticNN->GetWeightsB());
 	mu_target_actorNN->SetWeights(mu_actorNN->GetWeightsA(),
 		mu_actorNN->GetWeightsB());
+	*/
 
 	replay_buffer.reserve(REPLAY_BUFFER_SIZE);
 }
 
 DDPGAgent::~DDPGAgent(){
+	//TODO Ctorch
 	delete(q_criticNN);
 	delete(q_target_criticNN);
 	delete(mu_actorNN);
