@@ -5,6 +5,8 @@
 #include <list>
 #include <Eigen/Eigen>
 #include <algorithm>
+#include <bits/stdc++.h>
+#include <string>
 #include "Warehouse.h"
 #include "Agents/DDPGAgent.h"
 

@@ -42,24 +42,26 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
 		vector<double> actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
-		assert(0);
 		// Add Random Noise from process N
-		for (size_t n = 0; n < whGraph->GetEdges().size(); n++){
-			actions[n] = std::max(0.0,actions[n]+n_process(n_generator));
-			actions[n] = std::min(1.0,actions[n]);
+		for (size_t n = 0; n < N_EDGES; n++){
+			//actions[n] = std::clamp(actions[n]+n_process(n_generator), 0, 1);
+			actions[n] = actions[n] + n_process(n_generator);
+			if (actions[n] < 0)
+				actions[n] = 0;
+			if (actions[n] > 1)
+				actions[n] = 1;
+			//actions[n] = std::min(actions[n], 0);
+			//actions[n] = std::max(actions[n], 1);
 			assert(0 <= actions[n] && actions[n] <= 1);
-			std::cout << "Action[" << n << "] = " << actions[n] << std::endl;
+			//std::cout << "Action[" << n << "] = " << actions[n] << std::endl;
 		}
-
-		exit(0);
 
 		vector<double> final_costs = baseCosts;
 		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
 		for (size_t i = 0; i < nAgents; i++)
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++){ // output [0,1] scaled to max base cost
-				final_costs[whAgents[i]->eIDs[j]] += actions[j]*maxBaseCost;
-
+				final_costs[whAgents[i]->eIDs[j]]+=actions[j]*maxBaseCost;
 				assert(0 <= final_costs[whAgents[i]->eIDs[j]]);
 				assert(final_costs[whAgents[i]->eIDs[j]] <= maxBaseCost + baseCosts[whAgents[i]->eIDs[j]]);
 			}
@@ -68,7 +70,6 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		UpdateGraphCosts(final_costs);
 		replan_AGVs(final_costs);
 		transition_AGVs();
-
 		// Traverse
 		for (size_t k = 0; k < nAGVs; k++)
 			whAGVs[k]->Traverse();
@@ -113,7 +114,6 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		reward = (double)totalMove/whAGVs.size();
 		std::cout<<"Reward: "<<reward<<std::endl;
 		replay r = {temp_state,cur_state,actions,reward};
-		//TODO delete oldest replay when full
 		ddpg_maTeam[0]->addToReplayBuffer(r);
 		//TODO
 		//Reward idea: (different weight for each type of edge)
@@ -127,29 +127,28 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 
 		//TODO
-		/*
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
 			std::vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
 
-			std::vector<Eigen::VectorXd> trainInputs;
-			std::vector<Eigen::VectorXd> trainTargets;
+			std::vector<std::vector<double>> trainInputs;
+			std::vector<std::vector<double>> trainTargets;
 
 			std::cout << "Y = {";
 			for (size_t i = 0; i < BATCH_SIZE; i++){
 				replay b = miniBatch[i];
 
-				std::vector<double> na = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
-				assert(b.next_state.size() == N_EDGES && na.size() == N_EDGES);
-				assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na).size() ==1);
+				std::vector<double> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
+				assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);
+				assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta).size() ==1);
 				double y = b.reward + GAMMA *
-					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,na)[0];
+					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta)[0];
 				std::cout << y << ", ";
 
 				//Generate trainInputs and trainTargets for Q backprop
 				std::vector<double> input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
-				input << miniBatch[i].action , miniBatch[i].current_state;
+				input << miniBatch[i].action, miniBatch[i].current_state;
 				trainInputs.push_back(input);
-				Eigen::VectorXd t(1);
+				std::vector<double> t(1);
 				t[0] = y;
 				assert(t[0] == y && t.size() == 1);
 				trainTargets.push_back(t);
@@ -168,7 +167,6 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 		}else
 			std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
-		*/
 	}
 	std::cout << "End of Simulation with G: "<<totalDeliveries<<std::endl;
 	return;

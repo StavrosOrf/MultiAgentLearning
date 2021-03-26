@@ -7,6 +7,7 @@
 #include <vector>
 #include <random>
 #include <Eigen/Eigen>
+#include <cassert>
 #include <torch/torch.h>
 #include "Learning/NeuralNet.h"
 
@@ -35,6 +36,8 @@ struct Net : torch::nn::Module {
 		torch::Tensor hidden_layer, output_layer;
 		hidden_layer = torch::relu(torch::mm(input, weightsA));
 		output_layer = torch::relu(torch::mm(hidden_layer, weightsB));
+		//std::cout << output_layer.dim() << std::endl;
+		//assert(output_layer.dim() == 1);
 		return output_layer;
 	}
 	torch::Tensor weightsA, weightsB;
@@ -56,7 +59,7 @@ class DDPGAgent{
 		vector<replay> replay_buffer;
 
 		void updateTargetWeights();
-		void updateQCritic(vector<VectorXd> trainInputs, vector<VectorXd> trainTargets);
+		void updateQCritic(vector<std::vector<double>> trainInputs, vector<std::vector<double>> trainTargets);
 	protected:
 
 		NeuralNet * q_criticNN __attribute__ ((deprecated));
