@@ -177,27 +177,15 @@ void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qpr
 	std::cout<<"QLoss:\t"<<loss.item<float>()<<std::endl;		
 
 	//Update actor
-	// torch::Tensor i = torch::randn({2,3});
-	// std::cout<<i<<std::endl;
-	// torch::Tensor ii = torch::cat((i,i),1);
-	// std::cout<<ii<<std::endl;
-	// ii = torch::cat((i,i),0);
-	// std::cout<<ii<<std::endl;
+	torch::Tensor states_ = torch::from_blob(states.data(), {BATCH_SIZE, states[0].size()});
 
-	// assert(0);
-	// torch::Tensor states_ = torch::from_blob(states.data(), {BATCH_SIZE, states[0].size()});
+	torch::Tensor actions = muNN->forward(states_);
+	torch::Tensor input = torch::cat({states_,actions},1);
+	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));	
 
-	// torch::Tensor actions = muNN->forward(states_);
-	// std::cout<<actions<<std::endl;
-	// std::cout<<states_<<std::endl;
-	// torch::Tensor input = torch::cat((states_,actions),1);
-	// std::cout<<input<<std::endl;
-	// std::cout<<"Q2"<<std::endl;
-	// torch::Tensor policy_loss = -qNN->forward(input);
-	// std::cout<<"Q3"<<std::endl;
-	// optimezerMuNN.zero_grad();
-	// policy_loss.backward();
-	// optimezerMuNN.step();
+	optimezerMuNN.zero_grad();
+	policy_loss.backward();
+	optimezerMuNN.step();
 
 	std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;		
 }
