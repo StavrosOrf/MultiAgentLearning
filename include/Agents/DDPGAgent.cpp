@@ -154,9 +154,8 @@ void DDPGAgent::updateTargetWeights(){
 }
 void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime,std::vector<std::vector<double>> states){
 	
-
-	torch::optim::SGD optimezerQNN(qNN->parameters(),0.01);
-	torch::optim::SGD optimezerMuNN(muNN->parameters(),0.01);
+	torch::optim::Adam optimezerQNN(qNN->parameters(),0.01);
+	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
 
 	torch::Tensor QvalsTensor = torch::from_blob(Qvals.data(), {1, Qvals.size()});
 	torch::Tensor QprimeTensor = torch::from_blob(Qprime.data(), {1, Qprime.size()});
@@ -177,10 +176,35 @@ void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qpr
 	std::cout<<"QLoss:\t"<<loss.item<float>()<<std::endl;		
 
 	//Update actor
-	torch::Tensor states_ = torch::from_blob(states.data(), {BATCH_SIZE, states[0].size()});
+	// torch::Tensor states_ = torch::from_blob(states[0].data(), {BATCH_SIZE, states[0].size()});
+	
+	// std::cout<<states[0]<<std::endl;
+	// std::cout<<states[1]<<std::endl;
+	// std::cout<<states[2]<<std::endl;
+	// std::cout<<states[3]<<std::endl;
+	// std::cout<<states[4]<<std::endl;	
 
-	torch::Tensor actions = muNN->forward(states_);
+	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
+	for (int i = 1; i != BATCH_SIZE; i++){
+		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
+		states_ = torch::cat({states_,temp},0);
+	}
+	// std::cout<<states_.to(torch::kFloat32)<<std::endl;
+	states_ = states_.to(torch::kFloat32);
+	// torch::Tensor states__ = torch::tensor(states[0]);
+	// torch::Tensor states__1 = torch::tensor(states[1]);
+
+	// states__ = states__.unsqueeze(0);
+	// states__1 = states__1.unsqueeze(0);
+
+	// std::cout<<torch::cat({states__,states__1},0)<<std::endl;
+	torch::Tensor actions = muNN->forward(states_);	
 	torch::Tensor input = torch::cat({states_,actions},1);
+
+	// std::cout<<actions<<std::endl;
+	// std::cout<<input<<std::endl;
+	// std::cout<<qNN->forward(input)<<std::endl;
+
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));	
 
 	optimezerMuNN.zero_grad();
@@ -188,4 +212,6 @@ void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qpr
 	optimezerMuNN.step();
 
 	std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;		
+
+	// exit(1);
 }

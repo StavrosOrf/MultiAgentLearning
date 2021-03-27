@@ -79,7 +79,9 @@ README.md and tested it
 - implemented critic update( might need detailed testing after completing the aglorithm)
 - implemented actor update ( requires tests and bounds )
 
-
-
-
+##v 0.00014o
+- fixed and tested "update actor policy"
+- from_blob method doesnt work properly, an other method is proposed in the update actor section
+- TODO fix update Critic, all Evaluate functions
+- TODO implement Update Targe NN weights
 
