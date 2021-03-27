@@ -48,37 +48,37 @@ void DDPGAgent::ResetEpochEvals(){
  * *Method:Does a foward pass of the associated NN						*
  * *Output:Returns a vector of the final nodes of the NN					*
  * ************************************************************************************************/
-std::vector<double> DDPGAgent::EvaluateActorNN_DDPG(std::vector<double> s){
-	torch::Tensor t = torch::from_blob(s.data(), {1, s.size()});
+std::vector<double> DDPGAgent::EvaluateActorNN_DDPG(std::vector<double> s){	
+	torch::Tensor t = torch::tensor(s).unsqueeze(0);
+	t = t.to(torch::kFloat32);	
 
-	torch::Tensor t1 = muNN->forward(t);
+	torch::Tensor t1 = muNN->forward(t);	
 	std::vector<double> to_return;
 	for (int i = 0; i != t1.numel(); i++)
 			to_return.push_back(t1[0][i].item<double>());
-	assert(to_return.size() == t1.numel());
+	assert(to_return.size() == t1.numel());	
 	return to_return;
 }
 std::vector<double> DDPGAgent::EvaluateCriticNN_DDPG(std::vector<double> s,std::vector<double> a){
-	// std::vector<double> input(s.size() + a.size());
-	// input << s, a;
+
 	std::vector<double> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
+	
+	torch::Tensor t = torch::tensor(input).unsqueeze(0);
+	t = t.to(torch::kFloat32);	
 
-	torch::Tensor t = torch::from_blob(input.data(), {1, input.size()});
+	torch::Tensor t1 = qNN->forward(t);	
+	std::vector<double> to_return;	
+	for (int i = 0; i != t1.numel(); i++)
+		to_return.push_back(t1[0][i].item<double>());			
 
-	torch::Tensor t1 = qNN->forward(t);
-	std::vector<double> to_return;
-	// std::cout<<"Output:{";
-	for (int i = 0; i != t1.numel(); i++){
-		to_return.push_back(t1[0][i].item<double>());
-		// std::cout<<", "<<t1[0][i].item<double>();
-	}
-	// std::cout<<" }"<<std::endl;
 	return to_return;
 }
 std::vector<double> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<double> s){
-	torch::Tensor t = torch::from_blob(s.data(), {1, s.size()});
+	// torch::Tensor t = torch::from_blob(s.data(), {1, s.size()});
+	torch::Tensor t = torch::tensor(s).unsqueeze(0);
+	t = t.to(torch::kFloat32);	
 
 	torch::Tensor t1 = mutNN->forward(t);
 	std::vector<double> to_return;
@@ -94,7 +94,8 @@ std::vector<double> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<double> s
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
 
-	torch::Tensor t = torch::from_blob(input.data(), {1, input.size()});
+	torch::Tensor t = torch::tensor(input).unsqueeze(0);
+	t = t.to(torch::kFloat32);	
 
 	torch::Tensor t1 = qtNN->forward(t);
 	std::vector<double> to_return;
@@ -142,24 +143,30 @@ vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
  * *	by slow updating (with learning rate [TAU]) from non-targer networks			*
  * ************************************************************************************************/
 void DDPGAgent::updateTargetWeights(){
-	/*
-	MatrixXd QtA = TAU*q_criticNN->GetWeightsA() + (1-TAU)*q_target_criticNN->GetWeightsA();
-	MatrixXd QtB = TAU*q_criticNN->GetWeightsB() + (1-TAU)*q_target_criticNN->GetWeightsB();
-	q_target_criticNN->SetWeights(QtA,QtB);
+	// MatrixXd QtA = TAU*q_criticNN->GetWeightsA() + (1-TAU)*q_target_criticNN->GetWeightsA();
+	// std::cout<<muNN->parameters()<<std::endl;
+	// std::cout<<mutNN->parameters()<<std::endl;
+	// std::cout<<qNN->parameters().size()<<std::endl;
+	std::cout<<torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0]))<<std::endl;
+	for (int i = 0; i < qNN->parameters().size(); i++ ){
+		qtNN->parameters()[i] = qNN->parameters()[i];
+	}
+	for (int i = 0; i < muNN->parameters().size(); i++ ){
+		mutNN->parameters()[i] = muNN->parameters()[i].detach().clone();
 
-	MatrixXd MutA = TAU*mu_actorNN->GetWeightsA() + (1-TAU)*mu_target_actorNN->GetWeightsA();
-	MatrixXd MutB = TAU*mu_actorNN->GetWeightsB() + (1-TAU)*mu_target_actorNN->GetWeightsB();
-	mu_target_actorNN->SetWeights(MutA,MutB);
-	*/
+	}
+	// std::cout<<(mutNN->parameters() == muNN->parameters())<<std::endl;
+	std::cout<<torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0]))<<std::endl;
+
 }
 void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime,std::vector<std::vector<double>> states){
 	
+	//TODO try other optimizers too(etc SGD)
 	torch::optim::Adam optimezerQNN(qNN->parameters(),0.01);
 	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
 
-	torch::Tensor QvalsTensor = torch::from_blob(Qvals.data(), {1, Qvals.size()});
-	torch::Tensor QprimeTensor = torch::from_blob(Qprime.data(), {1, Qprime.size()});
-
+	torch::Tensor QprimeTensor = torch::tensor(Qprime).unsqueeze(0);
+	torch::Tensor QvalsTensor = torch::tensor(Qvals).unsqueeze(0);
 
 	//Update critic loss
 	torch::Tensor loss= torch::mse_loss(QvalsTensor,QprimeTensor);
@@ -168,36 +175,22 @@ void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qpr
 	loss.backward();
 	optimezerQNN.step();
 
-	std::cout<<"QVals \t\t Qprime"<<std::endl;
-	for (int i = 0; i != BATCH_SIZE; i++){
-		std::cout<<Qvals[i]<<"\t\t"<<Qprime[i]<<std::endl;
-	}
+	// std::cout<<"QVals \t\t Qprime"<<std::endl;
+	// for (int i = 0; i != BATCH_SIZE; i++){
+	// 	std::cout<<Qvals[i]<<"\t\t"<<Qprime[i]<<std::endl;
+	// }
 
-	std::cout<<"QLoss:\t"<<loss.item<float>()<<std::endl;		
+	std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;	
 
+	//TODO SCALE INPUTS OF Q NETWORK(if necessary)
 	//Update actor
-	// torch::Tensor states_ = torch::from_blob(states[0].data(), {BATCH_SIZE, states[0].size()});
-	
-	// std::cout<<states[0]<<std::endl;
-	// std::cout<<states[1]<<std::endl;
-	// std::cout<<states[2]<<std::endl;
-	// std::cout<<states[3]<<std::endl;
-	// std::cout<<states[4]<<std::endl;	
-
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
 	for (int i = 1; i != BATCH_SIZE; i++){
 		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
 		states_ = torch::cat({states_,temp},0);
-	}
-	// std::cout<<states_.to(torch::kFloat32)<<std::endl;
+	}	
 	states_ = states_.to(torch::kFloat32);
-	// torch::Tensor states__ = torch::tensor(states[0]);
-	// torch::Tensor states__1 = torch::tensor(states[1]);
 
-	// states__ = states__.unsqueeze(0);
-	// states__1 = states__1.unsqueeze(0);
-
-	// std::cout<<torch::cat({states__,states__1},0)<<std::endl;
 	torch::Tensor actions = muNN->forward(states_);	
 	torch::Tensor input = torch::cat({states_,actions},1);
 

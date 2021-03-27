@@ -85,3 +85,6 @@ README.md and tested it
 - TODO fix update Critic, all Evaluate functions
 - TODO implement Update Targe NN weights
 
+##v 0.00015o
+- fixed the logic errors resulting from the use of "from_blob"
+- started working on update weights

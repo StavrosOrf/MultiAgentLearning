@@ -134,7 +134,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			std::vector<double> Qprime;//Qprime ( the Y )
 			std::vector<std::vector<double>> states; //all states from the batch
 
-			std::cout << "Y = {";
+			// std::cout << "Y = {";
 			for (size_t i = 0; i < BATCH_SIZE; i++){
 				replay b = miniBatch[i];				
 				std::vector<double> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);				
@@ -142,7 +142,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 				// assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta).size() ==1);				
 				double y = b.reward + GAMMA *
 					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta)[0];
-				std::cout << y << ", ";				
+				// std::cout << y << ", ";				
 				//Generate Qvals and Qprime for Q backprop
 				//WRONG  std::vector<double> input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
 				//WRONG input << miniBatch[i].action, miniBatch[i].current_state;				
@@ -151,7 +151,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 				Qprime.push_back(y);
 				states.push_back(b.current_state);				
 			}
-			std::cout << '}' << std::endl;
+			// std::cout << '}' << std::endl;
 
 			//Update Q critic
 			ddpg_maTeam[0]->updateQCritic(Qvals, Qprime, states);

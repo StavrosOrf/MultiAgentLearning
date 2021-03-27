@@ -61,7 +61,7 @@ class Warehouse{
 	protected:
 		void replan_AGVs(std::vector<double> cost_add);
 		void transition_AGVs(bool verbose = false);
-		void GetJointState(vector<Edge *> e, vector<size_t> &s) __attribute__((deprecated));
+		void GetJointState(vector<Edge *> e, vector<size_t> &s) ;//__attribute__((deprecated))
 
 		size_t nSteps; //number of steps per simulation
 		size_t nAgents;

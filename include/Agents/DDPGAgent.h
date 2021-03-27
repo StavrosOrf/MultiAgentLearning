@@ -17,7 +17,7 @@ using std::string;
 #define REPLAY_BUFFER_SIZE 5000
 #define GAMMA 0.95
 #define TAU 0.01
-#define BATCH_SIZE 5
+#define BATCH_SIZE 3
 
 struct replay{
 	//TODO make int later
@@ -60,10 +60,10 @@ class DDPGAgent{
 		void updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime,std::vector<std::vector<double>> states);
 	protected:
 
-		NeuralNet * q_criticNN __attribute__ ((deprecated));
-		NeuralNet * q_target_criticNN __attribute__ ((deprecated));;
-		NeuralNet * mu_actorNN __attribute__ ((deprecated));;
-		NeuralNet * mu_target_actorNN __attribute__ ((deprecated));
+		// NeuralNet * q_criticNN __attribute__ ((deprecated));
+		// NeuralNet * q_target_criticNN __attribute__ ((deprecated));;
+		// NeuralNet * mu_actorNN __attribute__ ((deprecated));;
+		// NeuralNet * mu_target_actorNN __attribute__ ((deprecated));
 
 		Net* qNN;
 		Net* qtNN;
