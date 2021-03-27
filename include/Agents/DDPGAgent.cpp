@@ -25,6 +25,10 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	//assert(qtNN->weightsA[0].item<double> != qNN->weightsA[0].item<double>);
 
 	replay_buffer.reserve(REPLAY_BUFFER_SIZE);
+	// torch::optim::SGD optimezerQNN(qNN->parameters(),0.01);
+	// torch::optim::SGD optimezerQtNN(qNN->parameters(),0.01);
+	// torch::optim::SGD optimezerMuNN(qNN->parameters(),0.01);
+	// torch::optim::SGD optimezerMuTNN(qNN->parameters(),0.01);
 }
 
 DDPGAgent::~DDPGAgent(){
@@ -55,14 +59,22 @@ std::vector<double> DDPGAgent::EvaluateActorNN_DDPG(std::vector<double> s){
 	return to_return;
 }
 std::vector<double> DDPGAgent::EvaluateCriticNN_DDPG(std::vector<double> s,std::vector<double> a){
-	std::vector<double> input(s.size() + a.size());
-	input << s, a;
+	// std::vector<double> input(s.size() + a.size());
+	// input << s, a;
+	std::vector<double> input;
+	input.insert(input.begin(),s.begin(),s.end());
+	input.insert(input.end(),a.begin(),a.end());
+
 	torch::Tensor t = torch::from_blob(input.data(), {1, input.size()});
 
 	torch::Tensor t1 = qNN->forward(t);
 	std::vector<double> to_return;
-	for (int i = 0; i != t1.numel(); i++)
-			to_return.push_back(t1[0][i].item<double>());
+	// std::cout<<"Output:{";
+	for (int i = 0; i != t1.numel(); i++){
+		to_return.push_back(t1[0][i].item<double>());
+		// std::cout<<", "<<t1[0][i].item<double>();
+	}
+	// std::cout<<" }"<<std::endl;
 	return to_return;
 }
 std::vector<double> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<double> s){
@@ -71,13 +83,17 @@ std::vector<double> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<double> s)
 	torch::Tensor t1 = mutNN->forward(t);
 	std::vector<double> to_return;
 	for (int i = 0; i != t1.numel(); i++)
-			to_return.push_back(t1[0][i].item<double>());
+		to_return.push_back(t1[0][i].item<double>());
 	assert(to_return.size() == t1.numel());
 	return to_return;
 }
 std::vector<double> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<double> s,  std::vector<double> a){
-	std::vector<double> input(s.size() + a.size());
-	input << s, a;
+	// std::vector<double> input(s.size() + a.size());
+	// input << s, a;
+	std::vector<double> input;
+	input.insert(input.begin(),s.begin(),s.end());
+	input.insert(input.end(),a.begin(),a.end());
+
 	torch::Tensor t = torch::from_blob(input.data(), {1, input.size()});
 
 	torch::Tensor t1 = qtNN->forward(t);
@@ -136,7 +152,52 @@ void DDPGAgent::updateTargetWeights(){
 	mu_target_actorNN->SetWeights(MutA,MutB);
 	*/
 }
-void DDPGAgent::updateQCritic(vector<std::vector<double>> trainInputs, vector<std::vector<double>> trainTargets){
-	//TODO 
-	//q_criticNN->BackPropagation(trainInputs,trainTargets);
+void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime,std::vector<std::vector<double>> states){
+	
+
+	torch::optim::SGD optimezerQNN(qNN->parameters(),0.01);
+	torch::optim::SGD optimezerMuNN(muNN->parameters(),0.01);
+
+	torch::Tensor QvalsTensor = torch::from_blob(Qvals.data(), {1, Qvals.size()});
+	torch::Tensor QprimeTensor = torch::from_blob(Qprime.data(), {1, Qprime.size()});
+
+
+	//Update critic loss
+	torch::Tensor loss= torch::mse_loss(QvalsTensor,QprimeTensor);
+	
+	optimezerQNN.zero_grad();
+	loss.backward();
+	optimezerQNN.step();
+
+	std::cout<<"QVals \t\t Qprime"<<std::endl;
+	for (int i = 0; i != BATCH_SIZE; i++){
+		std::cout<<Qvals[i]<<"\t\t"<<Qprime[i]<<std::endl;
+	}
+
+	std::cout<<"QLoss:\t"<<loss.item<float>()<<std::endl;		
+
+	//Update actor
+	// torch::Tensor i = torch::randn({2,3});
+	// std::cout<<i<<std::endl;
+	// torch::Tensor ii = torch::cat((i,i),1);
+	// std::cout<<ii<<std::endl;
+	// ii = torch::cat((i,i),0);
+	// std::cout<<ii<<std::endl;
+
+	// assert(0);
+	// torch::Tensor states_ = torch::from_blob(states.data(), {BATCH_SIZE, states[0].size()});
+
+	// torch::Tensor actions = muNN->forward(states_);
+	// std::cout<<actions<<std::endl;
+	// std::cout<<states_<<std::endl;
+	// torch::Tensor input = torch::cat((states_,actions),1);
+	// std::cout<<input<<std::endl;
+	// std::cout<<"Q2"<<std::endl;
+	// torch::Tensor policy_loss = -qNN->forward(input);
+	// std::cout<<"Q3"<<std::endl;
+	// optimezerMuNN.zero_grad();
+	// policy_loss.backward();
+	// optimezerMuNN.step();
+
+	std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;		
 }

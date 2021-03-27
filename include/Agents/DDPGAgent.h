@@ -35,9 +35,7 @@ struct Net : torch::nn::Module {
 	torch::Tensor forward(torch::Tensor input) {
 		torch::Tensor hidden_layer, output_layer;
 		hidden_layer = torch::relu(torch::mm(input, weightsA));
-		output_layer = torch::relu(torch::mm(hidden_layer, weightsB));
-		//std::cout << output_layer.dim() << std::endl;
-		//assert(output_layer.dim() == 1);
+		output_layer = torch::relu(torch::mm(hidden_layer, weightsB));		
 		return output_layer;
 	}
 	torch::Tensor weightsA, weightsB;
@@ -59,7 +57,7 @@ class DDPGAgent{
 		vector<replay> replay_buffer;
 
 		void updateTargetWeights();
-		void updateQCritic(vector<std::vector<double>> trainInputs, vector<std::vector<double>> trainTargets);
+		void updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime,std::vector<std::vector<double>> states);
 	protected:
 
 		NeuralNet * q_criticNN __attribute__ ((deprecated));
@@ -71,6 +69,11 @@ class DDPGAgent{
 		Net* qtNN;
 		Net* muNN;
 		Net* mutNN;
+
+
+		// Net* qtNN;
+		// Net* muNN;
+		// Net* mutNN;
 };
 
 #endif // DDPG_AGENT_H_

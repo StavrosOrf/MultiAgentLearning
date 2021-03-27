@@ -73,3 +73,12 @@ white space characters between the last character and ';'
 ##v 0.00012k / Light up your (c)torches
 - imported the c++ frontent for PyTorch's backend also updated cmake and
 README.md and tested it
+
+##v 0.00013o
+- fixed compile errors
+- implemented critic update( might need detailed testing after completing the aglorithm)
+
+
+
+
+

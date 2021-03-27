@@ -99,9 +99,9 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			totalCommand += whAGVs[k]->GetNumCommanded();
 		}
 
-		std::cout<<"Stats: \nTotal Move:"<<totalMove<<" \nTotal Enter:"<<totalEnter<<
-				"\nTotal wait:"<<totalWait<< "\nTotal Success:"<<totalSuccess<<
-				"\nTotal Command:"<<totalCommand<<std::endl;
+		std::cout<<"Stats: \nTotal Move:\t"<<totalMove<<" \nTotal Enter:\t"<<totalEnter<<
+				"\nTotal wait:\t"<<totalWait<< "\nTotal Success:\t"<<totalSuccess<<
+				"\nTotal Command:\t"<<totalCommand<<std::endl;
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
 
 		totalDeliveries += totalSuccess;
@@ -130,37 +130,34 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
 			std::vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
 
-			std::vector<std::vector<double>> trainInputs;
-			std::vector<std::vector<double>> trainTargets;
+			std::vector<double>Qvals;//Qvals 
+			std::vector<double> Qprime;//Qprime ( the Y )
+			std::vector<std::vector<double>> states; //all states from the batch
 
 			std::cout << "Y = {";
 			for (size_t i = 0; i < BATCH_SIZE; i++){
-				replay b = miniBatch[i];
-
-				std::vector<double> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
-				assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);
-				assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta).size() ==1);
+				replay b = miniBatch[i];				
+				std::vector<double> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);				
+				// assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);
+				// assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta).size() ==1);				
 				double y = b.reward + GAMMA *
 					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta)[0];
-				std::cout << y << ", ";
-
-				//Generate trainInputs and trainTargets for Q backprop
-				std::vector<double> input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
-				input << miniBatch[i].action, miniBatch[i].current_state;
-				trainInputs.push_back(input);
-				std::vector<double> t(1);
-				t[0] = y;
-				assert(t[0] == y && t.size() == 1);
-				trainTargets.push_back(t);
+				std::cout << y << ", ";				
+				//Generate Qvals and Qprime for Q backprop
+				//WRONG  std::vector<double> input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
+				//WRONG input << miniBatch[i].action, miniBatch[i].current_state;				
+				double q = ddpg_maTeam[0]->EvaluateCriticNN_DDPG(b.current_state,b.action)[0];
+				Qvals.push_back(q);
+				Qprime.push_back(y);
+				states.push_back(b.current_state);				
 			}
 			std::cout << '}' << std::endl;
 
 			//Update Q critic
-			ddpg_maTeam[0]->updateQCritic(trainInputs, trainTargets);
+			ddpg_maTeam[0]->updateQCritic(Qvals, Qprime, states);
 
 			//TODO
 			//Update actor critic
-
 
 			//Update target Q critic and Mu target actor critic
 			ddpg_maTeam[0]->updateTargetWeights();
