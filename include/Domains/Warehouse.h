@@ -44,8 +44,7 @@ class Warehouse{
 		virtual void InitialiseMATeam(){ // create agents for the graph
 			std::cout << "This function initialises the multiagent team.\n";
 		}
-		void EvolvePolicies(bool init = false);
-		void ResetEpochEvals();
+		void EvolvePolicies(bool init = false);		
 
 		void OutputPerformance(string);
 		void OutputControlPolicies(string);
@@ -54,7 +53,7 @@ class Warehouse{
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
 		void SetTrainingAlgo(algo_type algot){algo = algot;}
-		virtual void SimulateEpochDDPG(){;}
+		virtual void SimulateEpochDDPG(bool verbose){;}
 
 		void print_warehouse_state();
 		vector<size_t> get_edge_utilization(bool verbose = false) __attribute__ ((pure));

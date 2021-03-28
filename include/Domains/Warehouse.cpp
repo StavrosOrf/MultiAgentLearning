@@ -34,15 +34,6 @@ Warehouse::~Warehouse(void){
 	}
 }
 
-void Warehouse::ResetEpochEvals(){
-	if (algo = algo_type::ddpg)
-		for (size_t i = 0; i < nAgents; i++)
-			ddpg_maTeam[i]->ResetEpochEvals();
-	else{
-		std::cout << "ERROR: Warehouse::ResetEpochEvals() invalid algo" << std::endl;
-	}
-}
-
 void Warehouse::OutputPerformance(string eval_str){
 	if (evalFile.is_open())
 		evalFile.close();

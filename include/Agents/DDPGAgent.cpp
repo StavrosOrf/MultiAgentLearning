@@ -39,10 +39,6 @@ DDPGAgent::~DDPGAgent(){
 	qNN = qtNN = muNN = mutNN = NULL;
 }
 
-
-void DDPGAgent::ResetEpochEvals(){
-}
-
 /************************************************************************************************
  * *Input:a vector [s] of the input state and a vector [a] of input actions			*
  * *Method:Does a foward pass of the associated NN						*
@@ -88,8 +84,6 @@ std::vector<double> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<double> s)
 	return to_return;
 }
 std::vector<double> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<double> s,  std::vector<double> a){
-	// std::vector<double> input(s.size() + a.size());
-	// input << s, a;
 	std::vector<double> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -146,24 +140,29 @@ void DDPGAgent::updateTargetWeights(){
 	// MatrixXd QtA = TAU*q_criticNN->GetWeightsA() + (1-TAU)*q_target_criticNN->GetWeightsA();
 	// std::cout<<muNN->parameters()<<std::endl;
 	// std::cout<<mutNN->parameters()<<std::endl;
-	// std::cout<<qNN->parameters().size()<<std::endl;
-	std::cout<<torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0]))<<std::endl;
+	// std::cout<<qNN->parameters().size()<<std::endl;		
 	for (int i = 0; i < qNN->parameters().size(); i++ ){
-		qtNN->parameters()[i] = qNN->parameters()[i];
+		torch::Tensor t = qNN->parameters()[i].detach().clone();
+		torch::Tensor tt = qtNN->parameters()[i].detach().clone();
+
+		qtNN->parameters()[i].set_data(TAU*t + (1-TAU)*tt);
 	}
 	for (int i = 0; i < muNN->parameters().size(); i++ ){
-		mutNN->parameters()[i] = muNN->parameters()[i].detach().clone();
+		torch::Tensor t = muNN->parameters()[i].detach().clone();
+		torch::Tensor tt = mutNN->parameters()[i].detach().clone();
 
+		mutNN->parameters()[i].set_data(TAU*t + (1-TAU)*tt);
 	}
-	// std::cout<<(mutNN->parameters() == muNN->parameters())<<std::endl;
-	std::cout<<torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0]))<<std::endl;
-
+	
+	// assert(torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0])));
+	// assert(torch::all(qtNN->parameters()[0].eq(qNN->parameters()[0])));	
+	// std::cout<<torch::all(qtNN->parameters()[0].eq(qNN->parameters()[0]))<<std::endl;	
+	// std::cout<<torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0]))<<std::endl;	
 }
-void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime,std::vector<std::vector<double>> states){
+void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime){
 	
 	//TODO try other optimizers too(etc SGD)
-	torch::optim::Adam optimezerQNN(qNN->parameters(),0.01);
-	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
+	torch::optim::Adam optimezerQNN(qNN->parameters(),0.01);	
 
 	torch::Tensor QprimeTensor = torch::tensor(Qprime).unsqueeze(0);
 	torch::Tensor QvalsTensor = torch::tensor(Qvals).unsqueeze(0);
@@ -180,9 +179,13 @@ void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qpr
 	// 	std::cout<<Qvals[i]<<"\t\t"<<Qprime[i]<<std::endl;
 	// }
 
-	std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;	
+	// std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;				
+}
 
+void DDPGAgent::updateMuActor(std::vector<std::vector<double>> states){
 	//TODO SCALE INPUTS OF Q NETWORK(if necessary)
+	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
+
 	//Update actor
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
 	for (int i = 1; i != BATCH_SIZE; i++){
@@ -204,7 +207,5 @@ void DDPGAgent::updateQCritic(std::vector<double> Qvals, std::vector<double> Qpr
 	policy_loss.backward();
 	optimezerMuNN.step();
 
-	std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;		
-
-	// exit(1);
+	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;	
 }

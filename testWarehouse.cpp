@@ -24,7 +24,7 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs);
 void create_results_folder(Warehouse* trainDomain, YAML::Node configs, size_t r);
 
 void WarehouseSimulationDDPG(int r, YAML::Node configs){
-	//srand(time(NULL)); // increment random seed
+	srand(time(NULL)); // increment random seed
 	// Initialise appropriate domain
 	size_t nEps = configs["DDPG"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();
@@ -35,11 +35,9 @@ void WarehouseSimulationDDPG(int r, YAML::Node configs){
 	int runs = configs["DDPG"]["runs"].as<int>();
 	create_results_folder(trainDomain, configs, r);
 
-	// for (size_t n = 0; n < nEps; n++){
-	for (size_t n = 0; n < 1; n++){
-		// trainDomain->ResetEpochEvals(); // reset domain
-
-		trainDomain->SimulateEpochDDPG();// simulate
+	for (size_t n = 0; n < nEps; n++){	
+		// std::cout<<"t0"<<std::endl;	
+		trainDomain->SimulateEpochDDPG(false);// simulate
 	}
 
 	exit(0);

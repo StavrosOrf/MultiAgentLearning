@@ -17,7 +17,7 @@ using std::string;
 #define REPLAY_BUFFER_SIZE 5000
 #define GAMMA 0.95
 #define TAU 0.01
-#define BATCH_SIZE 3
+#define BATCH_SIZE 20
 
 struct replay{
 	//TODO make int later
@@ -49,31 +49,22 @@ class DDPGAgent{
 		std::vector<double> EvaluateCriticNN_DDPG(std::vector<double> s,std::vector<double> a);
 		std::vector<double> EvaluateActorNN_DDPG(std::vector<double> s);
 		std::vector<double> EvaluateTargetActorNN_DDPG(std::vector<double> s);
-		std::vector<double> EvaluateTargetCriticNN_DDPG(std::vector<double> s,std::vector<double> a);
-		void ResetEpochEvals();
+		std::vector<double> EvaluateTargetCriticNN_DDPG(std::vector<double> s,std::vector<double> a);		
 
 		vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);
 		void addToReplayBuffer(replay r);
 		vector<replay> replay_buffer;
 
 		void updateTargetWeights();
-		void updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime,std::vector<std::vector<double>> states);
+		void updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime);
+		void updateMuActor(std::vector<std::vector<double>> states);
 	protected:
-
-		// NeuralNet * q_criticNN __attribute__ ((deprecated));
-		// NeuralNet * q_target_criticNN __attribute__ ((deprecated));;
-		// NeuralNet * mu_actorNN __attribute__ ((deprecated));;
-		// NeuralNet * mu_target_actorNN __attribute__ ((deprecated));
 
 		Net* qNN;
 		Net* qtNN;
 		Net* muNN;
 		Net* mutNN;
 
-
-		// Net* qtNN;
-		// Net* muNN;
-		// Net* mutNN;
 };
 
 #endif // DDPG_AGENT_H_

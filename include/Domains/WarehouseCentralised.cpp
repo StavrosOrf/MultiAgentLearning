@@ -22,7 +22,7 @@ WarehouseCentralised::~WarehouseCentralised(void){
 	}
 }
 
-void WarehouseCentralised::SimulateEpochDDPG(){
+void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	InitialiseNewEpoch();
 	double totalDeliveries = 0;
 	std::normal_distribution<double> n_process(0.0, 0.1);
@@ -35,11 +35,13 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 	for (int i = 0; i != N_EDGES; i++)
 		cur_state[i] = get_edge_utilization()[i];
-	print_warehouse_state();
+	if(verbose)
+		print_warehouse_state();
 
 	// each timestep
 	for (size_t t = 0; t < nSteps; t++){
-		std::cout <<"==============================================================Step - "<<t<<std::endl;
+		if(verbose)
+			std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
 		vector<double> actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
 		// Add Random Noise from process N
@@ -52,19 +54,23 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 				actions[n] = 1;
 			//actions[n] = std::min(actions[n], 0);
 			//actions[n] = std::max(actions[n], 1);
-			// assert(0 <= actions[n] && actions[n] <= 1); TODO CHECK MORE
+			assert(0 <= actions[n] && actions[n] <= 1); 
 			//std::cout << "Action[" << n << "] = " << actions[n] << std::endl;
 		}
+			// std::cout << "Actions:"<<actions << std::endl;
 
 		vector<double> final_costs = baseCosts;
 		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
+		assert(maxBaseCost == 28);
 
 		for (size_t i = 0; i < nAgents; i++)
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++){ // output [0,1] scaled to max base cost
 				final_costs[whAgents[i]->eIDs[j]]+=actions[j]*maxBaseCost;
-				// assert(0 <= final_costs[whAgents[i]->eIDs[j]]);TODO CHECK MORE
-				//assert(final_costs[whAgents[i]->eIDs[j]] <= maxBaseCost + baseCosts[whAgents[i]->eIDs[j]]);
+				assert(0 <= final_costs[whAgents[i]->eIDs[j]]); //TODO CHECK MORE
+				assert(final_costs[whAgents[i]->eIDs[j]] <= maxBaseCost + baseCosts[whAgents[i]->eIDs[j]]);
 			}
+		for (auto k: final_costs)
+			assert(k <= maxBaseCost*2);
 		assert(final_costs.size() == N_EDGES);
 
 		UpdateGraphCosts(final_costs);
@@ -81,7 +87,8 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			temp_state[i] = cur_state[i];
 			cur_state[i] = get_edge_utilization()[i];
 		}
-		print_warehouse_state();
+		if(verbose)
+			print_warehouse_state();
 
 		double maxEval = -1;
 		vector<size_t> travelStats;
@@ -98,10 +105,11 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			totalSuccess += whAGVs[k]->GetNumCompleted();
 			totalCommand += whAGVs[k]->GetNumCommanded();
 		}
+		if(verbose)
+			std::cout<<"Stats: \nTotal Move:\t"<<totalMove<<" \nTotal Enter:\t"<<totalEnter<<
+					"\nTotal wait:\t"<<totalWait<< "\nTotal Success:\t"<<totalSuccess<<
+					"\nTotal Command:\t"<<totalCommand<<std::endl;
 
-		std::cout<<"Stats: \nTotal Move:\t"<<totalMove<<" \nTotal Enter:\t"<<totalEnter<<
-				"\nTotal wait:\t"<<totalWait<< "\nTotal Success:\t"<<totalSuccess<<
-				"\nTotal Command:\t"<<totalCommand<<std::endl;
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
 
 		totalDeliveries += totalSuccess;
@@ -112,7 +120,10 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 
 		assert(temp_state.size() == N_EDGES && cur_state.size() == N_EDGES);
 		reward = (double)totalMove/whAGVs.size();
-		std::cout<<"Reward: "<<reward<<std::endl;
+
+		if(verbose)
+			std::cout<<"Reward: "<<reward<<std::endl;
+
 		replay r = {temp_state,cur_state,actions,reward};
 		ddpg_maTeam[0]->addToReplayBuffer(r);
 		//TODO
@@ -126,7 +137,7 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 	  // if not we need to think about that
 
 
-		//TODO
+
 		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
 			std::vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
 
@@ -138,14 +149,11 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			for (size_t i = 0; i < BATCH_SIZE; i++){
 				replay b = miniBatch[i];				
 				std::vector<double> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);				
-				// assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);
-				// assert(ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta).size() ==1);				
+				assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);				
 				double y = b.reward + GAMMA *
 					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta)[0];
 				// std::cout << y << ", ";				
-				//Generate Qvals and Qprime for Q backprop
-				//WRONG  std::vector<double> input(miniBatch[i].action.size() + miniBatch[i].current_state.size());
-				//WRONG input << miniBatch[i].action, miniBatch[i].current_state;				
+				//Generate Qvals and Qprime for Q backprop		
 				double q = ddpg_maTeam[0]->EvaluateCriticNN_DDPG(b.current_state,b.action)[0];
 				Qvals.push_back(q);
 				Qprime.push_back(y);
@@ -154,16 +162,18 @@ void WarehouseCentralised::SimulateEpochDDPG(){
 			// std::cout << '}' << std::endl;
 
 			//Update Q critic
-			ddpg_maTeam[0]->updateQCritic(Qvals, Qprime, states);
-
-			//TODO
+			ddpg_maTeam[0]->updateQCritic(Qvals, Qprime);
+			
 			//Update actor critic
+			ddpg_maTeam[0]->updateMuActor(states);
 
 			//Update target Q critic and Mu target actor critic
 			ddpg_maTeam[0]->updateTargetWeights();
 
-		}else
-			std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
+		}else{
+			if(verbose)
+				std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
+		}
 	}
 	std::cout << "End of Simulation with G: "<<totalDeliveries<<std::endl;
 	return;
