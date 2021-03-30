@@ -100,3 +100,16 @@ trace if Eigen, Threadpool.cpp
 - Fixed Various Bugs
 - Added test_torch.cpp, test_random.cpp, and created new ./result Directory
 - Added cleancode.sh in the main directory
+
+##v 0.00017o
+- added some metrics ( time, totalMove ...)
+- TODO more metrics can be added like Best G of Run etc
+- TODO add metrics about loss functions of NNs
+- TODO Store Results for each step/Epoch/Run in files so we can get Graphs for our report/paper
+
+
+
+
+
+
+

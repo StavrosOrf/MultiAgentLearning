@@ -29,6 +29,12 @@ enum algo_type{
     ddpg
 };
 
+struct epoch_results{
+    size_t totalDeliveries;
+    size_t totalMove;
+    size_t totalEnter;
+    size_t totalWait;
+};
 
 class Warehouse{
 	public:
@@ -46,7 +52,7 @@ class Warehouse{
 		void DisableEpisodeReplayOutput(){outputEpReplay = false;}
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual void SimulateEpochDDPG(bool verbose){;}
+		virtual epoch_results SimulateEpochDDPG(bool verbose){;}
 
 		void print_warehouse_state();
 		vector<float> get_edge_utilization(bool verbose = false) __attribute__ ((pure));

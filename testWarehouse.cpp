@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <yaml-cpp/yaml.h>
 #include <time.h>
+#include <ctime>
+#include <stdio.h>
 
 #include "Domains/Warehouse.h"
 #include "Domains/WarehouseCentralised.h"
@@ -23,16 +25,33 @@ void WarehouseSimulationDDPG(int r, YAML::Node configs){
 	size_t nEps = configs["DDPG"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();
 	int runs = configs["DDPG"]["runs"].as<int>();
+	
+	std::clock_t start;
+	std::clock_t startTotalRun;
+	std::clock_t startTotalExperiment = std::clock();
+
+  double duration;
+
 	for (int i = 0; i != runs; i ++){
-		std::cout << "Starting Run: " << i << std::endl;
+		startTotalRun = std::clock();
 		Warehouse * trainDomain = create_warehouse(agentType, configs);
 
 		create_results_folder(trainDomain, configs, r);
 
+		std::cout << "Starting Run: " << i << std::endl;
 		for (size_t n = 0; n < nEps; n++){
-			trainDomain->SimulateEpochDDPG(false);// simulate
+			start = std::clock();
+			epoch_results t = trainDomain->SimulateEpochDDPG(false);// simulate
+   		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+   		// std::cout<<"Epoch "<< n <<" ("<<duration<<" sec): ";
+   		std::printf("Epoch %3d (%5.1f sec): G=%4lu, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
+   				(int)n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);   		
 		}
+		duration = ( std::clock() - startTotalRun ) / ((double) CLOCKS_PER_SEC );
+		std::cout<<"Total time elapsed for Run "<<i<<" ( "<<duration<<" sec)"<<std::endl; 
 	}
+	duration = ( std::clock() - startTotalExperiment ) / ((double) CLOCKS_PER_SEC );
+		std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
 
 	exit(0);
 }

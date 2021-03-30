@@ -22,11 +22,12 @@ WarehouseCentralised::~WarehouseCentralised(void){
 	}
 }
 
-void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
+epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	InitialiseNewEpoch();
 	float totalDeliveries = 0;
 	std::normal_distribution<float> n_process(0.0, 0.1);
 	std::default_random_engine n_generator;
+	epoch_results results = {0,0,0,0};
 	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
 	std::vector<float> cur_state(N_EDGES * 1, 0);
@@ -72,6 +73,11 @@ void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					"\nTotal wait:\t"<<totalWait<< "\nTotal Success:\t"<<totalSuccess<<
 					"\nTotal Command:\t"<<totalCommand<<std::endl;
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
+		
+		results.totalDeliveries += totalSuccess;
+		results.totalMove += totalMove;
+		results.totalEnter += totalEnter;
+		results.totalWait += totalWait;
 
 		totalDeliveries += totalSuccess;
 		for (AGV* a : whAGVs) //Reset AGVs counters
@@ -138,9 +144,9 @@ void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 			if(verbose)
 				std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
 		}
-	}
-	std::cout << "End of Simulation with G: " << totalDeliveries << std::endl;
-	return;
+	}	
+	// std::cout << "End of Simulation with G: " << totalDeliveries << std::endl;
+	return results;
 }
 
 void WarehouseCentralised::InitialiseMATeam(){
