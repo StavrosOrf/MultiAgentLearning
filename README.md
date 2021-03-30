@@ -8,7 +8,7 @@ Top level project files for multiagent learning.
 
 Install system dependencies:
 ```
-sudo apt install libboost-dev libeigen3-dev libyaml-cpp-dev
+sudo apt install libboost-dev libyaml-cpp-dev
 
 ```
 
@@ -40,4 +40,9 @@ cmake .. && make
 Run the project configured by `config.yaml` using six threads:
 ```
 ./testWarehouse -c ../config.yaml -t 6
+```
+
+## Debug
+```
+cmake -DCMAKE_BUILD_TYPE=Debug .. && make && gdb --args ./testWarehouse -c ../config.yaml
 ```

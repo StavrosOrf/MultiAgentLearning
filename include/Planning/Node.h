@@ -42,8 +42,8 @@ class Node
 
 		Node * GetParent() const {return itsParent;}
 		void SetParent(Node * parent) {itsParent = parent;}
-		double GetCost() const {return itsCost;}
-		void SetCost(double cost) {itsCost = cost;}
+		float GetCost() const {return itsCost;}
+		void SetCost(float cost) {itsCost = cost;}
 		int GetVertex() const {return itsVertex;}
 		void SetVertex(int vertex) {itsVertex = vertex;}
 
@@ -53,7 +53,7 @@ class Node
 	private:
 		int itsVertex;
 		Node * itsParent;
-		double itsCost;
+		float itsCost;
 };
 
 #endif // NODE_H_

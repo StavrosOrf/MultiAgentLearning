@@ -43,12 +43,12 @@ int main(){
 		return 1;
 	}
 	vector< vector<int> > edges;
-	vector<double> costs;
+	vector<float> costs;
 	while (getline(edgesFile,line))
 	{
 		stringstream lineStream(line);
 		string cell;
-		vector<double> ec;
+		vector<float> ec;
 		while (getline(lineStream,cell,','))
 		{
 			ec.push_back(atof(cell.c_str()));

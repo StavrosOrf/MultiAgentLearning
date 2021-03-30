@@ -3,18 +3,12 @@
 #include <vector>
 #include <string>
 #include <stdlib.h>
-//#include <Eigen/Eigen>
 #include <yaml-cpp/yaml.h>
 #include <time.h>
-#include <torch/torch.h>
 
 #include "Domains/Warehouse.h"
 #include "Domains/WarehouseCentralised.h"
-#include "threadpool.hpp"
-
-using std::vector;
-using std::string;
-using namespace Eigen;
+//#include "threadpool.hpp"
 
 char mkdir[100];
 string domainDir;
@@ -28,16 +22,16 @@ void WarehouseSimulationDDPG(int r, YAML::Node configs){
 	// Initialise appropriate domain
 	size_t nEps = configs["DDPG"]["epochs"].as<size_t>();
 	string agentType = configs["domain"]["agents"].as<string>();
-	Warehouse * trainDomain = create_warehouse(agentType, configs);
-	//trainDomain->SetTrainingAlgo(algo_type::ddpg);
-	trainDomain->InitialiseMATeam();
-
 	int runs = configs["DDPG"]["runs"].as<int>();
-	create_results_folder(trainDomain, configs, r);
+	for (int i = 0; i != runs; i ++){
+		std::cout << "Starting Run: " << i << std::endl;
+		Warehouse * trainDomain = create_warehouse(agentType, configs);
 
-	for (size_t n = 0; n < nEps; n++){	
-		// std::cout<<"t0"<<std::endl;	
-		trainDomain->SimulateEpochDDPG(false);// simulate
+		create_results_folder(trainDomain, configs, r);
+
+		for (size_t n = 0; n < nEps; n++){
+			trainDomain->SimulateEpochDDPG(false);// simulate
+		}
 	}
 
 	exit(0);
@@ -50,7 +44,7 @@ void WarehouseSimulation(string config_file, int thrds){
 
 	string algo = configs["mode"]["algo"].as<string>();
 	string mode = configs["mode"]["type"].as<string>();
-	ThreadPool pool(thrds);
+	//ThreadPool pool(thrds);
 
 	if (algo == "DDPG") {
 		if(mode == "train"){
@@ -77,13 +71,8 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 		std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n";
 		exit(1);
 	}
-	if(configs["mode"]["algo"].as<string>() == "DDPG")
-		new_warehouse->SetTrainingAlgo(algo_type::ddpg);
-	else{
-		std::cout << "ERROR: Currently only configured for 'DDPG' and 'neuroevo'! Exiting.\n";
-		exit(1);
-	}
 
+	new_warehouse->InitialiseMATeam();
 	return new_warehouse;
 }
 
@@ -117,7 +106,7 @@ int main(int argc, char* argv[]){
 	int thrds = 2; // Default number of threads
 	for (int i = 1; i < argc; ++i){
 		string arg = argv[i];
-		std::cout << "main"<<std::endl;
+		//std::cout << "main"<<std::endl;
 		// Display help
 		if ((arg == "-h") || (arg == "--help")){
 			show_usage(argv[0]);
@@ -125,8 +114,9 @@ int main(int argc, char* argv[]){
 		}
 		// Path to configuration file
 		else if ((arg == "-c") || (arg == "--config")){
-			if (i + 1 < argc) 
+			if (i + 1 < argc)
 				config_file = argv[++i];
+				//config_file = "../config.yaml";i++;
 			else {
 				std::cerr << "--config option requires one argument.\n";
 				return 1;

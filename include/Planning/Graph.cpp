@@ -36,7 +36,7 @@ vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex i
 	return neighbours;
 }
 
-void Graph::GenerateEdges(vector< vector<int> > &edges, vector<double> &costs)
+void Graph::GenerateEdges(vector< vector<int> > &edges, vector<float> &costs)
 {
 	numEdges = edges.size();
 

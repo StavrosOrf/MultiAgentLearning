@@ -1,7 +1,6 @@
 #include "Search.h"
 
-Node * Search::PathSearch()
-{
+Node * Search::PathSearch(){
 	size_t sourceID = FindSourceID();
 	itsQueue = new Queue(new Node(itsGraph->GetVertices()[sourceID], SOURCE));
 	bool pathFound = false;
@@ -34,12 +33,11 @@ Node * Search::PathSearch()
 	else{
 		Node * bestPath;
 
-		for (size_t i = 0; i < itsQueue->GetClosed().size(); i++){
+		for (size_t i = 0; i < itsQueue->GetClosed().size(); i++)
 			if (itsGoal == itsQueue->GetClosed()[i]->GetVertex()){
 				bestPath = itsQueue->GetClosed()[i];
 				break;
 			}
-		}
 
 		return bestPath;
 	}
@@ -62,3 +60,10 @@ size_t Search::FindSourceID()
 	cout << "Error: souce ID not found. Exiting.\n";
 	exit(1);
 }
+float Search::PathSearchLenght(){
+	float total = 0;
+	for (Node *n = PathSearch(); n != NULL; n = n->GetParent())
+		total += n->GetCost();
+	return total;
+}
+

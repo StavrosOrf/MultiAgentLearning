@@ -18,8 +18,8 @@ class AGV{
 		void ResetAGV();
 		void Traverse();
 		void EnterNewEdge();
-		void CompareCosts(vector<double>);
-		void PlanAGV(vector<double>);
+		void CompareCosts(vector<float>);
+		void PlanAGV(vector<float>);
 		int GetNextVertex(){return nextVertex;}
 		Edge * GetCurEdge(){return curEdge;}
 		size_t GetT2V(){return t2v;}
@@ -32,6 +32,9 @@ class AGV{
 		size_t GetNumCompleted(){return nsDel;}
 		size_t GetNumCommanded(){return ncDel;}
 		Search * GetAGVPlanner(){return agvPlanner;}
+
+		int GetOriginVertex(){return origin;}
+		int GetDestinationVertex(){return goal;}
 
 		void DisplayPath();
 		void ResetPerformanceCounters(){nsDel=ncDel=tMove=tEnter=tWait=0;}
@@ -51,7 +54,7 @@ class AGV{
 		bool isReplan;			 // true if replanning is needed
 
 		Search * agvPlanner; // planning routine
-		vector<double> costs;// graph costs used to generate current plan
+		vector<float> costs;// graph costs used to generate current plan
 		list<Edge *> path;	 // current path as ordered list of edges
 		void SetNewGoal();	 // set new goal vertex
 };

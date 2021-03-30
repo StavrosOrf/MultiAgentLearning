@@ -12,7 +12,7 @@ using std::vector;
 class Graph
 {
 	public:
-		Graph(vector<int> &vertices, vector< vector<int> > &edges, vector<double> &costs): itsVertices(vertices){
+		Graph(vector<int> &vertices, vector< vector<int> > &edges, vector<float> &costs): itsVertices(vertices){
 			numVertices = itsVertices.size();
 			GenerateEdges(edges, costs);
 		}
@@ -38,7 +38,7 @@ class Graph
 		size_t numVertices;
 		size_t numEdges;
 
-		void GenerateEdges(vector< vector<int> > &edges, vector<double> &costs);
+		void GenerateEdges(vector< vector<int> > &edges, vector<float> &costs);
 };
 
 #endif // GRAPH_H_

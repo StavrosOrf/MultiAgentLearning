@@ -3,15 +3,13 @@
 
 #include <vector>
 #include <list>
-#include <Eigen/Eigen>
 #include <algorithm>
 #include <bits/stdc++.h>
 #include <string>
 #include "Warehouse.h"
 #include "Agents/DDPGAgent.h"
+#include "Planning/Search.h"
 
-using std::vector;
-using std::list;
 
 class WarehouseCentralised : public Warehouse {
 	public:

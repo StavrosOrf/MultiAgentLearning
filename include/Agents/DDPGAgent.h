@@ -6,25 +6,19 @@
 #include <string>
 #include <vector>
 #include <random>
-#include <Eigen/Eigen>
 #include <cassert>
 #include <torch/torch.h>
-#include "Learning/NeuralNet.h"
 
-using std::vector;
-using std::string;
-
-#define REPLAY_BUFFER_SIZE 5000
-#define GAMMA 0.95
-#define TAU 0.01
-#define BATCH_SIZE 20
+#define REPLAY_BUFFER_SIZE 100000000
+#define GAMMA 0.99
+#define TAU 0.005
+#define BATCH_SIZE 200
 
 struct replay{
-	//TODO make int later
-	std::vector<double> current_state;
-	std::vector<double> next_state;
-	std::vector<double> action;
-	double reward;
+	std::vector<float> current_state;
+	std::vector<float> next_state;
+	std::vector<float> action;
+	float reward;
 };
 
 struct Net : torch::nn::Module {
@@ -35,7 +29,7 @@ struct Net : torch::nn::Module {
 	torch::Tensor forward(torch::Tensor input) {
 		torch::Tensor hidden_layer, output_layer;
 		hidden_layer = torch::relu(torch::mm(input, weightsA));
-		output_layer = torch::relu(torch::mm(hidden_layer, weightsB));		
+		output_layer = torch::relu(torch::mm(hidden_layer, weightsB));
 		return output_layer;
 	}
 	torch::Tensor weightsA, weightsB;
@@ -46,25 +40,24 @@ class DDPGAgent{
 	public:
 		DDPGAgent(size_t state_space, size_t action_space);
 		~DDPGAgent();
-		std::vector<double> EvaluateCriticNN_DDPG(std::vector<double> s,std::vector<double> a);
-		std::vector<double> EvaluateActorNN_DDPG(std::vector<double> s);
-		std::vector<double> EvaluateTargetActorNN_DDPG(std::vector<double> s);
-		std::vector<double> EvaluateTargetCriticNN_DDPG(std::vector<double> s,std::vector<double> a);		
+		std::vector<float> EvaluateCriticNN_DDPG(const std::vector<float> s, const std::vector<float> a);
+		std::vector<float> EvaluateActorNN_DDPG(const std::vector<float> s);
+		std::vector<float> EvaluateTargetActorNN_DDPG(const std::vector<float> s);
+		std::vector<float> EvaluateTargetCriticNN_DDPG(const std::vector<float> s, const std::vector<float> a);
 
-		vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);
+		std::vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);
 		void addToReplayBuffer(replay r);
-		vector<replay> replay_buffer;
+		size_t get_replay_buffer_size(){return replay_buffer.size();}
 
 		void updateTargetWeights();
-		void updateQCritic(std::vector<double> Qvals, std::vector<double> Qprime);
-		void updateMuActor(std::vector<std::vector<double>> states);
+		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime);
+		void updateMuActor(const std::vector<std::vector<float>> states);
 	protected:
-
 		Net* qNN;
 		Net* qtNN;
 		Net* muNN;
 		Net* mutNN;
-
+		std::vector<replay> replay_buffer;
 };
 
 #endif // DDPG_AGENT_H_

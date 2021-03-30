@@ -2,6 +2,7 @@
 #define WAREHOUSE_H_
 
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -10,7 +11,6 @@
 #include <random>
 #include <algorithm>
 #include <float.h>
-//#include <Eigen/Eigen>
 #include <yaml-cpp/yaml.h>
 #include "Planning/Graph.h"
 #include "Planning/Edge.h"
@@ -35,16 +35,10 @@ class Warehouse{
 		Warehouse(YAML::Node);
 		virtual ~Warehouse(void);
 
-		virtual void SimulateEpoch(bool train = true){
-			std::cout << "This function simulates a single learning epoch.\n";
-		}
-		virtual void SimulateEpoch(vector<size_t> team){
-			std::cout << "This function simulates a single epoch with a given multiagent team.\n";
-		}
 		virtual void InitialiseMATeam(){ // create agents for the graph
 			std::cout << "This function initialises the multiagent team.\n";
 		}
-		void EvolvePolicies(bool init = false);		
+		void EvolvePolicies(bool init = false) __attribute__ ((deprecated));
 
 		void OutputPerformance(string);
 		void OutputControlPolicies(string);
@@ -52,20 +46,20 @@ class Warehouse{
 		void DisableEpisodeReplayOutput(){outputEpReplay = false;}
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		void SetTrainingAlgo(algo_type algot){algo = algot;}
 		virtual void SimulateEpochDDPG(bool verbose){;}
 
 		void print_warehouse_state();
-		vector<size_t> get_edge_utilization(bool verbose = false) __attribute__ ((pure));
+		vector<float> get_edge_utilization(bool verbose = false) __attribute__ ((pure));
 	protected:
-		void replan_AGVs(std::vector<double> cost_add);
+		void replan_AGVs(const std::vector<float> final_cost);
 		void transition_AGVs(bool verbose = false);
+		void traverse_one_step(const std::vector<float> final_cost);
 		void GetJointState(vector<Edge *> e, vector<size_t> &s) ;//__attribute__((deprecated))
 
 		size_t nSteps; //number of steps per simulation
 		size_t nAgents;
 		size_t nAGVs;
-		vector<double> baseCosts;
+		vector<float> baseCosts;
 		vector<size_t> capacities;
 
 		algo_type algo;
@@ -84,9 +78,9 @@ class Warehouse{
 		void InitialiseAGVs(YAML::Node); // create AGVs to move in graph
 		void InitialiseNewEpoch(); // reset simulation for each episode/epoch
 
-		vector< vector<size_t> > RandomiseTeams(size_t); // shuffle agent populations
+		vector< vector<size_t> > RandomiseTeams(size_t) __attribute__ ((deprecated)); // shuffle agent populations
 
-		void UpdateGraphCosts(vector<double>);
+		void UpdateGraphCosts(vector<float>);
 
 		bool outputEvals;
 		bool outputEpReplay;

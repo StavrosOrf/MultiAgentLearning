@@ -7,14 +7,14 @@
 class Edge
 {
 	public:
-		Edge(int v1, int v2, double cost):
+		Edge(int v1, int v2, float cost):
 			itsVertex1(v1), itsVertex2(v2), itsCost(cost), itsLength((size_t)cost) {}
 		~Edge(){}
 
 		int GetVertex1() const {return itsVertex1;}
 		int GetVertex2() const {return itsVertex2;}
-		double GetCost() const {return itsCost;}
-		void SetCost(double cost) {itsCost = cost;}
+		float GetCost() const {return itsCost;}
+		void SetCost(float cost) {itsCost = cost;}
 		size_t GetLength(){return itsLength;}
 
 		friend bool operator==(const Edge &lhs, const Edge &rhs){
@@ -23,7 +23,7 @@ class Edge
 	private:
 		int itsVertex1;
 		int itsVertex2;
-		double itsCost;
+		float itsCost;
 		size_t itsLength;
 };
 

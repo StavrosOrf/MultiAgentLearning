@@ -24,17 +24,14 @@ WarehouseCentralised::~WarehouseCentralised(void){
 
 void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	InitialiseNewEpoch();
-	double totalDeliveries = 0;
-	std::normal_distribution<double> n_process(0.0, 0.1);
+	float totalDeliveries = 0;
+	std::normal_distribution<float> n_process(0.0, 0.1);
 	std::default_random_engine n_generator;
+	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
-	//TODO change to int later
-	std::vector<double> cur_state(N_EDGES * 1);
-	std::vector<double> temp_state(N_EDGES * 1);
-	double reward;
+	std::vector<float> cur_state(N_EDGES * 1, 0);
+	std::vector<float> temp_state(N_EDGES * 1);
 
-	for (int i = 0; i != N_EDGES; i++)
-		cur_state[i] = get_edge_utilization()[i];
 	if(verbose)
 		print_warehouse_state();
 
@@ -43,61 +40,26 @@ void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 		if(verbose)
 			std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
-		vector<double> actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
+		float reward = 0;
+		const vector<float> actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
+		vector<float> final_costs = baseCosts;
 		// Add Random Noise from process N
 		for (size_t n = 0; n < N_EDGES; n++){
-			//actions[n] = std::clamp(actions[n]+n_process(n_generator), 0, 1);
-			actions[n] = actions[n] + n_process(n_generator);
-			if (actions[n] < 0)
-				actions[n] = 0;
-			if (actions[n] > 1)
-				actions[n] = 1;
-			//actions[n] = std::min(actions[n], 0);
-			//actions[n] = std::max(actions[n], 1);
-			assert(0 <= actions[n] && actions[n] <= 1); 
-			//std::cout << "Action[" << n << "] = " << actions[n] << std::endl;
+			final_costs[n] += std::clamp<float>(actions[n]+n_process(n_generator), -1, 1) * maxBaseCost;
+			assert(final_costs[n] <= maxBaseCost + baseCosts[n]);
 		}
-			// std::cout << "Actions:"<<actions << std::endl;
-
-		vector<double> final_costs = baseCosts;
-		double maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
-		assert(maxBaseCost == 28);
-
-		for (size_t i = 0; i < nAgents; i++)
-			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++){ // output [0,1] scaled to max base cost
-				final_costs[whAgents[i]->eIDs[j]]+=actions[j]*maxBaseCost;
-				assert(0 <= final_costs[whAgents[i]->eIDs[j]]); //TODO CHECK MORE
-				assert(final_costs[whAgents[i]->eIDs[j]] <= maxBaseCost + baseCosts[whAgents[i]->eIDs[j]]);
-			}
-		for (auto k: final_costs)
-			assert(k <= maxBaseCost*2);
 		assert(final_costs.size() == N_EDGES);
 
-		UpdateGraphCosts(final_costs);
-		replan_AGVs(final_costs);
-		transition_AGVs();
-		// Traverse
-		for (size_t k = 0; k < nAGVs; k++)
-			whAGVs[k]->Traverse();
-
-		//for (size_t k = 0; k < nAGVs; k++) whAGVs[k]->DisplayPath();
+		traverse_one_step(final_costs);
 
 		//update current state
-		for(int i = 0; i < cur_state.size(); i++){
-			temp_state[i] = cur_state[i];
-			cur_state[i] = get_edge_utilization()[i];
-		}
+		temp_state = cur_state;
+		cur_state = get_edge_utilization();
 		if(verbose)
 			print_warehouse_state();
 
-		double maxEval = -1;
-		vector<size_t> travelStats;
-		// Log data
-		size_t totalMove = 0;
-		size_t totalEnter = 0;
-		size_t totalWait = 0;
-		size_t totalSuccess = 0;
-		size_t totalCommand = 0;
+		// Log Perfomance Counters
+		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
 		for (size_t k = 0; k < nAGVs; k++){
 			totalMove += whAGVs[k]->GetMoveTime();
 			totalEnter += whAGVs[k]->GetEnterTime();
@@ -109,65 +71,67 @@ void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 			std::cout<<"Stats: \nTotal Move:\t"<<totalMove<<" \nTotal Enter:\t"<<totalEnter<<
 					"\nTotal wait:\t"<<totalWait<< "\nTotal Success:\t"<<totalSuccess<<
 					"\nTotal Command:\t"<<totalCommand<<std::endl;
-
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
 
 		totalDeliveries += totalSuccess;
-		//Reset AGVs counters
-		for (size_t k = 0; k < nAGVs; k++)
-			whAGVs[k]->ResetPerformanceCounters();
+		for (AGV* a : whAGVs) //Reset AGVs counters
+			a->ResetPerformanceCounters();
+
 		//Create and Save replay to buffer
-
-		assert(temp_state.size() == N_EDGES && cur_state.size() == N_EDGES);
-		reward = (double)totalMove/whAGVs.size();
-
+		//reward = (float)totalMove/whAGVs.size();
+		{
+			float totalInverse = 0;
+			float AGVs_on_edges = 0;
+			for (AGV* a : whAGVs)
+				if (a->GetT2V() != 0){//Make Sure the AGV is on an Edge
+					AGVs_on_edges++;
+					Search s0(whGraph, a->GetOriginVertex(),
+							a->GetNextVertex());
+					Search s1(whGraph, a->GetNextVertex(),
+							a->GetDestinationVertex());
+					totalInverse += s0.PathSearchLenght();
+					totalInverse += s1.PathSearchLenght();
+				}
+			reward = 1 / totalInverse / AGVs_on_edges;
+			assert(!std::isnan(reward));
+		}
+		//TODO
+		//Reward idea: (different weight for each type of edge)
+		//           * (Number of AGVs moving on that edge)
+		// 					 - w1*(Number of AGVs waiting)
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;
 
 		replay r = {temp_state,cur_state,actions,reward};
 		ddpg_maTeam[0]->addToReplayBuffer(r);
-		//TODO
-		//Reward idea: (different weight for each type of edge)
-		//           * (Number of AGVs moving on that edge)
-		// 					 - w1*(Number of AGVs waiting)
-
-		// We need to give incentive to AGVs to prefer moving
-	  // than waiting in heavy traffic nodes
-	  // ( maybe target Actor update will fix this)
-	  // if not we need to think about that
 
 
-
-		if(ddpg_maTeam[0]->replay_buffer.size() > BATCH_SIZE * 2){
+		if(ddpg_maTeam[0]->get_replay_buffer_size() > BATCH_SIZE * 2){
 			std::vector<replay> miniBatch = ddpg_maTeam[0]->getReplayBufferBatch();
 
-			std::vector<double>Qvals;//Qvals 
-			std::vector<double> Qprime;//Qprime ( the Y )
-			std::vector<std::vector<double>> states; //all states from the batch
+			std::vector<float> Qvals;//Qvals
+			std::vector<float> Qprime;//Qprime ( the Y )
+			std::vector<std::vector<float>> states; //all states from the batch
 
 			// std::cout << "Y = {";
 			for (size_t i = 0; i < BATCH_SIZE; i++){
-				replay b = miniBatch[i];				
-				std::vector<double> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);				
-				assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);				
-				double y = b.reward + GAMMA *
+				replay b = miniBatch[i];
+				std::vector<float> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
+				assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);
+				float y = b.reward + GAMMA *
 					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta)[0];
-				// std::cout << y << ", ";				
-				//Generate Qvals and Qprime for Q backprop		
-				double q = ddpg_maTeam[0]->EvaluateCriticNN_DDPG(b.current_state,b.action)[0];
+				// std::cout << y << ", ";
+				//Generate Qvals and Qprime for Q backprop
+				float q = ddpg_maTeam[0]->EvaluateCriticNN_DDPG(b.current_state,b.action)[0];
 				Qvals.push_back(q);
 				Qprime.push_back(y);
-				states.push_back(b.current_state);				
+				states.push_back(b.current_state);
 			}
 			// std::cout << '}' << std::endl;
 
-			//Update Q critic
+			//Update all the NNs
 			ddpg_maTeam[0]->updateQCritic(Qvals, Qprime);
-			
-			//Update actor critic
 			ddpg_maTeam[0]->updateMuActor(states);
-
-			//Update target Q critic and Mu target actor critic
 			ddpg_maTeam[0]->updateTargetWeights();
 
 		}else{
@@ -175,7 +139,7 @@ void WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 				std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
 		}
 	}
-	std::cout << "End of Simulation with G: "<<totalDeliveries<<std::endl;
+	std::cout << "End of Simulation with G: " << totalDeliveries << std::endl;
 	return;
 }
 
@@ -187,6 +151,7 @@ void WarehouseCentralised::InitialiseMATeam(){
 	iAgent * agent = new iAgent{0, eIDs}; // only one centralised agent controlling all traffic
 	whAgents.push_back(agent);
 	if (algo == algo_type::ddpg){
+		assert(ddpg_maTeam.empty());
 		ddpg_maTeam.push_back(new DDPGAgent(N_EDGES * 1, N_EDGES));
 		assert(!ddpg_maTeam.empty());
 	}else{

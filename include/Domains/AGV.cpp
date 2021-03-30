@@ -75,7 +75,7 @@ void AGV::EnterNewEdge(){
 	isReplan = false;
 }
 
-void AGV::CompareCosts(vector<double> c){
+void AGV::CompareCosts(vector<float> c){
 	if (t2v == 0 && !isReplan){ // compare if waiting to change edges and flag is not already set
 		// Compare current graph costs to prior costs used to generate existing plan
 		for (size_t i = 0; i < c.size(); i++){
@@ -91,7 +91,7 @@ void AGV::CompareCosts(vector<double> c){
 	}
 }
 
-void AGV::PlanAGV(vector<double> c){
+void AGV::PlanAGV(vector<float> c){
 	size_t nEdges = agvPlanner->GetGraph()->GetNumEdges();
 	vector<Edge *> edges = agvPlanner->GetGraph()->GetEdges();
 

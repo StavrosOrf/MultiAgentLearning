@@ -8,8 +8,14 @@ Warehouse::Warehouse(YAML::Node configs){
 	string cFile = domainDir + configs["graph"]["capacities"].as<string>();
 	nSteps = configs["simulation"]["steps"].as<size_t>();
 
-	InitialiseGraph(vFile, eFile, cFile, configs);
 	outputEvals = false;
+	if(configs["mode"]["algo"].as<string>() == "DDPG")
+		algo = algo_type::ddpg;
+	else{
+		std::cout << "ERROR: Currently only configured for 'DDPG' and ''! Exiting.\n";
+		exit(1);
+	}
+	InitialiseGraph(vFile, eFile, cFile, configs);
 }
 
 Warehouse::~Warehouse(void){
@@ -22,7 +28,6 @@ Warehouse::~Warehouse(void){
 	for (size_t i = 0; i < whAgents.size(); i++){
 		delete whAgents[i];
 		whAgents[i] = 0;
-		//TODO DELETE AGENTS
 	}
 	if (outputEvals)
 		evalFile.close();
@@ -82,12 +87,12 @@ void Warehouse::LoadPolicies(YAML::Node configs){
 void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::Node configs){
 	vector<int> vertices;
 	vector< vector<int> > edges;
-	vector< double > costs;
+	vector< float > costs;
 
 	// Read in data from files
-	cout << "Reading vertices from file: ";
+	std::cout << "Reading vertices from file: ";
 	ifstream verticesFile(v_str.c_str());
-	cout << v_str.c_str() << "...";
+	std::cout << v_str.c_str() << "...";
 	if (!verticesFile.is_open()){
 		cout << "\nFile: " << v_str.c_str() << " not found, exiting.\n";
 		exit(1);
@@ -107,7 +112,7 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 	while (getline(edgesFile,line)){
 		stringstream lineStream(line);
 		string cell;
-		vector<double> ec;
+		vector<float> ec;
 		while (getline(lineStream,cell,','))
 			ec.push_back(atof(cell.c_str()));
 		vector<int> e;
@@ -137,7 +142,7 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 //	std::cout << "Number of graph vertices: " << whGraph->GetNumVertices() << "\n";
 //	std::cout << "Number of graph edges: " << whGraph->GetNumEdges() << "\n";
 
-//	InitialiseMATeam();
+	InitialiseMATeam();
 	InitialiseAGVs(configs);
 }
 
@@ -147,11 +152,11 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 	string agv_str = domainDir + configs["simulation"]["agvs"].as<string>();
 
 	// Read in data from files
-	cout << "Reading AGVs from file: ";
+	std::cout << "Reading AGVs from file: ";
 	ifstream AGVFile(agv_str.c_str());
-	cout << agv_str.c_str() << "...";
+	std::cout << agv_str.c_str() << "...";
 	if (!AGVFile.is_open()){
-		cout << "\nFile: " << agv_str.c_str() << " not found, exiting.\n";
+		std::cout << "\nFile: " << agv_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
 	nAGVs = 0;
@@ -161,23 +166,23 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 		agvOrigins.push_back((size_t)atoi(line.c_str()));
 		nAGVs++;
 	}
-	cout << "complete. Created " << nAGVs << " AGVs.\n";
+	std::cout << "complete. Created " << nAGVs << " AGVs.\n";
 
 	// Store valid destination vertex IDs
 	string goal_str = domainDir + configs["simulation"]["goals"].as<string>();
 
 	// Read in data from files
-	cout << "Reading goal vertex IDs from file: ";
+	std::cout << "Reading goal vertex IDs from file: ";
 	ifstream goalFile(goal_str.c_str());
-	cout << goal_str.c_str() << "...";
+	std::cout << goal_str.c_str() << "...";
 	if (!goalFile.is_open()){
-		cout << "\nFile: " << goal_str.c_str() << " not found, exiting.\n";
+		std::cout << "\nFile: " << goal_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
 	vector<int> agvGoals;
 	while (getline(goalFile,line))
 		agvGoals.push_back(atoi(line.c_str()));
-	cout << "complete. " << agvGoals.size() << " goal vertices.\n";
+	std::cout << "complete. " << agvGoals.size() << " goal vertices.\n";
 
 //	std::cout << "Number of possible goals: " << agvGoals.size() << "\n";
 
@@ -188,9 +193,11 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 	assert(nAGVs == whAGVs.size());
 }
 
+/************************************************************************************************
+ **Method:Resets all AGVs to there Original position						*
+ ************************************************************************************************/
 void Warehouse::InitialiseNewEpoch(){
-	// Reset all AGVs
-	for (size_t i = 0; i < nAGVs; i++)
+	for (size_t i = 0; i < nAGVs; i++)// Reset all AGVs
 		whAGVs[i]->ResetAGV();
 	for (size_t i = 0; i < nAgents; i++)
 		whAgents[i]->agvIDs.clear();
@@ -213,22 +220,24 @@ vector< vector<size_t> > Warehouse::RandomiseTeams(size_t n){ // n = number of a
 	return teams;
 }
 
-void Warehouse::UpdateGraphCosts(vector<double> costs){
-	vector<Edge *> e = whGraph->GetEdges();
-	for (size_t i = 0; i < e.size(); i++)
-		e[i]->SetCost(costs[i]);
+/************************************************************************************************
+ **Input:a vector of [costs]									*
+ **Method:Sets the Cost of the graph Edges to the values provides by [costs]			*
+ *************************************************************************************************/
+void Warehouse::UpdateGraphCosts(vector<float> costs){
+	for (size_t i = 0; i < N_EDGES; i++)
+		whGraph->GetEdges()[i]->SetCost(costs[i]);
 }
 
 /************************************************************************************************
  * *Output:Print and number of AGVs that are on each edge					*
  ************************************************************************************************/
 void Warehouse::print_warehouse_state(){
-	vector<size_t> cur_state = get_edge_utilization();
+	vector<float> cur_state = get_edge_utilization();
 	std::cout << "Warehouse utilization: {";
-	for (size_t n = 0; n < N_EDGES; n++){
+	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n] > 0 )
 			std::cout<<"[e_"<< n << ", pop= " << cur_state[n] << "], ";
-	}
 	std::cout << '}' << std::endl;
 }
 
@@ -237,8 +246,8 @@ void Warehouse::print_warehouse_state(){
  * *Method:Count how for each edge how maany AGVs are on it					*
  * *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
  ************************************************************************************************/
-vector<size_t> Warehouse::get_edge_utilization(bool verbose){
-	vector<size_t> edge_utilization(N_EDGES);
+vector<float> Warehouse::get_edge_utilization(bool verbose){
+	vector<float> edge_utilization(N_EDGES);
 	for(int i = 0; i < N_EDGES; i++)
 		edge_utilization[i] = 0;
 	for(int i = 0; i < whAGVs.size(); i++){
@@ -258,7 +267,7 @@ vector<size_t> Warehouse::get_edge_utilization(bool verbose){
  * *Input:[cost_add] a vector containing aditional planing costs indexed by EdgedIDs		*
  * *Method:Replans the AGVs using Methos of the {Graph} class					*
  * ************************************************************************************************/
-void Warehouse::replan_AGVs(std::vector<double> cost_add){
+void Warehouse::replan_AGVs(std::vector<float> cost_add){
 	// Replan AGVs as necessary
 	for (size_t k = 0; k < nAGVs; k++){
 		whAGVs[k]->CompareCosts(cost_add); // set replanning flags
@@ -270,12 +279,11 @@ void Warehouse::replan_AGVs(std::vector<double> cost_add){
 		if (whAGVs[k]->GetT2V() == 0){
 			size_t agentID = 0; // only one agent
 			bool onWaitList = false;
-			for (list<size_t>::iterator it = whAgents[agentID]->agvIDs.begin(); it!=whAgents[agentID]->agvIDs.end(); ++it){
+			for (list<size_t>::iterator it = whAgents[agentID]->agvIDs.begin(); it!=whAgents[agentID]->agvIDs.end(); ++it)
 				if (k == *it){
 					onWaitList = true;
 					break;
 				}
-			}
 			if (!onWaitList)// only add if not already on wait list
 				whAgents[agentID]->agvIDs.push_back(k);
 		}
@@ -295,7 +303,7 @@ void Warehouse::transition_AGVs(bool verbose){
 			size_t curAGV = *it;
 			size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()); // next edge ID
 			assert(nextID < N_EDGES);
-			
+
 
 			if (nextID < 0 || nextID >= s.size()){
 				std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n";
@@ -321,6 +329,18 @@ void Warehouse::transition_AGVs(bool verbose){
 		for (size_t w = 0; w < toRemove.size(); w++)
 			whAgents[k]->agvIDs.remove(toRemove[w]);
 	}
+}
+
+/************************************************************************************************
+ * *Input:A vector containing the [final_costs] of the edges					*
+ * *Method:Executes all the required steps to plan and traverse the AGVs on the warehouse	*
+ * ************************************************************************************************/
+void Warehouse::traverse_one_step(std::vector<float> final_costs){
+	UpdateGraphCosts(final_costs);
+	replan_AGVs(final_costs);
+	transition_AGVs();
+	for (size_t k = 0; k < nAGVs; k++)// Traverse
+		whAGVs[k]->Traverse();
 }
 
 void Warehouse::GetJointState(vector<Edge *> e, vector<size_t> &s){

@@ -10,8 +10,8 @@ using std::priority_queue;
 
 struct CompareNode{
 	bool operator() (const Node * n1, const Node * n2) const{
-		double n1Cost = n1->GetCost();
-		double n2Cost = n2->GetCost();
+		float n1Cost = n1->GetCost();
+		float n2Cost = n2->GetCost();
 		return (n2Cost < n1Cost);
 	}
 };

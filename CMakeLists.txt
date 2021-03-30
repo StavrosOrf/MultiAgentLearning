@@ -11,7 +11,6 @@ set(Torch_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/share/cmake/Torch")
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
 find_package(Threads REQUIRED)
-find_package(Eigen3 REQUIRED)
 find_package(Torch REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
@@ -31,10 +30,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_FLAGS "-03")
 #set(CMAKE_CXX_FLAGS "-g -Wall -I /usr/local/include/eigen3/")
 add_subdirectory(include)
+add_subdirectory(tests)
 
 #link_directories(libraries)
 
-set( LIBS_TO_LINK Utilities
+set( LIBS_TO_LINK
                   Learning
                   Domains
                   Agents
@@ -43,8 +43,14 @@ set( LIBS_TO_LINK Utilities
                   ${TORCH_LIBRARIES}
                   ${CMAKE_THREAD_LIBS_INIT})# -llapack
 
-add_executable(testSearch testSearch.cpp)
-target_link_libraries( testSearch ${LIBS_TO_LINK})
+	  #add_executable(testSearch testSearch.cpp)
+	  #target_link_libraries(testSearch ${LIBS_TO_LINK})
 
-add_executable(testWarehouse testWarehouse.cpp threadpool.cpp)
-target_link_libraries( testWarehouse ${LIBS_TO_LINK})
+	  #add_executable(test_torch test_torch.cpp)
+	  #target_link_libraries(test_torch ${LIBS_TO_LINK})
+
+	  #add_executable(test_random test_random.cpp)
+	  #target_link_libraries(test_random ${LIBS_TO_LINK})
+
+add_executable(testWarehouse testWarehouse.cpp)
+target_link_libraries(testWarehouse ${LIBS_TO_LINK})

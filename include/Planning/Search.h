@@ -30,6 +30,7 @@ class Search
 		int GetGoal() const {return itsGoal;}
 		void SetGoal(int g){itsGoal = g;}
 		Node * PathSearch();
+		float PathSearchLenght(); //return the cost/lenght of the path returned by PathSearch()
 		void ResetSearch();
 
 	private:

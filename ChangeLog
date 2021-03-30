@@ -61,10 +61,10 @@ might need to restore some basic ware house functions
 - minor pefomance tweak
 - added changelog format (top of this file)
 - added testNeuralNet.cpp to cmake list
-- deprecated testNeuralNet.cpp (it is bugged and uses unfished code)
+- deprecated testNeuralNet.cpp (it is bugged and uses unfinished code)
 
 ##v 0.00011k
-- deprecated NEUROEVO and everthing associated with it
+- deprecated NEUROEVO and everything associated with it
 - deprecated allmulti agent structures (will bring back later)
 - Changed source formating now all lines that end with ';' do not contain
 white space characters between the last character and ';'
@@ -76,7 +76,7 @@ README.md and tested it
 
 ##v 0.00013o
 - fixed compile errors
-- implemented critic update( might need detailed testing after completing the aglorithm)
+- implemented critic update( might need detailed testing after completing the algorithm)
 - implemented actor update ( requires tests and bounds )
 
 ##v 0.00014o
@@ -88,3 +88,15 @@ README.md and tested it
 ##v 0.00015o
 - fixed the logic errors resulting from the use of "from_blob"
 - started working on update weights
+
+##v 0.00016k
+- Minor performance tweaks (memory system optimizations)
+- General code clean up
+- Deprecated NeuralNet.cpp & Utilities.cpp (all of them exist in std::), any
+trace if Eigen, Threadpool.cpp
+- Implemented a Reward Heuristic Function (it is shit though)
+- Changed all double floats to single float (for runtime performance reasons)
+- Added Debug instructions in README.md
+- Fixed Various Bugs
+- Added test_torch.cpp, test_random.cpp, and created new ./result Directory
+- Added cleancode.sh in the main directory

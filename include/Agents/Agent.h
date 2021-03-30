@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <Eigen/Eigen>
 #include "Learning/NeuroEvo.h"
 
 using std::vector;
@@ -29,7 +28,7 @@ class Agent{
 		size_t numOut;
 		size_t numHidden;
 
-		vector<double> epochEvals;
+		vector<float> epochEvals;
 };
 
 #endif // AGENT_H_
