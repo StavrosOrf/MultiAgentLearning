@@ -10,6 +10,7 @@
 #include <chrono>
 #include <random>
 #include <algorithm>
+#include <cassert>
 #include <float.h>
 #include <yaml-cpp/yaml.h>
 #include "Planning/Graph.h"
@@ -52,7 +53,7 @@ class Warehouse{
 		void DisableEpisodeReplayOutput(){outputEpReplay = false;}
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual epoch_results SimulateEpochDDPG(bool verbose){;}
+		virtual epoch_results SimulateEpochDDPG(bool verbose){assert(0);}
 
 		void print_warehouse_state();
 		vector<float> get_edge_utilization(bool verbose = false) __attribute__ ((pure));

@@ -107,9 +107,8 @@ trace if Eigen, Threadpool.cpp
 - TODO add metrics about loss functions of NNs
 - TODO Store Results for each step/Epoch/Run in files so we can get Graphs for our report/paper
 
-
-
-
-
+##v 0.00018k
+- Huge Runtime Perfomance Tweaks
+- Minor Tweaks to reward function (needs more work)
 
 

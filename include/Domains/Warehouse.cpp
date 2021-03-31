@@ -142,7 +142,7 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 //	std::cout << "Number of graph vertices: " << whGraph->GetNumVertices() << "\n";
 //	std::cout << "Number of graph edges: " << whGraph->GetNumEdges() << "\n";
 
-	InitialiseMATeam();
+	//InitialiseMATeam();
 	InitialiseAGVs(configs);
 }
 

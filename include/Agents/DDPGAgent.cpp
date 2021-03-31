@@ -95,19 +95,25 @@ void DDPGAgent::addToReplayBuffer(replay r){
  * *Output:Returns a non-inclusive miniBatch of [size]						*
  * ************************************************************************************************/
 std::vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
-	assert(replay_buffer.size() >= size);
-	std::vector<replay> temp;
+	assert(replay_buffer.size()+1 >= size);
+	std::vector<replay> to_return;
+	to_return.reserve(size);
 
+	//generate a list of rand indexes (non inclusive)
+	std::vector<int> rand_list;
+	rand_list.reserve(size);
 	for (int i = 0; i != size; i++){
 		int r = rand()%replay_buffer.size();
-		temp.push_back(replay_buffer[r]);
-		replay_buffer.erase(replay_buffer.begin()+r);
+		while (std::find(rand_list.begin(), rand_list.end(),r)!=rand_list.end())
+			r = rand()%replay_buffer.size();
+		rand_list.push_back(r);
 	}
-	for (size_t i = 0; i < size; i++)
-		replay_buffer.push_back(temp[i]);
 
-	assert(temp.size() == size);
-	return temp;
+	for (int i : rand_list)
+		to_return.push_back(replay_buffer[i]);
+
+	assert(to_return.size() == size);
+	return to_return;
 }
 
 /************************************************************************************************

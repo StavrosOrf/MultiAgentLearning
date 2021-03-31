@@ -98,7 +98,7 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
 				}
-			reward = 1 / totalInverse / AGVs_on_edges;
+			reward = AGVs_on_edges / totalInverse;
 			assert(!std::isnan(reward));
 		}
 		//TODO

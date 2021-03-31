@@ -7,6 +7,7 @@
 #include <vector>
 #include <random>
 #include <cassert>
+#include <algorithm>
 #include <torch/torch.h>
 
 #define REPLAY_BUFFER_SIZE 100000000

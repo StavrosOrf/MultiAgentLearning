@@ -7,6 +7,7 @@
 #include <time.h>
 #include <ctime>
 #include <stdio.h>
+#include <easy/profiler.h>
 
 #include "Domains/Warehouse.h"
 #include "Domains/WarehouseCentralised.h"
