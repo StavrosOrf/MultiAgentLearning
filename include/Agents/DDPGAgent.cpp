@@ -3,12 +3,12 @@
 
 DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	//Create NNs
-	qNN = new Net(state_space + action_space,
+	qNN = new Net(state_space+action_space,
 		1, (state_space + action_space) * 2);
-	qtNN = new Net(state_space + action_space,
+	qtNN = new Net(state_space+action_space,
 		1, (state_space + action_space) * 2);
-	muNN = new Net(action_space, action_space, action_space*2);
-	mutNN = new Net(action_space, action_space, action_space*2);
+	muNN = new Net(state_space, action_space, action_space*2);
+	mutNN = new Net(state_space, action_space, action_space*2);
 
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (int i = 0; i < qNN->parameters().size(); i++ )

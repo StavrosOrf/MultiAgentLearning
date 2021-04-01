@@ -108,8 +108,9 @@ trace if Eigen, Threadpool.cpp
 - TODO Store Results for each step/Epoch/Run in files so we can get Graphs for our report/paper
 
 ##v 0.00018k
-- Huge Runtime Perfomance Tweaks
+- Huge Runtime Performance Tweaks
 - Minor Tweaks to reward function (needs more work)
 - testWarehouse now writes Evaluation parameters to results folder
-
+- Streamlined Domains
+- Now supports centralized warehouse with provided time
 

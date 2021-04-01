@@ -28,7 +28,7 @@ class Graph
 		vector<Edge *> GetEdges() const {return itsEdges;}
 		size_t GetNumVertices() const {return numVertices;}
 		size_t GetNumEdges() const {return numEdges;}
-		size_t GetEdgeID(Edge *);
+		size_t GetEdgeID(Edge *) __attribute__ ((pure));
 
 		vector<Edge *> GetNeighbours(Node * n);
 

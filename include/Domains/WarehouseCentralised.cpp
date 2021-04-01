@@ -30,8 +30,8 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	epoch_results results = {0,0,0,0};
 	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
-	std::vector<float> cur_state(N_EDGES * 1, 0);
-	std::vector<float> temp_state(N_EDGES * 1);
+	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
+	std::vector<float> temp_state;
 
 	if(verbose)
 		print_warehouse_state();
@@ -98,7 +98,10 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
 				}
-			reward = 512*AGVs_on_edges / totalInverse - totalWait;
+			if (AGVs_on_edges)
+				reward = 512*AGVs_on_edges / totalInverse - totalWait;
+			else
+				reward = 0;
 			assert(!std::isnan(reward));
 		}
 
@@ -120,33 +123,28 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 			std::vector<float> Qprime;//Qprime ( the Y )
 			std::vector<std::vector<float>> states; //all states from the batch
 
-			// std::cout << "Y = {";
 			for (size_t i = 0; i < BATCH_SIZE; i++){
 				replay b = miniBatch[i];
 				std::vector<float> nta = ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(b.next_state);
-				assert(b.next_state.size() == N_EDGES && nta.size() == N_EDGES);
+				assert(N_EDGES && nta.size() == N_EDGES);
 				float y = b.reward + GAMMA *
 					ddpg_maTeam[0]->EvaluateTargetCriticNN_DDPG(b.next_state,nta)[0];
-				// std::cout << y << ", ";
 				//Generate Qvals and Qprime for Q backprop
 				float q = ddpg_maTeam[0]->EvaluateCriticNN_DDPG(b.current_state,b.action)[0];
 				Qvals.push_back(q);
 				Qprime.push_back(y);
 				states.push_back(b.current_state);
 			}
-			// std::cout << '}' << std::endl;
 
 			//Update all the NNs
 			ddpg_maTeam[0]->updateQCritic(Qvals, Qprime);
 			ddpg_maTeam[0]->updateMuActor(states);
 			ddpg_maTeam[0]->updateTargetWeights();
 
-		}else{
+		}else
 			if(verbose)
-				std::cout << "Not enough Replays yet for updating NN!"<<std::endl;
-		}
+				std::cout << "Not enough Replays yet for updating NNs!"<<std::endl;
 	}	
-	// std::cout << "End of Simulation with G: " << totalDeliveries << std::endl;
 	return results;
 }
 
@@ -159,13 +157,12 @@ void WarehouseCentralised::InitialiseMATeam(){
 	whAgents.push_back(agent);
 	if (algo == algo_type::ddpg){
 		assert(ddpg_maTeam.empty());
-		ddpg_maTeam.push_back(new DDPGAgent(N_EDGES * 1, N_EDGES));
+		ddpg_maTeam.push_back(new DDPGAgent(N_EDGES*(1+incorporates_time), N_EDGES));
 		assert(!ddpg_maTeam.empty());
 	}else{
 		std::cout << "ERROR: InitialiseMATeam invalid also";
 		exit(1);
 	}
-
 
 	nAgents = whAgents.size();
 }

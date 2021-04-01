@@ -15,6 +15,9 @@ Warehouse::Warehouse(YAML::Node configs){
 		std::cout << "ERROR: Currently only configured for 'DDPG' and ''! Exiting.\n";
 		exit(1);
 	}
+	std::string agentType = configs["domain"]["agents"].as<std::string>();
+	incorporates_time = agentType.ends_with("_t");
+
 	InitialiseGraph(vFile, eFile, cFile, configs);
 }
 
@@ -79,9 +82,6 @@ void Warehouse::OutputEpisodeReplay(string agv_s_str, string agv_e_str, string a
 	std::cout << "Writing agent logs to files: " << "\n";
 	std::cout << "\t" << a_s_str << "\n";
 	std::cout << "\t" << a_a_str << "\n";
-}
-
-void Warehouse::LoadPolicies(YAML::Node configs){
 }
 
 void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::Node configs){
@@ -199,7 +199,7 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 void Warehouse::InitialiseNewEpoch(){
 	for (size_t i = 0; i < nAGVs; i++)// Reset all AGVs
 		whAGVs[i]->ResetAGV();
-	for (size_t i = 0; i < nAgents; i++)
+	for (size_t i = 0; i < whAgents.size(); i++)
 		whAgents[i]->agvIDs.clear();
 }
 
@@ -212,7 +212,7 @@ vector< vector<size_t> > Warehouse::RandomiseTeams(size_t n){ // n = number of a
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
-	for (size_t j = 0; j < nAgents; j++){
+	for (size_t j = 0; j < whAgents.size(); j++){
 		shuffle (order.begin(), order.end(), std::default_random_engine(seed));
 		teams.push_back(order);
 	}
@@ -242,22 +242,25 @@ void Warehouse::print_warehouse_state(){
 }
 
 /************************************************************************************************
- * *Input:[verbose] which if true will print progress						*
- * *Method:Count how for each edge how maany AGVs are on it					*
- * *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
- ************************************************************************************************/
-vector<float> Warehouse::get_edge_utilization(bool verbose){
-	vector<float> edge_utilization(N_EDGES);
+*Input:	[verbose] which if true will print progress						*
+*Method:Count for each edge how many AGVs are on it and if it [incorporates_time] also		*
+*	observe what is the remaining time of the closest to finish AGV				*
+*Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
+*	And the minimum remaining distance of AGVs on edge indexed by EdgeID+N_EDGES		*
+************************************************************************************************/
+vector<float> Warehouse::get_edge_utilization(){
+	vector<float> edge_utilization(N_EDGES * (1+incorporates_time));
 	for(int i = 0; i < N_EDGES; i++)
 		edge_utilization[i] = 0;
-	for(int i = 0; i < whAGVs.size(); i++){
-		Edge* e = whAGVs[i]->GetCurEdge();
+	for(AGV* a: whAGVs){
+		Edge* e = a->GetCurEdge();
+		int Edge_ID = whGraph->GetEdgeID(e);
 		if(e != NULL){//check if AGVs are at an edge
-			assert(whGraph->GetEdgeID(e) < edge_utilization.size());
-			edge_utilization[whGraph->GetEdgeID(e)]++;
-			if (verbose)
-				std::cout<<"Edge id-"<<whGraph->GetEdgeID(e)<<
-					" length: "<<e->GetLength()<< " "<<std::endl;
+			assert(Edge_ID < edge_utilization.size()/(1+incorporates_time));
+			edge_utilization[Edge_ID]++;
+			if (incorporates_time)
+				edge_utilization[Edge_ID + N_EDGES] = std::min<float>(
+					edge_utilization[Edge_ID + N_EDGES], a->GetT2V());
 		}
 	}
 	return edge_utilization;
@@ -297,7 +300,7 @@ void Warehouse::transition_AGVs(bool verbose){
 	vector<size_t> s(N_EDGES);
 	GetJointState(whGraph->GetEdges(), s);
 
-	for (size_t k = 0; k < nAgents; k++){
+	for (size_t k = 0; k < whAgents.size(); k++){
 		vector<size_t> toRemove;
 		for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
 			size_t curAGV = *it;

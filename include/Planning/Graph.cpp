@@ -1,12 +1,15 @@
 #include "Graph.h"
 
+/************************************************************************************************
+**Input:An Edge [e]										*
+**Output:Returns the ID of that edge as indexed by the graph, returns the number of edges in	*
+**		case the edge is not a valid edge (is NULL or exists in a different graph)	*
+*************************************************************************************************/
 size_t Graph::GetEdgeID(Edge * e){
-	for (size_t i = 0; i < numEdges; i++){
-		if (e == itsEdges[i]){
+	for (size_t i = 0; i < numEdges; i++)
+		if (e == itsEdges[i])
 			return i;
-		}
-	}
-//	std::cout << "Error: edge not found in graph!\n";
+	//std::cout << "Error: edge not found in graph!\n";
 	return numEdges;
 }
 

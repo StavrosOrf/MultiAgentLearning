@@ -55,13 +55,14 @@ class Warehouse{
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
 		virtual epoch_results SimulateEpochDDPG(bool verbose){return {0,0,0,0};}
 
+		bool get_incorporates_time(){return incorporates_time;}
 	protected:
 		void replan_AGVs(const std::vector<float> final_cost);
 		void transition_AGVs(bool verbose = false);
 		void traverse_one_step(const std::vector<float> final_cost);
 		void GetJointState(vector<Edge *> e, vector<size_t> &s) ;//__attribute__((deprecated))
 		void print_warehouse_state();
-		vector<float> get_edge_utilization(bool verbose = false) __attribute__ ((pure));
+		vector<float> get_edge_utilization() __attribute__ ((pure));
 
 		size_t nSteps; //number of steps per simulation
 		size_t nAgents;
@@ -97,6 +98,9 @@ class Warehouse{
 		std::ofstream agvEdgeFile;
 		std::ofstream agentStateFile;
 		std::ofstream agentActionFile;
+
+		bool incorporates_time; //True means that the domain incorpated time to it's state
+		//as described in github.io/anthropomorphic/Papers/Chung2018multiagent.pdf
 };
 
 #endif // WAREHOUSE_H_

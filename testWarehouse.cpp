@@ -23,6 +23,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	srand(time(NULL)); // increment random seed
 	int nEps = configs["DDPG"]["epochs"].as<int>();
 	int runs = configs["DDPG"]["runs"].as<int>();
+	std::string agentType = configs["domain"]["agents"].as<std::string>();
 	
 	std::clock_t start;
 	std::clock_t startTotalRun;
@@ -32,7 +33,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	create_results_folder(configs);
 
 	for (int run = 0; run != runs; run ++){
-		std::ofstream eval_file(resFolder + '_' + std::to_string(run) + ".csv");
+		std::ofstream eval_file(resFolder + agentType + '_' + std::to_string(run) + ".csv");
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait";
 		startTotalRun = std::clock();
@@ -41,7 +42,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		std::cout << "Starting Run: " << run << std::endl;
 		for (size_t n = 0; n < nEps; n++){
 			start = std::clock();
-			epoch_results t = trainDomain->SimulateEpochDDPG(false);// simulate
+			epoch_results t = trainDomain->SimulateEpochDDPG(false);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			std::printf("Epoch %3d (%5.1f sec): G=%4lu, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
 				n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
@@ -80,8 +81,12 @@ void WarehouseSimulation(std::string config_file, int thrds){
 Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
 	std::string agentType = configs["domain"]["agents"].as<std::string>();
-	if (agentType.compare("centralised") == 0)
+	if (agentType.compare("centralised") == 0){
 		new_warehouse = new WarehouseCentralised(configs);
+	}
+	else if (agentType.compare("centralised_t") == 0){
+		new_warehouse = new WarehouseCentralised(configs);
+	}
 	else{
 		std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n";
 		exit(1);
@@ -92,8 +97,8 @@ Warehouse* create_warehouse(YAML::Node configs){
 }
 
 void create_results_folder(YAML::Node configs){
-	resFolder  = configs["domain"]["folder"].as<std::string>()
-		+ configs["results"]["folder"].as<std::string>();
+	resFolder  = //configs["domain"]["folder"].as<std::string>() +
+		configs["results"]["folder"].as<std::string>();
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
 	system(mkdir);
 }
