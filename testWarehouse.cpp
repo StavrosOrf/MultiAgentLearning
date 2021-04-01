@@ -6,85 +6,80 @@
 #include <yaml-cpp/yaml.h>
 #include <time.h>
 #include <ctime>
+#include <cassert>
 #include <stdio.h>
-#include <easy/profiler.h>
+#include <unistd.h>
 
 #include "Domains/Warehouse.h"
 #include "Domains/WarehouseCentralised.h"
-//#include "threadpool.hpp"
 
 char mkdir[100];
-string domainDir;
-string resFolder;
+std::string resFolder;
 
-Warehouse* create_warehouse(std::string agentType, YAML::Node configs);
-void create_results_folder(Warehouse* trainDomain, YAML::Node configs, size_t r);
+Warehouse* create_warehouse(YAML::Node configs);
+void create_results_folder(YAML::Node configs);
 
-void WarehouseSimulationDDPG(int r, YAML::Node configs){
+void WarehouseSimulationDDPG(YAML::Node configs){
 	srand(time(NULL)); // increment random seed
-	// Initialise appropriate domain
-	size_t nEps = configs["DDPG"]["epochs"].as<size_t>();
-	string agentType = configs["domain"]["agents"].as<string>();
+	int nEps = configs["DDPG"]["epochs"].as<int>();
 	int runs = configs["DDPG"]["runs"].as<int>();
 	
 	std::clock_t start;
 	std::clock_t startTotalRun;
 	std::clock_t startTotalExperiment = std::clock();
 
-  double duration;
+	double duration;
+	create_results_folder(configs);
 
-	for (int i = 0; i != runs; i ++){
+	for (int run = 0; run != runs; run ++){
+		std::ofstream eval_file(resFolder + '_' + std::to_string(run) + ".csv");
+		assert(eval_file.is_open());
+		eval_file << "run,Epoch,G,tMove,tEnter,tWait";
 		startTotalRun = std::clock();
-		Warehouse * trainDomain = create_warehouse(agentType, configs);
+		Warehouse * trainDomain = create_warehouse(configs);
 
-		create_results_folder(trainDomain, configs, r);
-
-		std::cout << "Starting Run: " << i << std::endl;
+		std::cout << "Starting Run: " << run << std::endl;
 		for (size_t n = 0; n < nEps; n++){
 			start = std::clock();
 			epoch_results t = trainDomain->SimulateEpochDDPG(false);// simulate
-   		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-   		// std::cout<<"Epoch "<< n <<" ("<<duration<<" sec): ";
-   		std::printf("Epoch %3d (%5.1f sec): G=%4lu, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
-   				(int)n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);   		
+			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+			std::printf("Epoch %3d (%5.1f sec): G=%4lu, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
+				n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
+			eval_file<<"\n"<<run<<','<<n<<','<<t.totalDeliveries<<','<<t.totalMove<<','<<t.totalEnter<<','<<t.totalWait;
 		}
 		duration = ( std::clock() - startTotalRun ) / ((double) CLOCKS_PER_SEC );
-		std::cout<<"Total time elapsed for Run "<<i<<" ( "<<duration<<" sec)"<<std::endl; 
+		std::cout<<"Total time elapsed for Run "<<run<<" ( "<<duration<<" sec)"<<std::endl; 
+		eval_file.close();
 	}
 	duration = ( std::clock() - startTotalExperiment ) / ((double) CLOCKS_PER_SEC );
 		std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
-
-	exit(0);
 }
 
-void WarehouseSimulation(string config_file, int thrds){
+void WarehouseSimulation(std::string config_file, int thrds){
 	std::cout << "Reading configuration file: " << config_file << "\n";
 
 	YAML::Node configs = YAML::LoadFile(config_file);
 
-	string algo = configs["mode"]["algo"].as<string>();
-	string mode = configs["mode"]["type"].as<string>();
-	//ThreadPool pool(thrds);
+	std::string algo = configs["mode"]["algo"].as<std::string>();
+	std::string mode = configs["mode"]["type"].as<std::string>();
 
 	if (algo == "DDPG") {
-		if(mode == "train"){
-			int r = 0;
-			WarehouseSimulationDDPG(r, configs);
-		}
+		if(mode == "train")
+			WarehouseSimulationDDPG(configs);
 	}
 	else{
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(1);
 	}
-
 }
 
 /************************************************************************************************
  * *Input: A string named [agentType] which indicates the type of the Warehouse			*
  * *Output:A Warehouse of that type								*
  ************************************************************************************************/
-Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
+Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
+	std::string agentType = configs["domain"]["agents"].as<std::string>();
 	if (agentType.compare("centralised") == 0)
 		new_warehouse = new WarehouseCentralised(configs);
 	else{
@@ -96,15 +91,11 @@ Warehouse* create_warehouse(std::string agentType, YAML::Node configs){
 	return new_warehouse;
 }
 
-void create_results_folder(Warehouse* trainDomain, YAML::Node configs, size_t r){
-	domainDir = configs["domain"]["folder"].as<string>();
-	resFolder = configs["results"]["folder"].as<string>();
-	std::stringstream ss_eval;
-	ss_eval << domainDir << resFolder << configs["results"]["evaluation"].as<string>() << "_" << r << ".csv";
-	string eval_str = ss_eval.str();
-	sprintf(mkdir,"mkdir -p %s",(domainDir + resFolder).c_str());
+void create_results_folder(YAML::Node configs){
+	resFolder  = configs["domain"]["folder"].as<std::string>()
+		+ configs["results"]["folder"].as<std::string>();
+	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
 	system(mkdir);
-	trainDomain->OutputPerformance(eval_str);
 }
 
 static void show_usage(std::string name){

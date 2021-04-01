@@ -122,8 +122,8 @@ std::vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
  * ************************************************************************************************/
 void DDPGAgent::updateTargetWeights(){
 	for (int i = 0; i < qNN->parameters().size(); i++ ){
-		torch::Tensor t = qNN->parameters()[i].detach().clone();
-		torch::Tensor tt = qtNN->parameters()[i].detach().clone();
+		torch::Tensor t = qNN->parameters()[i].clone();
+		torch::Tensor tt = qtNN->parameters()[i].clone();
 
 		qtNN->parameters()[i].set_data(TAU*t + (1-TAU)*tt);
 	}

@@ -25,7 +25,7 @@ WarehouseCentralised::~WarehouseCentralised(void){
 epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	InitialiseNewEpoch();
 	float totalDeliveries = 0;
-	std::normal_distribution<float> n_process(0.0, 0.1);
+	std::normal_distribution<float> n_process(0.0, 0.25);
 	std::default_random_engine n_generator;
 	epoch_results results = {0,0,0,0};
 	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
@@ -98,9 +98,10 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
 				}
-			reward = AGVs_on_edges / totalInverse;
+			reward = 512*AGVs_on_edges / totalInverse - totalWait;
 			assert(!std::isnan(reward));
 		}
+
 		//TODO
 		//Reward idea: (different weight for each type of edge)
 		//           * (Number of AGVs moving on that edge)

@@ -2,6 +2,7 @@
 *.png
 *.pdf
 *.fig
+*.yaml
 libtorch
 build*
 Results*

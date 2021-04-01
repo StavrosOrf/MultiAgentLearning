@@ -47,21 +47,21 @@ class Warehouse{
 		}
 		void EvolvePolicies(bool init = false) __attribute__ ((deprecated));
 
-		void OutputPerformance(string);
-		void OutputControlPolicies(string);
-		void OutputEpisodeReplay(string, string, string, string);
-		void DisableEpisodeReplayOutput(){outputEpReplay = false;}
+		void OutputPerformance(string) __attribute__ ((deprecated));
+		void OutputControlPolicies(string) __attribute__ ((deprecated));
+		void OutputEpisodeReplay(string, string, string, string) __attribute__ ((deprecated));
+		void DisableEpisodeReplayOutput()__attribute__ ((deprecated)) {outputEpReplay = false;}
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual epoch_results SimulateEpochDDPG(bool verbose){assert(0);}
+		virtual epoch_results SimulateEpochDDPG(bool verbose){return {0,0,0,0};}
 
-		void print_warehouse_state();
-		vector<float> get_edge_utilization(bool verbose = false) __attribute__ ((pure));
 	protected:
 		void replan_AGVs(const std::vector<float> final_cost);
 		void transition_AGVs(bool verbose = false);
 		void traverse_one_step(const std::vector<float> final_cost);
 		void GetJointState(vector<Edge *> e, vector<size_t> &s) ;//__attribute__((deprecated))
+		void print_warehouse_state();
+		vector<float> get_edge_utilization(bool verbose = false) __attribute__ ((pure));
 
 		size_t nSteps; //number of steps per simulation
 		size_t nAgents;

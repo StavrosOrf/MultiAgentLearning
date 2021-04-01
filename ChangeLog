@@ -110,5 +110,6 @@ trace if Eigen, Threadpool.cpp
 ##v 0.00018k
 - Huge Runtime Perfomance Tweaks
 - Minor Tweaks to reward function (needs more work)
+- testWarehouse now writes Evaluation parameters to results folder
 
 

@@ -6,10 +6,9 @@ Top level project files for multiagent learning.
 
 ### Linux ###
 
-Install system dependencies:
+Install system dependencies (on ubuntu):
 ```
 sudo apt install libboost-dev libyaml-cpp-dev
-
 ```
 
 In the working folder of your choice, clone the project code
@@ -45,4 +44,13 @@ Run the project configured by `config.yaml` using six threads:
 ## Debug
 ```
 cmake -DCMAKE_BUILD_TYPE=Debug .. && make && gdb --args ./testWarehouse -c ../config.yaml
+```
+## Profiling
+With Perf (Recommended if you are not made out RAM)
+```
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make && perf record -g ./testWarehouse -c ../config.yaml
+```
+With Callgrind
+```
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make && valgrind --tool=callgrind ./testWarehouse -c ../config.yaml
 ```

@@ -5,17 +5,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include "Learning/NeuroEvo.h"
-
-using std::vector;
-using std::string;
 
 class Agent{
 	public:
 		Agent(size_t nIn, size_t nOut, size_t nHidden);
 		~Agent();
 
-		void ResetEpochEvals();
 
 		void TrainAgent();
 
@@ -28,7 +23,6 @@ class Agent{
 		size_t numOut;
 		size_t numHidden;
 
-		vector<float> epochEvals;
 };
 
 #endif // AGENT_H_
