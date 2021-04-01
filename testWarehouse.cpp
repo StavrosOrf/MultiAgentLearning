@@ -31,6 +31,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 
 	double duration;
 	create_results_folder(configs);
+	int max_G = 0;
 
 	for (int run = 0; run != runs; run ++){
 		std::ofstream eval_file(resFolder + agentType + '_' + std::to_string(run) + ".csv");
@@ -44,8 +45,14 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 			start = std::clock();
 			epoch_results t = trainDomain->SimulateEpochDDPG(false);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-			std::printf("Epoch %3d (%5.1f sec): G=%4lu, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
-				n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
+			if (t.totalDeliveries > max_G){
+				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4lu\e[0m, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
+					n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
+				max_G = t.totalDeliveries;
+			}
+			else
+				std::printf("Epoch %3d (%5.1f sec): G=%4lu, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
+					n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
 			eval_file<<"\n"<<run<<','<<n<<','<<t.totalDeliveries<<','<<t.totalMove<<','<<t.totalEnter<<','<<t.totalWait;
 		}
 		duration = ( std::clock() - startTotalRun ) / ((double) CLOCKS_PER_SEC );

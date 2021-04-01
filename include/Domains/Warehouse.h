@@ -11,6 +11,7 @@
 #include <random>
 #include <algorithm>
 #include <cassert>
+#include <csignal>
 #include <float.h>
 #include <yaml-cpp/yaml.h>
 #include "Planning/Graph.h"

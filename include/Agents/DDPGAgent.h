@@ -24,13 +24,17 @@ struct replay{
 
 struct Net : torch::nn::Module {
 	Net(int32_t numIn, int32_t numOut, int32_t numHid) {
-		weightsA = register_parameter("input", torch::randn({numIn, numHid}));
-		weightsB = register_parameter("output", torch::randn({numHid, numOut}));
+		weightsA = register_parameter("input", torch::rand({numIn, numHid}))*0.013;
+		weightsB = register_parameter("output", torch::rand({numHid, numOut}))*0.013;
 	}
 	torch::Tensor forward(torch::Tensor input) {
 		torch::Tensor hidden_layer, output_layer;
-		hidden_layer = torch::relu(torch::mm(input, weightsA));
-		output_layer = torch::relu(torch::mm(hidden_layer, weightsB));
+		//hidden_layer = torch::relu(torch::mm(input, weightsA));
+		//output_layer = torch::relu(torch::mm(hidden_layer, weightsB));
+		//hidden_layer = torch::tanh(torch::mm(input, weightsA));
+		//output_layer = torch::tanh(torch::mm(hidden_layer, weightsB));
+		hidden_layer = (torch::mm(input, weightsA));
+		output_layer = (torch::mm(hidden_layer, weightsB));
 		return output_layer;
 	}
 	torch::Tensor weightsA, weightsB;
