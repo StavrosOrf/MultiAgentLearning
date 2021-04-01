@@ -99,7 +99,7 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					totalInverse += s1.PathSearchLenght();
 				}
 			if (AGVs_on_edges)
-				reward = 1.5*whAGVs*AGVs_on_edges / totalInverse - totalWait;
+				reward = 1.5*whAGVs.size()*AGVs_on_edges / totalInverse - totalWait;
 			else
 				reward = 0;
 			assert(!std::isnan(reward));

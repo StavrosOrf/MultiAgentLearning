@@ -114,3 +114,5 @@ trace if Eigen, Threadpool.cpp
 - Streamlined Domains
 - Now supports centralized warehouse with provided time
 
+##v 0.00019k
+- bunch of micro optimizations
