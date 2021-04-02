@@ -116,4 +116,5 @@ trace if Eigen, Threadpool.cpp
 
 ##v 0.00019k
 - bunch of micro optimizations
-- Finalized Reward Function
+- Finalized Reward Function (this is not true)
+- Improved Reward Function

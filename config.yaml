@@ -12,8 +12,8 @@ graph:
   edges:      edges.csv
   capacities: capacities.csv
 DDPG:
-  epochs: 125 # set to 1 in test mode
-  runs: 1
+  epochs: 500 # set to 1 in test mode
+  runs: 30
 simulation:
   steps: 200
   agvs: origins.csv
