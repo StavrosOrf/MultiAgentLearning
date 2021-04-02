@@ -70,3 +70,9 @@ void Graph::GenerateEdges(vector< vector<int> > &edges, vector<float> &costs)
 		itsEdges.push_back(e);
 	}
 }
+
+void Graph::reset_edge_costs(){
+	for(Edge * e : itsEdges)
+		e->SetCost(e->GetLength());
+}
+

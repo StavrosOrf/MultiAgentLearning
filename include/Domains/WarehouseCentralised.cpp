@@ -25,7 +25,7 @@ WarehouseCentralised::~WarehouseCentralised(void){
 epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	InitialiseNewEpoch();
 	float totalDeliveries = 0;
-	std::normal_distribution<float> n_process(0.0, 0.15);
+	std::normal_distribution<float> n_process(0.0, 0.10);
 	std::default_random_engine n_generator(time(NULL));
 	epoch_results results = {0,0,0,0};
 	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
@@ -86,22 +86,22 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 		//Create and Save replay to buffer
 		//reward = (float)totalMove/whAGVs.size();
 		{
-			float totalInverse = 0;
-			float AGVs_on_edges = 0;
+			whGraph->reset_edge_costs();
+			float totalInverse = 0, AGVs_on_edges = 0;
 			for (AGV* a : whAGVs)
 				if (a->GetT2V() != 0){//Make Sure the AGV is on an Edge
 					AGVs_on_edges++;
 					Search s0(whGraph, a->GetOriginVertex(),
-							a->GetNextVertex());
+							a->GetCurEdge()->GetVertex1());
 					Search s1(whGraph, a->GetNextVertex(),
 							a->GetDestinationVertex());
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
+					totalInverse += a->GetCurEdge()->GetLength();
 				}
-			if (AGVs_on_edges)
-				reward = 1.5*whAGVs.size()*AGVs_on_edges / totalInverse - totalWait;
-			else
-				reward = 0;
+			//reward = whAGVs.size()*AGVs_on_edges / totalInverse;
+			reward = 64*whAGVs.size()*AGVs_on_edges / totalInverse - totalWait;
+			assert(AGVs_on_edges);
 			assert(!std::isnan(reward));
 		}
 

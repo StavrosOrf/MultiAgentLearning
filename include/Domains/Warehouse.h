@@ -83,7 +83,7 @@ class Warehouse{
 		Graph * whGraph; // vertex and edge definitions, access to change edge costs at each step
 		vector<AGV *> whAGVs; // manage AGV A* search and movement through graph
 
-		inline void InitialiseGraph(string, string, string, YAML::Node); // read in configuration files and construct Graph
+		inline void InitialiseGraph(string, string, string, YAML::Node, bool verbose = false); // read in configuration files and construct Graph
 		void InitialiseAGVs(YAML::Node); // create AGVs to move in graph
 		void InitialiseNewEpoch(); // reset simulation for each episode/epoch
 

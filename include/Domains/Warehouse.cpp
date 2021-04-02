@@ -84,29 +84,33 @@ void Warehouse::OutputEpisodeReplay(string agv_s_str, string agv_e_str, string a
 	std::cout << "\t" << a_a_str << "\n";
 }
 
-void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::Node configs){
+void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::Node configs, bool verbose){
 	vector<int> vertices;
 	vector< vector<int> > edges;
 	vector< float > costs;
 
 	// Read in data from files
-	std::cout << "Reading vertices from file: ";
+	if (verbose)
+		std::cout << "Reading vertices from file: ";
 	ifstream verticesFile(v_str.c_str());
 	std::cout << v_str.c_str() << "...";
 	if (!verticesFile.is_open()){
-		cout << "\nFile: " << v_str.c_str() << " not found, exiting.\n";
+		std::cout << "\nFile: " << v_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
 	string line;
 	while (getline(verticesFile,line))
 		vertices.push_back(atoi(line.c_str()));
-	cout << "complete. " << vertices.size() << " vertices in graph.\n";
+	if (verbose)
+		std::cout << "complete. " << vertices.size() << " vertices in graph.\n";
 
-	cout << "Reading edges from file: ";
+	if (verbose)
+		std::cout << "Reading edges from file: ";
 	ifstream edgesFile(e_str.c_str());
-	cout << e_str.c_str() << "...";
+	if (verbose)
+		std::cout << e_str.c_str() << "...";
 	if (!edgesFile.is_open()){
-		cout << "\nFile: " << e_str.c_str() << " not found, exiting.\n";
+		std::cout << "\nFile: " << e_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
 	while (getline(edgesFile,line)){
@@ -121,21 +125,25 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 		costs.push_back(ec[2]);
 		edges.push_back(e);
 	}
-	cout << "complete. " << edges.size() << " edges in graph.\n";
+	if (verbose)
+		std::cout << "complete. " << edges.size() << " edges in graph.\n";
 
 	baseCosts = costs;
 
 	// Read in data from files
-	cout << "Reading capacities from file: ";
+	if (verbose)
+		std::cout << "Reading capacities from file: ";
 	ifstream capacitiesFile(c_str.c_str());
-	cout << c_str.c_str() << "...";
+	if (verbose)
+		std::cout << c_str.c_str() << "...";
 	if (!capacitiesFile.is_open()){
-		cout << "\nFile: " << c_str.c_str() << " not found, exiting.\n";
+		std::cout << "\nFile: " << c_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
 	while (getline(capacitiesFile,line))
 		capacities.push_back((size_t)atoi(line.c_str()));
-	cout << "complete.\n";
+	if (verbose)
+		std::cout << "complete.\n";
 
 	whGraph = new Graph(vertices, edges, costs);
 

@@ -32,6 +32,8 @@ class Graph
 
 		vector<Edge *> GetNeighbours(Node * n);
 
+		void reset_edge_costs();
+
 	private:
 		vector<int> itsVertices;
 		vector<Edge *> itsEdges;
