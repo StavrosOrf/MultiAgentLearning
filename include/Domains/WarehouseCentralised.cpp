@@ -87,7 +87,8 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 		//reward = (float)totalMove/whAGVs.size();
 		{
 			whGraph->reset_edge_costs();
-			float totalInverse = 0, AGVs_on_edges = 0;
+			float AGVs_on_edges = 0;
+			float total = 0;
 			for (AGV* a : whAGVs)
 				if (a->GetT2V() != 0){//Make Sure the AGV is on an Edge
 					AGVs_on_edges++;
@@ -95,12 +96,15 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 							a->GetCurEdge()->GetVertex1());
 					Search s1(whGraph, a->GetNextVertex(),
 							a->GetDestinationVertex());
+					float totalInverse = 0;
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
 					totalInverse += a->GetCurEdge()->GetLength();
+					total += 1/totalInverse;
 				}
 			//reward = whAGVs.size()*AGVs_on_edges / totalInverse;
-			reward = 64*whAGVs.size()*AGVs_on_edges / totalInverse - totalWait;
+			//reward = 64*whAGVs.size()*AGVs_on_edges / totalInverse - totalWait;
+			reward = total;
 			assert(AGVs_on_edges);
 			assert(!std::isnan(reward));
 		}
