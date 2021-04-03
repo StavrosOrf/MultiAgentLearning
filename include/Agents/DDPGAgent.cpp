@@ -12,9 +12,9 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (int i = 0; i < qNN->parameters().size(); i++ )
-		qtNN->parameters()[i] = qNN->parameters()[i].clone();
+		qtNN->parameters()[i].set_data(qNN->parameters()[i].detach().clone());
 	for (int i = 0; i < muNN->parameters().size(); i++ )
-		mutNN->parameters()[i] = muNN->parameters()[i].clone();
+		mutNN->parameters()[i].set_data(muNN->parameters()[i].detach().clone());
 
 	replay_buffer.reserve(REPLAY_BUFFER_SIZE);
 	// torch::optim::SGD optimezerQNN(qNN->parameters(),0.01);
@@ -122,8 +122,8 @@ std::vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
  * ************************************************************************************************/
 void DDPGAgent::updateTargetWeights(){
 	for (int i = 0; i < qNN->parameters().size(); i++ ){
-		torch::Tensor t = qNN->parameters()[i].clone();
-		torch::Tensor tt = qtNN->parameters()[i].clone();
+		torch::Tensor t = qNN->parameters()[i].detach().clone();
+		torch::Tensor tt = qtNN->parameters()[i].detach().clone();
 
 		qtNN->parameters()[i].set_data(TAU*t + (1-TAU)*tt);
 	}
@@ -176,7 +176,7 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 
 	// std::cout<<actions<<std::endl;
 	// std::cout<<input<<std::endl;
-	// std::cout<<qNN->forward(input)<<std::endl;
+	//std::cout<<qNN->forward(input)<<std::endl;
 
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 
@@ -185,4 +185,13 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 	optimezerMuNN.step();
 
 	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
+}
+
+void DDPGAgent::printAboutNN(){
+	for (int i = 0; i < muNN->parameters().size(); i++ ){
+		torch::Tensor t = muNN->parameters()[i].detach().clone();
+		torch::Tensor tt = mutNN->parameters()[i].detach().clone();
+
+		std::cout<<"MuNN "<<i<<": "<< torch::sum(t)<<"\nMutNN "<<i<<": "<< torch::sum(tt)<<std::endl;
+	}	
 }

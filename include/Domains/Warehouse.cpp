@@ -245,7 +245,7 @@ void Warehouse::print_warehouse_state(){
 	std::cout << "Warehouse utilization: {";
 	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n] > 0 )
-			std::cout<<"[e_"<< n << ", pop= " << cur_state[n] << "], ";
+			std::cout<<"[e_"<< n << ",p= " << cur_state[n] << "], ";
 	std::cout << '}' << std::endl;
 }
 

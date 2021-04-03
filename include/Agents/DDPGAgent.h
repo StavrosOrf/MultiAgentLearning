@@ -13,7 +13,7 @@
 #define REPLAY_BUFFER_SIZE 100000000
 #define GAMMA 0.99
 #define TAU 0.005
-#define BATCH_SIZE 200
+#define BATCH_SIZE 5
 
 struct replay{
 	std::vector<float> current_state;
@@ -25,6 +25,8 @@ struct replay{
 struct Net : torch::nn::Module {
 	Net(int32_t numIn, int32_t numOut, int32_t numHid) {
 		weightsA = register_parameter("input", torch::rand({numIn, numHid}))*0.013;
+		// weightsBa = register_parameter("hidden", torch::rand({numHid, numHid}))*0.013;
+		// weightsBb = register_parameter("hidden", torch::rand({numHid, numHid}))*0.013;
 		weightsB = register_parameter("output", torch::rand({numHid, numOut}))*0.013;
 	}
 	torch::Tensor forward(torch::Tensor input) {
@@ -57,6 +59,7 @@ class DDPGAgent{
 		void updateTargetWeights();
 		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime);
 		void updateMuActor(const std::vector<std::vector<float>> states);
+		void printAboutNN();
 	protected:
 		Net* qNN;
 		Net* qtNN;

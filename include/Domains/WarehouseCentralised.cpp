@@ -25,7 +25,7 @@ WarehouseCentralised::~WarehouseCentralised(void){
 epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	InitialiseNewEpoch();
 	float totalDeliveries = 0;
-	std::normal_distribution<float> n_process(0.0, 0.10);
+	std::normal_distribution<float> n_process(0.0, 0.25);
 	std::default_random_engine n_generator(time(NULL));
 	epoch_results results = {0,0,0,0};
 	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
@@ -43,14 +43,36 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 		//Select action
 		float reward = 0;
 		const vector<float> actions = ddpg_maTeam[0]->EvaluateActorNN_DDPG(cur_state);
+		
+		if(verbose){
+			ddpg_maTeam[0]->printAboutNN();
+		
+			printf("Actions:     ");
+			for (size_t n = 0; n < actions.size(); n++){
+				printf(" %4.2f",actions[n]);
+			}
+			printf("\n");
+		}
+		// std::cout<<"Actions: "<< actions <<std::endl;
 		vector<float> final_costs = baseCosts;
 		// Add Random Noise from process N
 		for (size_t n = 0; n < N_EDGES; n++){
-			final_costs[n] += std::clamp<float>(actions[n]+n_process(n_generator), -1, 1) * maxBaseCost;
-			assert(final_costs[n] <= maxBaseCost + baseCosts[n]);
+			// final_costs[n] += std::clamp<float>(actions[n]+n_process(n_generator), -1, 1) * maxBaseCost;
+			final_costs[n] += (actions[n]+n_process(n_generator)) * maxBaseCost;
+			// assert(final_costs[n] <= maxBaseCost + baseCosts[n]);
 		}
 		assert(final_costs.size() == N_EDGES);
+		// if(t==0)
 
+		if(verbose){
+			printf("FinalCosts: ");
+			for (size_t n = 0; n < final_costs.size(); n++){
+				printf(" %4.1f",final_costs[n]-baseCosts[n]);
+			}
+			printf("\n");
+		}
+
+		//std::cout<<"FinalCosts: "<< final_costs <<std::endl;
 		traverse_one_step(final_costs);
 
 		//update current state
@@ -84,14 +106,12 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 			a->ResetPerformanceCounters();
 
 		//Create and Save replay to buffer
-		//reward = (float)totalMove/whAGVs.size();
+		reward = (float)totalMove/whAGVs.size();
 		{
 			whGraph->reset_edge_costs();
-			float AGVs_on_edges = 0;
 			float total = 0;
 			for (AGV* a : whAGVs)
 				if (a->GetT2V() != 0){//Make Sure the AGV is on an Edge
-					AGVs_on_edges++;
 					Search s0(whGraph, a->GetOriginVertex(),
 							a->GetCurEdge()->GetVertex1());
 					Search s1(whGraph, a->GetNextVertex(),
@@ -100,15 +120,15 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
 					totalInverse += a->GetCurEdge()->GetLength();
-					total += 1/totalInverse;
+					total += 32/totalInverse;
 				}
 			//reward = whAGVs.size()*AGVs_on_edges / totalInverse;
 			//reward = 64*whAGVs.size()*AGVs_on_edges / totalInverse - totalWait;
-			reward = total;
-			assert(AGVs_on_edges);
+			reward = total - totalEnter;
 			assert(!std::isnan(reward));
 		}
-
+		// reward =0;
+		// reward = whAGVs.size()-totalEnter;
 		//TODO
 		//Reward idea: (different weight for each type of edge)
 		//           * (Number of AGVs moving on that edge)
