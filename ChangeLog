@@ -118,3 +118,9 @@ trace if Eigen, Threadpool.cpp
 - bunch of micro optimizations
 - Finalized Reward Function (this is not true)
 - Improved Reward Function
+
+##v 0.00020o
+- some additions for Link Agent
+
+##v 0.00021k
+- Initialize Intersection Multi Agent Team Implemented

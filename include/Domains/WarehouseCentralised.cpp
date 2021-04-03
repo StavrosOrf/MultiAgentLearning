@@ -218,32 +218,43 @@ void WarehouseCentralised::InitialiseMATeam(){
 	    iAgent * agent = new iAgent{i, vIDs} ;
 	    whAgents.push_back(agent);
 		}
+	}else if(agent_type == agent_def::intersection){
+		for (int v : whGraph->GetVertices()){
+			std::vector<size_t> eIDs;
+			for (size_t i = 0; i != whGraph->GetEdges().size(); i++)
+				if (whGraph->GetEdges()[i]->GetVertex2() == v)
+					eIDs.push_back(i);
+			whAgents.push_back(new iAgent{(size_t) v, eIDs});
+		}
+		assert(whAgents.size() == whGraph->GetVertices().size());
 	}
 	
 	if (algo == algo_type::ddpg){
 		assert(ddpg_maTeam.empty());
-		if(agent_type == agent_def::centralized){
+		if(agent_type == agent_def::centralized)
 			ddpg_maTeam.push_back(new DDPGAgent(N_EDGES*(1+incorporates_time), N_EDGES,N_EDGES*(1+incorporates_time), N_EDGES));	
 	}else if(agent_type == agent_def::link){
 		for (Edge* e : whGraph->GetEdges()){
 			ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time), 1,(1+incorporates_time)*N_EDGES, N_EDGES));	
 		}
+ 	}else if (agent_type == agent_def::intersection){
+		for (int v : whGraph->GetVertices()){
+			ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size(), (1+incorporates_time)*N_EDGES, N_EDGES));
+		}
 	}
-		
-		assert(!ddpg_maTeam.empty());
-	}else{
-		std::cout << "ERROR: InitialiseMATeam invalid also";
-		exit(1);
-	}
+	else{
+		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
+		exit(EXIT_FAILURE);
+	} 
+	assert(!ddpg_maTeam.empty());
 	nAgents = whAgents.size();
 }
 
-std::vector<float>  WarehouseCentralised::QueryActorMATeam(std::vector<float> states){
+std::vector<float> WarehouseCentralised::QueryActorMATeam(std::vector<float> states){
  	assert(states.size() == N_EDGES*(1 + incorporates_time));
  	if(agent_type == agent_def::centralized){
  		return ddpg_maTeam[0]->EvaluateActorNN_DDPG(states);
- 	// }else if(agent_type == agent_def::link){
- 	}else{
+ 	}else if (agent_type == agent_def::link){
  		std::vector<float> actions;
  		actions.reserve(N_EDGES);
 
@@ -256,7 +267,14 @@ std::vector<float>  WarehouseCentralised::QueryActorMATeam(std::vector<float> st
  			} 				
  		}
  		return actions;
- 	}
+ 	}else if (agent_type == agent_def::intersection){
+		
+	}
+	else{
+		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
+		exit(EXIT_FAILURE);
+		return {0};
+	} 
 }
 
 

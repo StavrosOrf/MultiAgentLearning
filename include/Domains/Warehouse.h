@@ -72,7 +72,7 @@ class Warehouse{
 		vector<float> get_edge_utilization() __attribute__ ((pure));
 
 		size_t nSteps; //number of steps per simulation
-		size_t nAgents;
+		size_t nAgents __attribute__ ((deprecated));
 		size_t nAGVs;
 		vector<float> baseCosts;
 		vector<size_t> capacities;
