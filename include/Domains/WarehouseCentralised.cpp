@@ -159,7 +159,9 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 				std::vector<float> Qvals;//Qvals
 				std::vector<float> Qprime;//Qprime ( the Y )
 				std::vector<std::vector<float>> states; //all states from the batch
+				std::vector<std::vector<float>> all_actions; //all actions from the batch
 				Qvals.reserve(BATCH_SIZE);Qprime.reserve(BATCH_SIZE);states.reserve(BATCH_SIZE);
+				all_actions.reserve(BATCH_SIZE);
 				for (size_t i = 0; i < BATCH_SIZE; i++){
 					replay b = miniBatch[i];
 					std::vector<float> nta = QueryTargetActorMATeam(b.next_state);
@@ -178,7 +180,9 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 						if(incorporates_time){
 							states.push_back({b.current_state[n],b.current_state[n + N_EDGES]});							
 						}else{
-							states.push_back({b.current_state[n]});							
+							// states.push_back({b.current_state[n]});
+							states.push_back(b.current_state);
+							all_actions.push_back(b.action);							
 						}						
 					}					
 				}
@@ -186,8 +190,18 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 				
 				//Update all the NNs
 				ddpg_maTeam[n]->updateQCritic(Qvals, Qprime);
-				ddpg_maTeam[n]->updateMuActor(states);
-				
+
+				if (agent_type == agent_def::centralized){
+					ddpg_maTeam[n]->updateMuActor(states);	
+				}else if (agent_type == agent_def::link){
+					if(incorporates_time){
+						//Nothing yet
+						std::cout << "TBI soon"<<std::endl;
+						exit(1);
+					}else{
+						ddpg_maTeam[n]->updateMuActorLink_noTime(states,all_actions,n);
+					}						
+				}													
 			}
 
 			for (size_t n = 0; n < ddpg_maTeam.size(); n++)
@@ -246,6 +260,7 @@ void WarehouseCentralised::InitialiseMATeam(){
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
 		exit(EXIT_FAILURE);
 	} 
+	std::cout<<ddpg_maTeam<<std::endl;
 	assert(!ddpg_maTeam.empty());
 	nAgents = whAgents.size();
 }
