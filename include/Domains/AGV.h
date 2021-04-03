@@ -32,6 +32,7 @@ class AGV{
 		size_t GetNumCompleted(){return nsDel;}
 		size_t GetNumCommanded(){return ncDel;}
 		Search * GetAGVPlanner(){return agvPlanner;}
+		bool is_on_graph(){return nextVertex!=-1;}
 
 		int GetOriginVertex(){return origin;}
 		int GetDestinationVertex(){return goal;}

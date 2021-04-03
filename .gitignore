@@ -3,6 +3,7 @@
 *.pdf
 *.fig
 *.yaml
+config.yaml
 libtorch
 build*
 Results*

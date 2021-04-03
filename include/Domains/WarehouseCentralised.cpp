@@ -108,8 +108,13 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 		//Create and Save replay to buffer
 		reward = (float)totalMove/whAGVs.size();
 		{
+			//TODO optimize Perfomance (with LUTs?)
 			whGraph->reset_edge_costs();
+<<<<<<< HEAD
 			float total = 0;
+=======
+			float AGVs_on_edges = 0, total = 0;
+>>>>>>> 6a316c2c0614ae36364d777b57421adc045d50e3
 			for (AGV* a : whAGVs)
 				if (a->GetT2V() != 0){//Make Sure the AGV is on an Edge
 					Search s0(whGraph, a->GetOriginVertex(),
@@ -120,11 +125,26 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
 					totalInverse += a->GetCurEdge()->GetLength();
+<<<<<<< HEAD
 					total += 32/totalInverse;
 				}
 			//reward = whAGVs.size()*AGVs_on_edges / totalInverse;
 			//reward = 64*whAGVs.size()*AGVs_on_edges / totalInverse - totalWait;
 			reward = total - totalEnter;
+=======
+					total += 1/totalInverse;
+				} else if (a->is_on_graph()){
+					Search s0(whGraph, a->GetOriginVertex(),
+							a->GetNextVertex());
+					Search s1(whGraph, a->GetNextVertex(),
+							a->GetDestinationVertex());
+					float totalInverse = 0;
+					totalInverse += s0.PathSearchLenght();
+					totalInverse += s1.PathSearchLenght();
+					total += 1/totalInverse;
+				}
+			reward = total;
+>>>>>>> 6a316c2c0614ae36364d777b57421adc045d50e3
 			assert(!std::isnan(reward));
 		}
 		// reward =0;
