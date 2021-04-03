@@ -1,12 +1,12 @@
 #include "DDPGAgent.h"
 
 
-DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
+DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space){
 	//Create NNs
-	qNN = new Net(state_space+action_space,
-		1, (state_space + action_space) * 2);
-	qtNN = new Net(state_space+action_space,
-		1, (state_space + action_space) * 2);
+	qNN = new Net(global_state_space+global_action_space,
+		1, (global_state_space + global_action_space) * 2);
+	qtNN = new Net(global_state_space+global_action_space,
+		1, (global_state_space + global_action_space) * 2);
 	muNN = new Net(state_space, action_space, action_space*2);
 	mutNN = new Net(state_space, action_space, action_space*2);
 
@@ -16,7 +16,8 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space){
 	for (int i = 0; i < muNN->parameters().size(); i++ )
 		mutNN->parameters()[i].set_data(muNN->parameters()[i].detach().clone());
 
-	replay_buffer.reserve(REPLAY_BUFFER_SIZE);
+	DDPGAgent::replay_buffer.reserve(REPLAY_BUFFER_SIZE);
+
 	// torch::optim::SGD optimezerQNN(qNN->parameters(),0.01);
 	// torch::optim::SGD optimezerQtNN(qNN->parameters(),0.01);
 	// torch::optim::SGD optimezerMuNN(qNN->parameters(),0.01);
@@ -84,10 +85,10 @@ std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<float> s, 
 void DDPGAgent::addToReplayBuffer(replay r){
 	assert(r.next_state.size() == r.current_state.size());
 
-	if (replay_buffer.size() < REPLAY_BUFFER_SIZE)
-		replay_buffer.push_back(r);
+	if (DDPGAgent::replay_buffer.size() < REPLAY_BUFFER_SIZE)
+		DDPGAgent::replay_buffer.push_back(r);
 	else
-		replay_buffer[rand()%REPLAY_BUFFER_SIZE] = r;
+		DDPGAgent::replay_buffer[rand()%REPLAY_BUFFER_SIZE] = r;
 }
 /************************************************************************************************
  * *Input:[size] of batch to return								*
@@ -103,14 +104,14 @@ std::vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
 	std::vector<int> rand_list;
 	rand_list.reserve(size);
 	for (int i = 0; i != size; i++){
-		int r = rand()%replay_buffer.size();
+		int r = rand()%DDPGAgent::replay_buffer.size();
 		while (std::find(rand_list.begin(), rand_list.end(),r)!=rand_list.end())
-			r = rand()%replay_buffer.size();
+			r = rand()%DDPGAgent::replay_buffer.size();
 		rand_list.push_back(r);
 	}
 
 	for (int i : rand_list)
-		to_return.push_back(replay_buffer[i]);
+		to_return.push_back(DDPGAgent::replay_buffer[i]);
 
 	assert(to_return.size() == size);
 	return to_return;
@@ -159,6 +160,35 @@ void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprim
 	// std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;
 }
 
+
+void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> actions,int agentNumber ){
+	//TODO SCALE INPUTS OF Q NETWORK(if necessary)
+	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
+
+	//Update actor
+	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
+	for (int i = 1; i != BATCH_SIZE; i++){
+		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
+		states_ = torch::cat({states_,temp},0);
+	}
+	states_ = states_.to(torch::kFloat32);
+	std::cout<<states_<<std::endl;	
+	torch::Tensor actions = muNN->forward(states_[agentNumber]);
+	torch::Tensor input = torch::cat({states_,actions},1);
+
+	std::cout<<actions<<std::endl;
+	std::cout<<input<<std::endl;
+	std::cout<<qNN->forward(input)<<std::endl;
+
+	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
+
+	optimezerMuNN.zero_grad();
+	policy_loss.backward();
+	optimezerMuNN.step();
+
+	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
+}
+
 void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 	//TODO SCALE INPUTS OF Q NETWORK(if necessary)
 	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
@@ -170,13 +200,13 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 		states_ = torch::cat({states_,temp},0);
 	}
 	states_ = states_.to(torch::kFloat32);
-
+	std::cout<<states_<<std::endl;	
 	torch::Tensor actions = muNN->forward(states_);
 	torch::Tensor input = torch::cat({states_,actions},1);
 
-	// std::cout<<actions<<std::endl;
-	// std::cout<<input<<std::endl;
-	//std::cout<<qNN->forward(input)<<std::endl;
+	std::cout<<actions<<std::endl;
+	std::cout<<input<<std::endl;
+	std::cout<<qNN->forward(input)<<std::endl;
 
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 

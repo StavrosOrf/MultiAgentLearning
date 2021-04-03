@@ -41,7 +41,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		Warehouse * trainDomain = create_warehouse(configs);
 
 		std::cout << "Starting Run: " << run << std::endl;
-		for (size_t n = 0; n < nEps; n++){
+		for (int n = 0; n < nEps; n++){
 			start = std::clock();
 			epoch_results t = trainDomain->SimulateEpochDDPG(false);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
@@ -87,18 +87,7 @@ void WarehouseSimulation(std::string config_file, int thrds){
  ************************************************************************************************/
 Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
-	std::string agentType = configs["domain"]["agents"].as<std::string>();
-	if (agentType.compare("centralised") == 0){
-		new_warehouse = new WarehouseCentralised(configs);
-	}
-	else if (agentType.compare("centralised_t") == 0){
-		new_warehouse = new WarehouseCentralised(configs);
-	}
-	else{
-		std::cout << "ERROR: Currently only configured for 'intersection', 'link' or 'centralised' agents! Exiting.\n";
-		exit(1);
-	}
-
+	new_warehouse = new WarehouseCentralised(configs);
 	new_warehouse->InitialiseMATeam();
 	return new_warehouse;
 }

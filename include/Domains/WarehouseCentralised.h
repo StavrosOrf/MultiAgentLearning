@@ -18,7 +18,10 @@ class WarehouseCentralised : public Warehouse {
 		epoch_results SimulateEpochDDPG(bool verbose = false);
 
 		void InitialiseMATeam(); // create agents for each vertex in graph
+		std::vector<float> QueryActorMATeam(std::vector<float> states);
+		std::vector<float> QueryTargetActorMATeam(std::vector<float> states);
 	private:
+
 };
 
 #endif // WAREHOUSE_CENTRALISED_H_

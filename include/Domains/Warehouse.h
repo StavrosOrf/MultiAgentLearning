@@ -31,6 +31,12 @@ enum algo_type{
     ddpg
 };
 
+enum class agent_def{
+    centralized,
+    link,
+    intersection
+};
+
 struct epoch_results{
     size_t totalDeliveries;
     size_t totalMove;
@@ -102,6 +108,8 @@ class Warehouse{
 
 		bool incorporates_time; //True means that the domain incorpated time to it's state
 		//as described in github.io/anthropomorphic/Papers/Chung2018multiagent.pdf
+
+		agent_def agent_type;
 };
 
 #endif // WAREHOUSE_H_

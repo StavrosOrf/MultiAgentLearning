@@ -16,6 +16,17 @@ Warehouse::Warehouse(YAML::Node configs){
 		exit(1);
 	}
 	std::string agentType = configs["domain"]["agents"].as<std::string>();
+
+	if(agentType.starts_with("centralized")){
+		agent_type = agent_def::centralized;
+	}else if(agentType.starts_with("link")){
+		agent_type = agent_def::link;
+	}else if(agentType.starts_with("intersection")){
+		agent_type = agent_def::intersection;
+	}else{
+		std:cout<<"Error in agent definition"<<std::endl;
+		exit(1);
+	}
 	incorporates_time = agentType.ends_with("_t");
 
 	InitialiseGraph(vFile, eFile, cFile, configs);
