@@ -53,6 +53,7 @@ class DDPGAgent{
 		void updateTargetWeights();
 		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime);
 		void updateMuActor(const std::vector<std::vector<float>> states);
+		void updateMuActorLink_noTime(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber);
 		void printAboutNN();
 	protected:
 		Net* qNN;

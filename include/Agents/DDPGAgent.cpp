@@ -160,8 +160,7 @@ void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprim
 	// std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;
 }
 
-
-void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> actions,int agentNumber ){
+void DDPGAgent::updateMuActorLink_noTime(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber){
 	//TODO SCALE INPUTS OF Q NETWORK(if necessary)
 	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
 
@@ -172,14 +171,27 @@ void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::ve
 		states_ = torch::cat({states_,temp},0);
 	}
 	states_ = states_.to(torch::kFloat32);
-	std::cout<<states_<<std::endl;	
-	torch::Tensor actions = muNN->forward(states_[agentNumber]);
-	torch::Tensor input = torch::cat({states_,actions},1);
 
-	std::cout<<actions<<std::endl;
-	std::cout<<input<<std::endl;
-	std::cout<<qNN->forward(input)<<std::endl;
+	// make a tensor from only agent's n actions			
+	torch::Tensor states_N = states_.slice(1,agentNumber,agentNumber+1);	
+	torch::Tensor actions = muNN->forward(states_N);
 
+	torch::Tensor final_actions = torch::tensor(all_actions[0]).unsqueeze(0);	
+	final_actions[0][agentNumber] = actions[0][0];
+	for (int i = 1; i != BATCH_SIZE; i++){
+		torch::Tensor temp = torch::tensor(all_actions[i]).unsqueeze(0);		
+		temp[0][agentNumber] = actions[i][0];		
+		final_actions = torch::cat({final_actions,temp},0);		
+	}
+
+	torch::Tensor input = torch::cat({states_,final_actions},1);
+	// std::cout<<actions<<std::endl;
+	// std::cout<<all_actions<<std::endl;
+	// std::cout<<final_actions<<std::endl;
+
+	// std::cout<<input<<std::endl;
+	// std::cout<<agentNumber<<std::endl;	
+	// std::cout<<qNN->forward(input)<<std::endl;
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 
 	optimezerMuNN.zero_grad();
