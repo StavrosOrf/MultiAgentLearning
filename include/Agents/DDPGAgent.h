@@ -14,6 +14,7 @@
 #define GAMMA 0.99
 #define TAU 0.005
 #define BATCH_SIZE 50
+#define TRAINING_STEP 1
 
 struct replay{
 	std::vector<float> current_state;
@@ -24,8 +25,8 @@ struct replay{
 
 struct Net : torch::nn::Module {
 	Net(int32_t numIn, int32_t numOut, int32_t numHid) {
-		weightsA = register_parameter("input", torch::rand({numIn, numHid}))*0.013;
-		weightsB = register_parameter("output", torch::rand({numHid, numOut}))*0.013;
+		weightsA = register_parameter("input", torch::rand({numIn, numHid}));
+		weightsB = register_parameter("output", torch::rand({numHid, numOut}));		
 	}
 	torch::Tensor forward(torch::Tensor input) {
 		torch::Tensor hidden_layer, output_layer;
@@ -34,6 +35,7 @@ struct Net : torch::nn::Module {
 		return output_layer;
 	}
 	torch::Tensor weightsA, weightsB;
+	// torch::nn::Linear weightsA,weightsB;
 };
 
 
@@ -53,7 +55,7 @@ class DDPGAgent{
 		void updateTargetWeights();
 		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime);
 		void updateMuActor(const std::vector<std::vector<float>> states);
-		void updateMuActorLink_noTime(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber);
+		void updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber,bool withTime);
 		void printAboutNN();
 	protected:
 		Net* qNN;

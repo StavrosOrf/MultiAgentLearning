@@ -124,3 +124,10 @@ trace if Eigen, Threadpool.cpp
 
 ##v 0.00021k
 - Initialize Intersection Multi Agent Team Implemented
+
+##v 0.00022o ( yes we have changelog!!!)
+- Implemented and tested MADDPG link agents
+- Added Training step to reduce computational requirements
+  (will do tests to prove that is not necessary to train in each step)
+- TODO link_t doesn't reads state correctly ( the time part is always 0)
+

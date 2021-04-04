@@ -6,13 +6,13 @@ mode:
 # eval_file: ../Domains/Small_120_AGVs_SS_centralised_no_time/Results/evaluation_29.csv # file containing best teams
 domain:
   folder: ../Domains/Small_120_AGVs_SS/
-  agents: link
+  agents: link_t
 graph:
   vertices:   vertices.csv
   edges:      edges.csv
   capacities: capacities.csv
 DDPG:
-  epochs: 1 # set to 1 in test mode
+  epochs: 100 # set to 1 in test mode
   runs: 1
 simulation:
   steps: 200

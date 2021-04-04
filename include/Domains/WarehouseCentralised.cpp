@@ -42,8 +42,10 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 			std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
 		float value_of_state = 0 , value_of_prev_state = 0, reward = 0;
+		
 		const vector<float> actions = QueryActorMATeam(cur_state);
 		if(verbose){
+			std::cout<<"State: "<< cur_state <<std::endl;
 			ddpg_maTeam[0]->printAboutNN();
 		
 			printf("Actions:     ");
@@ -150,7 +152,7 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 		// ddpg_maTeam[0]->addToReplayBuffer(r);
 		DDPGAgent::addToReplayBuffer(r);
 
-		if(DDPGAgent::get_replay_buffer_size() > BATCH_SIZE * 2){
+		if(DDPGAgent::get_replay_buffer_size() > BATCH_SIZE * 2 && t%TRAINING_STEP == 0){
 			
 
 			for (size_t n = 0; n < ddpg_maTeam.size(); n++){
@@ -177,17 +179,10 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 					if (agent_type == agent_def::centralized){
 						states.push_back(b.current_state);						
 					}else if (agent_type == agent_def::link){
-						if(incorporates_time){
-							//TODO
-							states.push_back({b.current_state[n],b.current_state[n + N_EDGES]});							
-						}else{
-							// states.push_back({b.current_state[n]});
 							states.push_back(b.current_state);
-							all_actions.push_back(b.action);							
-						}						
+							all_actions.push_back(b.action);																		
 					}					
 				}
-
 				
 				//Update all the NNs
 				ddpg_maTeam[n]->updateQCritic(Qvals, Qprime);
@@ -195,13 +190,7 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 				if (agent_type == agent_def::centralized){
 					ddpg_maTeam[n]->updateMuActor(states);	
 				}else if (agent_type == agent_def::link){
-					if(incorporates_time){
-						//Nothing yet
-						std::cout << "TBI soon"<<std::endl;
-						exit(1);
-					}else{
-						ddpg_maTeam[n]->updateMuActorLink_noTime(states,all_actions,n);
-					}						
+					ddpg_maTeam[n]->updateMuActorLink(states,all_actions,n,incorporates_time);					
 				}													
 			}
 
@@ -263,7 +252,6 @@ void WarehouseCentralised::InitialiseMATeam(){
 		exit(EXIT_FAILURE);
 	} 
 	assert(!ddpg_maTeam.empty());
-	nAgents = whAgents.size();
 }
 
 std::vector<float> WarehouseCentralised::QueryActorMATeam(std::vector<float> states){
@@ -278,6 +266,8 @@ std::vector<float> WarehouseCentralised::QueryActorMATeam(std::vector<float> sta
  			if(incorporates_time){
  				actions.push_back(ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i], states[i+N_EDGES]})[0]);
  			}else{
+ 				// std::cout << "Si" << (states[i])<<std::endl;
+ 				// std::cout << (ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i]}))<<std::endl;
  				float t = (ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i]}))[0];
  				actions.push_back(t);
  			} 				
@@ -314,13 +304,3 @@ std::vector<float>  WarehouseCentralised::QueryTargetActorMATeam(std::vector<flo
  		return actions;
  	}
 }
-
-
-
-
-
-/* TODO LIST
-	- Make replay buffer static
-	- Make QueryMaTeam for actor (combine each agent's output to get the final action)
-	- 
-*/

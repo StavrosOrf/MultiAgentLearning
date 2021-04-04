@@ -43,7 +43,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		std::cout << "Starting Run: " << run << std::endl;
 		for (int n = 0; n < nEps; n++){
 			start = std::clock();
-			epoch_results t = trainDomain->SimulateEpochDDPG(true);//simulate
+			epoch_results t = trainDomain->SimulateEpochDDPG(false);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			if (t.totalDeliveries > max_G){
 				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4lu\e[0m, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
