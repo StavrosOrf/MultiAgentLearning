@@ -212,13 +212,13 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 		states_ = torch::cat({states_,temp},0);
 	}
 	states_ = states_.to(torch::kFloat32);
-	std::cout<<states_<<std::endl;	
+	// std::cout<<states_<<std::endl;	
 	torch::Tensor actions = muNN->forward(states_);
 	torch::Tensor input = torch::cat({states_,actions},1);
 
-	std::cout<<actions<<std::endl;
-	std::cout<<input<<std::endl;
-	std::cout<<qNN->forward(input)<<std::endl;
+	// std::cout<<actions<<std::endl;
+	// std::cout<<input<<std::endl;
+	// std::cout<<qNN->forward(input)<<std::endl;
 
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 

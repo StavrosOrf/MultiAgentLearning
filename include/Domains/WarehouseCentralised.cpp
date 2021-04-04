@@ -178,6 +178,7 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 						states.push_back(b.current_state);						
 					}else if (agent_type == agent_def::link){
 						if(incorporates_time){
+							//TODO
 							states.push_back({b.current_state[n],b.current_state[n + N_EDGES]});							
 						}else{
 							// states.push_back({b.current_state[n]});
@@ -245,22 +246,22 @@ void WarehouseCentralised::InitialiseMATeam(){
 	
 	if (algo == algo_type::ddpg){
 		assert(ddpg_maTeam.empty());
-		if(agent_type == agent_def::centralized)
+		if(agent_type == agent_def::centralized){
 			ddpg_maTeam.push_back(new DDPGAgent(N_EDGES*(1+incorporates_time), N_EDGES,N_EDGES*(1+incorporates_time), N_EDGES));	
-	}else if(agent_type == agent_def::link){
-		for (Edge* e : whGraph->GetEdges()){
-			ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time), 1,(1+incorporates_time)*N_EDGES, N_EDGES));	
-		}
- 	}else if (agent_type == agent_def::intersection){
-		for (int v : whGraph->GetVertices()){
-			ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size(), (1+incorporates_time)*N_EDGES, N_EDGES));
+		}	else if(agent_type == agent_def::link){
+			for (Edge* e : whGraph->GetEdges()){
+				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time), 1,(1+incorporates_time)*N_EDGES, N_EDGES));	
+			}
+ 		}else if (agent_type == agent_def::intersection){
+			for (int v : whGraph->GetVertices()){
+				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size(), (1+incorporates_time)*N_EDGES, N_EDGES));
+			}
 		}
 	}
 	else{
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
 		exit(EXIT_FAILURE);
 	} 
-	std::cout<<ddpg_maTeam<<std::endl;
 	assert(!ddpg_maTeam.empty());
 	nAgents = whAgents.size();
 }
