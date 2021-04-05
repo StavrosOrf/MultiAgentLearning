@@ -2,7 +2,8 @@
 
 Warehouse::Warehouse(YAML::Node configs){
 	// Read in graph definition from vertices and edges files (directories stored in configs)
-	string domainDir = configs["domain"]["folder"].as<string>();
+	string domainDir = configs["domain"]["folder"].as<string>() +
+		configs["domain"]["warehouse"].as<string>() + '/';
 	string vFile = domainDir + configs["graph"]["vertices"].as<string>();
 	string eFile = domainDir + configs["graph"]["edges"].as<string>();
 	string cFile = domainDir + configs["graph"]["capacities"].as<string>();
@@ -17,13 +18,13 @@ Warehouse::Warehouse(YAML::Node configs){
 	}
 	std::string agentType = configs["domain"]["agents"].as<std::string>();
 
-	if(agentType.starts_with("centralized")){
+	if(agentType.starts_with("centralized"))
 		agent_type = agent_def::centralized;
-	}else if(agentType.starts_with("link")){
+	else if(agentType.starts_with("link"))
 		agent_type = agent_def::link;
-	}else if(agentType.starts_with("intersection")){
+	else if(agentType.starts_with("intersection"))
 		agent_type = agent_def::intersection;
-	}else{
+	else{
 		std:cout<<"Error in agent definition"<<std::endl;
 		exit(1);
 	}
@@ -104,7 +105,8 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 	if (verbose)
 		std::cout << "Reading vertices from file: ";
 	ifstream verticesFile(v_str.c_str());
-	std::cout << v_str.c_str() << "...";
+	if (verbose)
+		std::cout << v_str.c_str() << "...";
 	if (!verticesFile.is_open()){
 		std::cout << "\nFile: " << v_str.c_str() << " not found, exiting.\n";
 		exit(1);
@@ -166,7 +168,8 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 }
 
 void Warehouse::InitialiseAGVs(YAML::Node configs){
-	string domainDir = configs["domain"]["folder"].as<string>();
+	string domainDir = configs["domain"]["folder"].as<string>() +
+		configs["domain"]["warehouse"].as<string>() + '/';
 	// Initialise AGV objects
 	string agv_str = domainDir + configs["simulation"]["agvs"].as<string>();
 

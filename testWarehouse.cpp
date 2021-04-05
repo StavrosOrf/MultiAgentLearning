@@ -17,24 +17,25 @@ char mkdir[100];
 std::string resFolder;
 
 Warehouse* create_warehouse(YAML::Node configs);
-void create_results_folder(YAML::Node configs);
+std::string create_results_folder(YAML::Node configs);
 
 void WarehouseSimulationDDPG(YAML::Node configs){
 	srand(time(NULL)); // increment random seed
-	int nEps = configs["DDPG"]["epochs"].as<int>();
-	int runs = configs["DDPG"]["runs"].as<int>();
-	std::string agentType = configs["domain"]["agents"].as<std::string>();
-	
+	const int nEps = configs["DDPG"]["epochs"].as<int>();
+	const int runs = configs["DDPG"]["runs"].as<int>();
+	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
+	const std::string agentType = configs["domain"]["agents"].as<std::string>();
+
 	std::clock_t start;
 	std::clock_t startTotalRun;
 	std::clock_t startTotalExperiment = std::clock();
 
 	double duration;
 	create_results_folder(configs);
-	int max_G = 0;
+	int max_G = 0; //Maximum Total Deliveries
 
 	for (int run = 0; run != runs; run ++){
-		std::ofstream eval_file(resFolder + agentType + '_' + std::to_string(run) + ".csv");
+		std::ofstream eval_file(resFolder + warehouse_type + '_' + agentType + '_' + std::to_string(run) + ".csv");
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait";
 		startTotalRun = std::clock();
@@ -92,11 +93,16 @@ Warehouse* create_warehouse(YAML::Node configs){
 	return new_warehouse;
 }
 
-void create_results_folder(YAML::Node configs){
+/************************************************************************************************
+**Input:Creates a Result_folder as defined by the config					*
+**Output:Returns the string of the file result's folder file path				*
+*************************************************************************************************/
+std::string create_results_folder(YAML::Node configs){
 	resFolder	= //configs["domain"]["folder"].as<std::string>() +
 		configs["results"]["folder"].as<std::string>();
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
 	system(mkdir);
+	return resFolder;
 }
 
 static void show_usage(std::string name){

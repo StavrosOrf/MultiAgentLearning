@@ -5,14 +5,15 @@ mode:
 # agent_policies: ../Domains/Small_120_AGVs_SS_centralised_no_time/Results/neural_nets.csv # file containing agent policies
 # eval_file: ../Domains/Small_120_AGVs_SS_centralised_no_time/Results/evaluation_29.csv # file containing best teams
 domain:
-  folder: ../Domains/Tiny_SS/ ##Valid Opt 'Small_SS', Tiny_SS
-  agents: centralized_t #Valid Options 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
+  folder: ../Domains/
+  warehouse: Small_SS ##Valid Opt: 'Small_SS', 'Tiny_SS'
+  agents: centralized #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
 graph:
   vertices:   vertices.csv
   edges:      edges.csv
   capacities: capacities.csv
 DDPG:
-  epochs: 50 # set to 1 in test mode
+  epochs: 1000 # set to 1 in test mode
   runs: 1
 simulation:
   steps: 200
@@ -20,5 +21,5 @@ simulation:
   goals: goals.csv
 results:
   folder:     ../Results/
-  evaluation: evaluation
-  policies:   neural_nets.csv
+  #evaluation: evaluation
+  #policies:   neural_nets.csv
