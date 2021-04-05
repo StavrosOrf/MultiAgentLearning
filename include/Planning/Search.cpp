@@ -16,7 +16,7 @@ Node * Search::PathSearch(){
 		}
 
 		// Find all neighbours excluding ancestor vertices if any
-		vector<Edge *> neighbours = itsGraph->GetNeighbours(currentNode);
+		std::vector<Edge *> neighbours = itsGraph->GetNeighbours(currentNode);
 
 		// Update neighbours
 		for (size_t i = 0; i < neighbours.size(); i++){
@@ -27,7 +27,7 @@ Node * Search::PathSearch(){
 	}
 
 	if (!pathFound){
-		cout << "No path found from source to goal. Exiting.\n";
+		std::cout << "No path found from source to goal. Exiting.\n";
 		exit(1);
 	}
 	else{
@@ -51,16 +51,14 @@ void Search::ResetSearch(){
 	}
 }
 
-size_t Search::FindSourceID()
-{
-	for (size_t i = 0; i < itsGraph->GetNumVertices(); i++){
-		if (itsSource == itsGraph->GetVertices()[i]){
+size_t Search::FindSourceID(){
+	for (size_t i = 0; i < itsGraph->GetNumVertices(); i++)
+		if (itsSource == itsGraph->GetVertices()[i])
 			return i;
-		}
-	}
-	cout << "Error: souce ID not found. Exiting.\n";
+	std::cout << "Error: souce ID not found. Exiting.\n";
 	exit(1);
 }
+
 float Search::PathSearchLenght(){
 	float total = 0;
 	for (Node *n = PathSearch(); n != NULL; n = n->GetParent())

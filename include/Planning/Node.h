@@ -5,9 +5,6 @@
 #include <float.h> // DBL_MAX
 #include "Edge.h"
 
-using std::cout;
-using std::endl;
-
 enum nodeType {SOURCE, OTHER};
 
 // Node class to maintain path information up to a vertex

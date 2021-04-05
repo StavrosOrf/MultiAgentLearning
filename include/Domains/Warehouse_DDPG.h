@@ -26,7 +26,7 @@ class Warehouse_DDPG : public Warehouse {
 		std::vector<float> QueryActorMATeam(std::vector<float> states);
 		std::vector<float> QueryTargetActorMATeam(std::vector<float> states);
 		float N_proc_std_dev;
-		vector<DDPGAgent *> ddpg_maTeam;
+		std::vector<DDPGAgent *> ddpg_maTeam;
 };
 
 #endif // WAREHOUSE_CENTRALISED_H_

@@ -43,7 +43,7 @@ void AGV::Traverse(){
 		t2v--;
 		tMove++;
 		// manage end of path transitions here
-		if (t2v == 0){
+		if (t2v == 0)
 			if (nextVertex == goal){ // end of path
 				nsDel++; // increment number of sucessful deliveries
 				agvPlanner->SetSource(goal); // set current vertex as new source
@@ -51,19 +51,15 @@ void AGV::Traverse(){
 				nextVertex = -1; // agv must re-enter graph
 				ncDel++; // increment number of commanded deliveries
 				agvPlanner->ResetSearch();
-				curEdge = 0; // remove it from its final edge
+				curEdge = NULL; // remove it from its final edge
 				isReplan = true;
 			}
-		}
 	}
-	else{
-		if (nextVertex < 0){ // waiting to enter
+	else
+		if (nextVertex < 0) // waiting to enter
 			tEnter++;
-		}
-		else{ // waiting to cross intersection
+		else // waiting to cross intersection
 			tWait++;
-		}
-	}
 }
 
 void AGV::EnterNewEdge(){
@@ -75,7 +71,7 @@ void AGV::EnterNewEdge(){
 	isReplan = false;
 }
 
-void AGV::CompareCosts(vector<float> c){
+void AGV::CompareCosts(std::vector<float> c){
 	if (t2v == 0 && !isReplan) // compare if waiting to change edges and flag is not already set
 		// Compare current graph costs to prior costs used to generate existing plan
 		for (size_t i = 0; i < c.size(); i++)
@@ -88,9 +84,9 @@ void AGV::CompareCosts(vector<float> c){
 			}
 }
 
-void AGV::PlanAGV(vector<float> c){
+void AGV::PlanAGV(std::vector<float> c){
 	size_t nEdges = agvPlanner->GetGraph()->GetNumEdges();
-	vector<Edge *> edges = agvPlanner->GetGraph()->GetEdges();
+	std::vector<Edge *> edges = agvPlanner->GetGraph()->GetEdges();
 
 	// Assuming agvPlanner is set up with correct start, goal
 	Node * bestPath = agvPlanner->PathSearch();
@@ -122,9 +118,8 @@ void AGV::PlanAGV(vector<float> c){
 }
 
 void AGV::DisplayPath(){
-	for (std::list<Edge *>::iterator it = path.begin(); it != path.end(); it++){
+	for (std::list<Edge *>::iterator it = path.begin(); it != path.end(); it++)
 		std::cout << "(" << (*it)->GetVertex1() << "," << (*it)->GetVertex2() << ") ";
-	}
 	std::cout << "\n";
 }
 

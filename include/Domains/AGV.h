@@ -9,15 +9,16 @@
 
 class AGV{
 	public:
-		AGV(int, vector<int>, Graph *);
+		AGV(int, std::vector<int>, Graph *);
 		~AGV();
 
 		void ResetAGV();
 		void Traverse();
 		void EnterNewEdge();
-		void CompareCosts(vector<float>);
-		void PlanAGV(vector<float>);
+		void CompareCosts(std::vector<float>);
+		void PlanAGV(std::vector<float>);
 		int GetNextVertex(){return nextVertex;}
+		int get_cur_vertex(){assert(t2v>0); return nextVertex;}
 		Edge * GetCurEdge(){return curEdge;}
 		size_t GetT2V(){return t2v;}
 		bool GetIsReplan(){return isReplan;}
@@ -30,6 +31,7 @@ class AGV{
 		size_t GetNumCommanded(){return ncDel;}
 		Search * GetAGVPlanner(){return agvPlanner;}
 		bool is_on_graph(){return nextVertex!=-1;}
+		std::vector<int> get_possible_goals() const {return agvGoals;}
 
 		int GetOriginVertex(){return origin;}
 		int GetDestinationVertex(){return goal;}
@@ -48,11 +50,11 @@ class AGV{
 		size_t tMove;				// moving time
 		size_t tEnter;			 // time waiting to enter graph
 		size_t tWait;				// time waiting to cross intersections
-		vector<int> agvGoals;// vector of valid goal vertices
+		std::vector<int> agvGoals;// vector of valid goal vertices
 		bool isReplan;			 // true if replanning is needed
 
 		Search * agvPlanner; // planning routine
-		vector<float> costs;// graph costs used to generate current plan
+		std::vector<float> costs;// graph costs used to generate current plan
 		std::list<Edge *> path;	 // current path as ordered list of edges
 		void SetNewGoal();	 // set new goal vertex
 };

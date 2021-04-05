@@ -46,9 +46,9 @@ Warehouse::~Warehouse(void){
 }
 
 void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::string c_str, YAML::Node configs, bool verbose){
-	vector<int> vertices;
-	vector< vector<int> > edges;
-	vector< float > costs;
+	std::vector<int> vertices;
+	std::vector<std::vector<int>> edges;
+	std::vector< float > costs;
 
 	// Read in data from files
 	if (verbose)
@@ -78,10 +78,10 @@ void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::strin
 	while (getline(edgesFile,line)){
 		std::stringstream lineStream(line);
 		std::string cell;
-		vector<float> ec;
+		std::vector<float> ec;
 		while (getline(lineStream,cell,','))
 			ec.push_back(atof(cell.c_str()));
-		vector<int> e;
+		std::vector<int> e;
 		e.push_back((int)ec[0]);
 		e.push_back((int)ec[1]);
 		costs.push_back(ec[2]);
@@ -131,7 +131,7 @@ void Warehouse::InitialiseAGVs(YAML::Node configs, bool verbose){
 		exit(1);
 	}
 	size_t nAGVs = 0;
-	vector<size_t> agvOrigins;
+	std::vector<size_t> agvOrigins;
 	std::string line;
 	while (getline(AGVFile,line)){
 		agvOrigins.push_back((size_t)atoi(line.c_str()));
@@ -153,7 +153,7 @@ void Warehouse::InitialiseAGVs(YAML::Node configs, bool verbose){
 		std::cout << "\nFile: " << goal_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
-	vector<int> agvGoals;
+	std::vector<int> agvGoals;
 	while (getline(goalFile,line))
 		agvGoals.push_back(atoi(line.c_str()));
 	if (verbose)
@@ -182,7 +182,7 @@ void Warehouse::InitialiseNewEpoch(){
  **Input:a vector of [costs]									*
  **Method:Sets the Cost of the graph Edges to the values provides by [costs]			*
  *************************************************************************************************/
-void Warehouse::UpdateGraphCosts(vector<float> costs){
+void Warehouse::UpdateGraphCosts(std::vector<float> costs){
 	for (size_t i = 0; i < N_EDGES; i++)
 		whGraph->GetEdges()[i]->SetCost(costs[i]);
 }
@@ -191,7 +191,7 @@ void Warehouse::UpdateGraphCosts(vector<float> costs){
  * *Output:Print and number of AGVs that are on each edge					*
  ************************************************************************************************/
 void Warehouse::print_warehouse_state(){
-	vector<float> cur_state = get_edge_utilization();
+	std::vector<float> cur_state = get_edge_utilization();
 	std::cout << "Warehouse utilization: {";
 	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n] > 0 )
@@ -206,8 +206,8 @@ void Warehouse::print_warehouse_state(){
 *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
 *	And the minimum remaining distance of AGVs on edge indexed by EdgeID+N_EDGES		*
 ************************************************************************************************/
-vector<float> Warehouse::get_edge_utilization(){
-	vector<float> edge_utilization(N_EDGES * (1+incorporates_time));
+std::vector<float> Warehouse::get_edge_utilization(){
+	std::vector<float> edge_utilization(N_EDGES * (1+incorporates_time));
 	for(size_t i = 0; i < N_EDGES; i++)
 		edge_utilization[i] = 0;
 	for(AGV* a: whAGVs){
@@ -255,11 +255,11 @@ void Warehouse::replan_AGVs(std::vector<float> cost_add){
  * *Method:Attempt to move any transitioning AGVs on to new edges (according to wait list order)*
  ************************************************************************************************/
 void Warehouse::transition_AGVs(bool verbose){
-	vector<size_t> s(N_EDGES);
+	std::vector<size_t> s(N_EDGES);
 	GetJointState(s);
 
 	for (size_t k = 0; k < whAgents.size(); k++){
-		vector<size_t> toRemove;
+		std::vector<size_t> toRemove;
 		for (std::list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
 			size_t curAGV = *it;
 			size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()); // next edge ID
@@ -309,15 +309,15 @@ void Warehouse::traverse_one_step(std::vector<float> final_costs){
 void Warehouse::initialise_wh_agents(){
 	assert(whAgents.empty());
 	if(agent_type == agent_def::centralized){
-		vector<size_t> eIDs;
+		std::vector<size_t> eIDs;
 		for (size_t j = 0; j < N_EDGES; j++)
 			eIDs.push_back(j);
 		whAgents.push_back(new iAgent{0, eIDs});// only one centralised agent controlling all traffic
 	}else if(agent_type == agent_def::link){
-		vector<int> v = whGraph->GetVertices();
-		vector<Edge *> e = whGraph->GetEdges();
+		std::vector<int> v = whGraph->GetVertices();
+		std::vector<Edge *> e = whGraph->GetEdges();
 		for (size_t i = 0; i < e.size(); i++){
-			vector<size_t> vIDs;
+			std::vector<size_t> vIDs;
 			vIDs.push_back(e[i]->GetVertex1());
 			vIDs.push_back(e[i]->GetVertex2());
 			whAgents.push_back(new iAgent{i, vIDs});
@@ -333,7 +333,7 @@ void Warehouse::initialise_wh_agents(){
 }
 
 
-void Warehouse::GetJointState(vector<size_t> &s){
+void Warehouse::GetJointState(std::vector<size_t> &s){
 	for (size_t i = 0; i < whAGVs.size(); i++){
 		Edge * curEdge = whAGVs[i]->GetCurEdge();
 		size_t j = whGraph->GetEdgeID(curEdge);
@@ -342,3 +342,29 @@ void Warehouse::GetJointState(vector<size_t> &s){
 	}
 }
 
+/************************************************************************************************
+**Method:Checks how many AGVs are on each Edge, if AGVs are outside the graph they count as	*
+**	Being on their origin vertex								*
+**Output:The number of AGVs on each Vertex							*
+*************************************************************************************************/
+std::vector<float> Warehouse::get_vertex_utilization(){
+	std::vector<float> vertex_population(whGraph->GetNumEdges());
+	for (AGV* a: whAGVs)//this function is desinged for possible AGV goal of 2 if you need a more generic function update it
+		assert(a->get_possible_goals().size() == 2);
+
+	for (AGV* a: whAGVs)
+		if (a->is_on_graph() && a->GetT2V() == 0)
+			vertex_population[a->get_cur_vertex()]++;
+		else if(!a->is_on_graph()){
+			if (a->GetOriginVertex() != a->GetDestinationVertex())
+				vertex_population[a->GetOriginVertex()]++;
+			else if (a->GetOriginVertex() == a->GetDestinationVertex()){
+				if (a->get_possible_goals()[0] == a->GetOriginVertex())
+					vertex_population[a->get_possible_goals()[1]]++;
+				else
+					vertex_population[a->get_possible_goals()[0]]++;
+			}
+		}
+
+	return vertex_population;
+}

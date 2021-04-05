@@ -2,8 +2,8 @@
 
 void Node::DisplayPath()
 {
-	cout << "Vertex: " << itsVertex << "\n";
-	cout << "	cost-to-come: " << itsCost << "\n";
+	std::cout << "Vertex: " << itsVertex << "\n";
+	std::cout << "	cost-to-come: " << itsCost << "\n";
 
 	if (itsParent)
 		itsParent->DisplayPath();

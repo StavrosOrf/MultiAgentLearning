@@ -9,8 +9,6 @@
 #include "Node.h"
 #include "Queue.h"
 
-using std::vector;
-using std::cout;
 
 // Dijkstra's path search class to store and search a graph
 class Search

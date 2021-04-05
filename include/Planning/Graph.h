@@ -6,13 +6,11 @@
 #include "Edge.h"
 #include "Node.h"
 
-using std::vector;
-
 // Graph class to create and store graph structure
 class Graph
 {
 	public:
-		Graph(vector<int> &vertices, vector< vector<int> > &edges, vector<float> &costs): itsVertices(vertices){
+		Graph(std::vector<int> &vertices, std::vector< std::vector<int> > &edges, std::vector<float> &costs): itsVertices(vertices){
 			numVertices = itsVertices.size();
 			GenerateEdges(edges, costs);
 		}
@@ -24,23 +22,26 @@ class Graph
 			}
 		}
 
-		vector<int> GetVertices() const {return itsVertices;}
-		vector<Edge *> GetEdges() const {return itsEdges;}
+		std::vector<int> GetVertices() const {return itsVertices;}
+		std::vector<Edge *> GetEdges() const {return itsEdges;}
 		size_t GetNumVertices() const {return numVertices;}
 		size_t GetNumEdges() const {return numEdges;}
 		size_t GetEdgeID(Edge *) __attribute__ ((pure));
 
-		vector<Edge *> GetNeighbours(Node * n);
+		std::vector<Edge*> get_outgoing_edges_of_a_vertex(int vertex);
+		std::vector<Edge*> get_incoming_edges_of_a_vertex(int vertex);
+
+		std::vector<Edge *> GetNeighbours(Node * n);
 
 		void reset_edge_costs();
 
 	private:
-		vector<int> itsVertices;
-		vector<Edge *> itsEdges;
+		std::vector<int> itsVertices;
+		std::vector<Edge *> itsEdges;
 		size_t numVertices;
 		size_t numEdges;
 
-		void GenerateEdges(vector< vector<int> > &edges, vector<float> &costs);
+		void GenerateEdges(std::vector< std::vector<int> > &edges, std::vector<float> &costs);
 };
 
 #endif // GRAPH_H_

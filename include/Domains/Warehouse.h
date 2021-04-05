@@ -57,11 +57,12 @@ class Warehouse{
 		void traverse_one_step(const std::vector<float> final_cost);
 		void GetJointState(std::vector<size_t> &s);//__attribute__((deprecated))
 		void print_warehouse_state();
-		vector<float> get_edge_utilization() __attribute__ ((pure));
+		std::vector<float> get_edge_utilization() __attribute__ ((pure));
+		std::vector<float> get_vertex_utilization() __attribute__ ((pure));
 
 		size_t nSteps; //number of steps per simulation
-		vector<float> baseCosts;
-		vector<size_t> capacities;
+		std::vector<float> baseCosts;
+		std::vector<size_t> capacities;
 
 		algo_type algo;
 		struct iAgent{
@@ -70,15 +71,15 @@ class Warehouse{
 			std::list<size_t> agvIDs; // agv IDs waiting to cross intersection
 		};
 
-		vector<iAgent *> whAgents; // manage agent vertex and edge lookups from graph
+		std::vector<iAgent *> whAgents; // manage agent vertex and edge lookups from graph
 		Graph * whGraph; // vertex and edge definitions, access to change edge costs at each step
-		vector<AGV *> whAGVs; // manage AGV A* search and movement through graph
+		std::vector<AGV *> whAGVs; // manage AGV A* search and movement through graph
 
 		inline void InitialiseGraph(std::string, std::string, std::string, YAML::Node, bool verbose = false); // read in configuration files and construct Graph
 		inline void InitialiseAGVs(YAML::Node, bool verbose = false); // create AGVs to move in graph
 		void InitialiseNewEpoch(); // reset simulation for each episode/epoch
 
-		void UpdateGraphCosts(vector<float>);
+		void UpdateGraphCosts(std::vector<float>);
 
 		bool incorporates_time; //True means that the domain incorpated time to it's state
 		//as described in github.io/anthropomorphic/Papers/Chung2018multiagent.pdf

@@ -5,9 +5,6 @@
 #include <queue> // std::priority_queue
 #include "Node.h"
 
-using std::vector;
-using std::priority_queue;
-
 struct CompareNode{
 	bool operator() (const Node * n1, const Node * n2) const{
 		float n1Cost = n1->GetCost();
@@ -20,7 +17,7 @@ struct CompareNode{
 class Queue
 {
 	public:
-		typedef priority_queue<Node *, vector<Node *>, CompareNode> QUEUE;
+		typedef std::priority_queue<Node *, std::vector<Node *>, CompareNode> QUEUE;
 		Queue(Node * source){
 			itsPQ = new QUEUE;
 			itsPQ->push(source);
@@ -41,7 +38,7 @@ class Queue
 			}
 		}
 
-		vector<Node *> GetClosed() const {return closed;}
+		std::vector<Node *> GetClosed() const {return closed;}
 		bool EmptyQueue() const {return itsPQ->empty();}
 		size_t SizeQueue() const {return itsPQ->size();}
 		void UpdateQueue(Node * newNode);
@@ -49,7 +46,7 @@ class Queue
 
 	private:
 		QUEUE * itsPQ;
-		vector<Node *> closed;
+		std::vector<Node *> closed;
 };
 
 #endif //QUEUE_H_

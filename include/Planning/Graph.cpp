@@ -13,8 +13,8 @@ size_t Graph::GetEdgeID(Edge * e){
 	return numEdges;
 }
 
-vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex in list of neighbours
-	vector<Edge *> neighbours;
+std::vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex in list of neighbours
+	std::vector<Edge *> neighbours;
 	int v = n->GetVertex();
 
 	for (size_t i = 0; i < numEdges; i++){
@@ -39,7 +39,7 @@ vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex i
 	return neighbours;
 }
 
-void Graph::GenerateEdges(vector< vector<int> > &edges, vector<float> &costs)
+void Graph::GenerateEdges(std::vector< std::vector<int> > &edges, std::vector<float> &costs)
 {
 	numEdges = edges.size();
 
@@ -72,7 +72,24 @@ void Graph::GenerateEdges(vector< vector<int> > &edges, vector<float> &costs)
 }
 
 void Graph::reset_edge_costs(){
-	for(Edge * e : itsEdges)
+	for(Edge* e : itsEdges)
 		e->SetCost(e->GetLength());
 }
 
+std::vector<Edge*> Graph::get_incoming_edges_of_a_vertex(int vertex){
+	std::vector<Edge*> edges;
+	for(Edge* e : itsEdges)
+		if (e->GetVertex2() == vertex)
+			edges.push_back(e);
+	edges.shrink_to_fit();
+	return edges;
+}
+
+std::vector<Edge*> Graph::get_outgoing_edges_of_a_vertex(int vertex){
+	std::vector<Edge*> edges;
+	for(Edge* e : itsEdges)
+		if (e->GetVertex1() == vertex)
+			edges.push_back(e);
+	edges.shrink_to_fit();
+	return edges;
+}

@@ -36,7 +36,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose){
 		//Select action
 		float value_of_state = 0, value_of_prev_state = 0, reward = 0;
 
-		const vector<float> actions = QueryActorMATeam(cur_state);
+		const std::vector<float> actions = QueryActorMATeam(cur_state);
 		assert(actions.size() == N_EDGES);
 
 		if(verbose){
@@ -49,7 +49,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose){
 			printf("\n");
 		}
 
-		vector<float> final_costs = baseCosts;
+		std::vector<float> final_costs = baseCosts;
 		// Add Random Noise from process N
 		for (size_t n = 0; n < N_EDGES; n++){
 			// final_costs[n] += std::clamp<float>(actions[n]+n_process(n_generator), -1, 1) * maxBaseCost;
@@ -65,17 +65,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose){
 			printf("\n");
 		}
 
-		/*
 		int routable_AGVs = 0;
-		{
-			for (AGV* a: whAGVs){
-				if (!a->is_on_graph())
-					routable_AGVs++;
-				else if (a->GetT2V()  == 0){
-				}
-			}
-		}
-		*/
 		traverse_one_step(final_costs);
 
 		//update current state
