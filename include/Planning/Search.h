@@ -3,6 +3,7 @@
 
 #include <vector> // std::vector, std::cout
 #include <math.h> // pow, abs, sqrt
+#include <cassert>
 #include "Edge.h"
 #include "Graph.h"
 #include "Node.h"

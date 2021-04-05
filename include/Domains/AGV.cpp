@@ -1,6 +1,6 @@
 #include "AGV.h"
 
-AGV::AGV(int initV, vector<int> goalVs, Graph * graph){
+AGV::AGV(int initV, std::vector<int> goalVs, Graph * graph){
 	nextVertex = -1;
 	t2v = 0;
 	origin = initV;
@@ -76,19 +76,16 @@ void AGV::EnterNewEdge(){
 }
 
 void AGV::CompareCosts(vector<float> c){
-	if (t2v == 0 && !isReplan){ // compare if waiting to change edges and flag is not already set
+	if (t2v == 0 && !isReplan) // compare if waiting to change edges and flag is not already set
 		// Compare current graph costs to prior costs used to generate existing plan
-		for (size_t i = 0; i < c.size(); i++){
+		for (size_t i = 0; i < c.size(); i++)
 			if (c[i] != costs[i]){
 				agvPlanner->ResetSearch();
 				isReplan = true;
-				if (nextVertex >= 0){ // only reset search source if AGV is enroute
+				if (nextVertex >= 0) // only reset search source if AGV is enroute
 					agvPlanner->SetSource(nextVertex);
-				}
 				break;
 			}
-		}
-	}
 }
 
 void AGV::PlanAGV(vector<float> c){
@@ -125,7 +122,7 @@ void AGV::PlanAGV(vector<float> c){
 }
 
 void AGV::DisplayPath(){
-	for (list<Edge *>::iterator it = path.begin(); it != path.end(); it++){
+	for (std::list<Edge *>::iterator it = path.begin(); it != path.end(); it++){
 		std::cout << "(" << (*it)->GetVertex1() << "," << (*it)->GetVertex2() << ") ";
 	}
 	std::cout << "\n";

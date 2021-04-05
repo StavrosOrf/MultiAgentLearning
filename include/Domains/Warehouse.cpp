@@ -9,7 +9,6 @@ Warehouse::Warehouse(YAML::Node configs){
 	std::string cFile = domainDir + configs["graph"]["capacities"].as<std::string>();
 	nSteps = configs["simulation"]["steps"].as<size_t>();
 
-	outputEvals = false;
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		algo = algo_type::ddpg;
 	else{
@@ -44,56 +43,6 @@ Warehouse::~Warehouse(void){
 		delete whAgents[i];
 		whAgents[i] = 0;
 	}
-	if (outputEvals)
-		evalFile.close();
-	if (outputEpReplay){
-		agvStateFile.close();
-		agvEdgeFile.close();
-		agentStateFile.close();
-		agentActionFile.close();
-	}
-}
-
-void Warehouse::OutputPerformance(std::string eval_str){
-	if (evalFile.is_open())
-		evalFile.close();
-	evalFile.open(eval_str.c_str(),std::ios::app);
-
-	outputEvals = true;
-
-	std::cout << "Writing evaluation outputs to file: " << eval_str << "\n";
-}
-
-void Warehouse::OutputControlPolicies(std::string nn_str){
-	//TODO
-}
-
-void Warehouse::OutputEpisodeReplay(std::string agv_s_str, std::string agv_e_str, std::string a_s_str, std::string a_a_str){
-	if (agvStateFile.is_open())
-		agvStateFile.close();
-	agvStateFile.open(agv_s_str.c_str(),std::ios::app);
-
-	if (agvEdgeFile.is_open())
-		agvEdgeFile.close();
-	agvEdgeFile.open(agv_e_str.c_str(),std::ios::app);
-
-	if (agentStateFile.is_open())
-		agentStateFile.close();
-	agentStateFile.open(a_s_str.c_str(),std::ios::app);
-
-	if (agentActionFile.is_open())
-		agentActionFile.close();
-	agentActionFile.open(a_a_str.c_str(),std::ios::app);
-
-	outputEpReplay = true;
-
-	std::cout << "Writing AGV logs to files: " << "\n";
-	std::cout << "\t" << agv_s_str << "\n";
-	std::cout << "\t" << agv_e_str << "\n";
-
-	std::cout << "Writing agent logs to files: " << "\n";
-	std::cout << "\t" << a_s_str << "\n";
-	std::cout << "\t" << a_a_str << "\n";
 }
 
 void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::string c_str, YAML::Node configs, bool verbose){
@@ -104,7 +53,7 @@ void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::strin
 	// Read in data from files
 	if (verbose)
 		std::cout << "Reading vertices from file: ";
-	ifstream verticesFile(v_str.c_str());
+	std::ifstream verticesFile(v_str.c_str());
 	if (verbose)
 		std::cout << v_str.c_str() << "...";
 	if (!verticesFile.is_open()){
@@ -119,7 +68,7 @@ void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::strin
 
 	if (verbose)
 		std::cout << "Reading edges from file: ";
-	ifstream edgesFile(e_str.c_str());
+	std::ifstream edgesFile(e_str.c_str());
 	if (verbose)
 		std::cout << e_str.c_str() << "...";
 	if (!edgesFile.is_open()){
@@ -127,7 +76,7 @@ void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::strin
 		exit(1);
 	}
 	while (getline(edgesFile,line)){
-		stringstream lineStream(line);
+		std::stringstream lineStream(line);
 		std::string cell;
 		vector<float> ec;
 		while (getline(lineStream,cell,','))
@@ -146,7 +95,7 @@ void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::strin
 	// Read in data from files
 	if (verbose)
 		std::cout << "Reading capacities from file: ";
-	ifstream capacitiesFile(c_str.c_str());
+	std::ifstream capacitiesFile(c_str.c_str());
 	if (verbose)
 		std::cout << c_str.c_str() << "...";
 	if (!capacitiesFile.is_open()){
@@ -160,10 +109,8 @@ void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::strin
 
 	whGraph = new Graph(vertices, edges, costs);
 
-//	std::cout << "Number of graph vertices: " << whGraph->GetNumVertices() << "\n";
-//	std::cout << "Number of graph edges: " << whGraph->GetNumEdges() << "\n";
-
-	//InitialiseMATeam();
+	initialise_wh_agents();
+	//InitialiseMATeam(); MATeam must be initialed outside the constractor
 	InitialiseAGVs(configs);
 }
 
@@ -176,14 +123,14 @@ void Warehouse::InitialiseAGVs(YAML::Node configs, bool verbose){
 	// Read in data from files
 	if (verbose)
 		std::cout << "Reading AGVs from file: ";
-	ifstream AGVFile(agv_str.c_str());
+	std::ifstream AGVFile(agv_str.c_str());
 	if (verbose)
 		std::cout << agv_str.c_str() << "...";
 	if (!AGVFile.is_open()){
 		std::cout << "\nFile: " << agv_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
-	int nAGVs = 0;
+	size_t nAGVs = 0;
 	vector<size_t> agvOrigins;
 	std::string line;
 	while (getline(AGVFile,line)){
@@ -199,7 +146,7 @@ void Warehouse::InitialiseAGVs(YAML::Node configs, bool verbose){
 	// Read in data from files
 	if (verbose)
 		std::cout << "Reading goal vertex IDs from file: ";
-	ifstream goalFile(goal_str.c_str());
+	std::ifstream goalFile(goal_str.c_str());
 	if (verbose)
 		std::cout << goal_str.c_str() << "...";
 	if (!goalFile.is_open()){
@@ -261,7 +208,7 @@ void Warehouse::print_warehouse_state(){
 ************************************************************************************************/
 vector<float> Warehouse::get_edge_utilization(){
 	vector<float> edge_utilization(N_EDGES * (1+incorporates_time));
-	for(int i = 0; i < N_EDGES; i++)
+	for(size_t i = 0; i < N_EDGES; i++)
 		edge_utilization[i] = 0;
 	for(AGV* a: whAGVs){
 		Edge* e = a->GetCurEdge();
@@ -293,7 +240,7 @@ void Warehouse::replan_AGVs(std::vector<float> cost_add){
 		if (whAGVs[k]->GetT2V() == 0){
 			size_t agentID = 0; // only one agent
 			bool onWaitList = false;
-			for (list<size_t>::iterator it = whAgents[agentID]->agvIDs.begin(); it!=whAgents[agentID]->agvIDs.end(); ++it)
+			for (std::list<size_t>::iterator it = whAgents[agentID]->agvIDs.begin(); it!=whAgents[agentID]->agvIDs.end(); ++it)
 				if (k == *it){
 					onWaitList = true;
 					break;
@@ -309,17 +256,18 @@ void Warehouse::replan_AGVs(std::vector<float> cost_add){
  ************************************************************************************************/
 void Warehouse::transition_AGVs(bool verbose){
 	vector<size_t> s(N_EDGES);
-	GetJointState(whGraph->GetEdges(), s);
+	GetJointState(s);
 
 	for (size_t k = 0; k < whAgents.size(); k++){
 		vector<size_t> toRemove;
-		for (list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
+		for (std::list<size_t>::iterator it = whAgents[k]->agvIDs.begin(); it!=whAgents[k]->agvIDs.end(); ++it){
 			size_t curAGV = *it;
 			size_t nextID = whGraph->GetEdgeID(whAGVs[curAGV]->GetNextEdge()); // next edge ID
 			assert(nextID < N_EDGES);
 
 
-			if (nextID < 0 || nextID >= s.size()){
+			assert(nextID >= 0);
+			if (nextID >= s.size()){
 				std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n";
 				std::cout << "	t2v: " << whAGVs[curAGV]->GetT2V() << "\n";
 				std::cout << "	itsQueue: " << (whAGVs[curAGV]->GetAGVPlanner()->GetQueue() != 0) << "\n";
@@ -359,6 +307,7 @@ void Warehouse::traverse_one_step(std::vector<float> final_costs){
 
  // Initialise NE components and domain housekeeping components of the agent type
 void Warehouse::initialise_wh_agents(){
+	assert(whAgents.empty());
 	if(agent_type == agent_def::centralized){
 		vector<size_t> eIDs;
 		for (size_t j = 0; j < N_EDGES; j++)
@@ -377,14 +326,14 @@ void Warehouse::initialise_wh_agents(){
 		for (size_t v : whGraph->GetVertices()){
 			std::vector<size_t> eIDs;
 			for (size_t i = 0; i != whGraph->GetEdges().size(); i++)
-				if (whGraph->GetEdges()[i]->GetVertex2() == v)
+				if ((size_t) whGraph->GetEdges()[i]->GetVertex2() == v)
 					eIDs.push_back(i);
 			whAgents.push_back(new iAgent{v, eIDs});
 		}
 }
 
 
-void Warehouse::GetJointState(vector<Edge *> e, vector<size_t> &s){
+void Warehouse::GetJointState(vector<size_t> &s){
 	for (size_t i = 0; i < whAGVs.size(); i++){
 		Edge * curEdge = whAGVs[i]->GetCurEdge();
 		size_t j = whGraph->GetEdgeID(curEdge);

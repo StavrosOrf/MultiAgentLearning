@@ -7,9 +7,6 @@
 #include "Planning/Search.h"
 #include "Planning/Edge.h"
 
-using std::vector;
-using std::list;
-
 class AGV{
 	public:
 		AGV(int, vector<int>, Graph *);
@@ -56,7 +53,7 @@ class AGV{
 
 		Search * agvPlanner; // planning routine
 		vector<float> costs;// graph costs used to generate current plan
-		list<Edge *> path;	 // current path as ordered list of edges
+		std::list<Edge *> path;	 // current path as ordered list of edges
 		void SetNewGoal();	 // set new goal vertex
 };
 

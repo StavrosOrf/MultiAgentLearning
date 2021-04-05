@@ -31,7 +31,7 @@ Node * Search::PathSearch(){
 		exit(1);
 	}
 	else{
-		Node * bestPath;
+		Node * bestPath = 0;
 
 		for (size_t i = 0; i < itsQueue->GetClosed().size(); i++)
 			if (itsGoal == itsQueue->GetClosed()[i]->GetVertex()){
@@ -39,6 +39,7 @@ Node * Search::PathSearch(){
 				break;
 			}
 
+		assert(bestPath != NULL);
 		return bestPath;
 	}
 }

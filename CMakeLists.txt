@@ -33,7 +33,7 @@ include_directories( ${Boost_INCLUDE_DIRS}
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_FLAGS "-03")
-#set(CMAKE_CXX_FLAGS "-g -Wall -I /usr/local/include/eigen3/")
+#set(CMAKE_CXX_FLAGS "-g -Wall -Wextra")
 add_subdirectory(include)
 add_subdirectory(tests)
 

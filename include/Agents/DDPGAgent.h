@@ -61,12 +61,12 @@ class DDPGAgent{
 		void printAboutNN();
 
 		static void set_batch_size(int i){batch_size = i;}
-		static uint get_batch_size(){return batch_size;}
+		static size_t get_batch_size(){return batch_size;}
 	protected:
 		Net* qNN, *qtNN;
 		Net* muNN, *mutNN;
 		inline static std::vector<replay> replay_buffer;
-		inline static uint batch_size;
+		inline static size_t batch_size;
 };
 
 #endif // DDPG_AGENT_H_

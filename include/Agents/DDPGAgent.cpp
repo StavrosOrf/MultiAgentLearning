@@ -11,9 +11,9 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state
 	mutNN = new Net(state_space, action_space, action_space*2);
 
 	//copy {Q', Mu'} <- {Q, Mu}
-	for (int i = 0; i < qNN->parameters().size(); i++ )
+	for (size_t i = 0; i < qNN->parameters().size(); i++ )
 		qtNN->parameters()[i].set_data(qNN->parameters()[i].detach().clone());
-	for (int i = 0; i < muNN->parameters().size(); i++ )
+	for (size_t i = 0; i < muNN->parameters().size(); i++ )
 		mutNN->parameters()[i].set_data(muNN->parameters()[i].detach().clone());
 
 	DDPGAgent::replay_buffer.reserve(REPLAY_BUFFER_SIZE);
@@ -103,7 +103,7 @@ std::vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
 	//generate a list of rand indexes (non inclusive)
 	std::vector<int> rand_list;
 	rand_list.reserve(size);
-	for (int i = 0; i != size; i++){
+	for (size_t i = 0; i != size; i++){
 		int r = rand()%DDPGAgent::replay_buffer.size();
 		while (std::find(rand_list.begin(), rand_list.end(),r)!=rand_list.end())
 			r = rand()%DDPGAgent::replay_buffer.size();
@@ -122,13 +122,13 @@ std::vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
  * *	by slow updating (with learning rate [TAU]) from non-targer networks			*
  * ************************************************************************************************/
 void DDPGAgent::updateTargetWeights(){
-	for (int i = 0; i < qNN->parameters().size(); i++ ){
+	for (size_t i = 0; i < qNN->parameters().size(); i++ ){
 		torch::Tensor t = qNN->parameters()[i].detach().clone();
 		torch::Tensor tt = qtNN->parameters()[i].detach().clone();
 
 		qtNN->parameters()[i].set_data(TAU*t + (1-TAU)*tt);
 	}
-	for (int i = 0; i < muNN->parameters().size(); i++ ){
+	for (size_t i = 0; i < muNN->parameters().size(); i++ ){
 		torch::Tensor t = muNN->parameters()[i].detach().clone();
 		torch::Tensor tt = mutNN->parameters()[i].detach().clone();
 
@@ -166,7 +166,7 @@ void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::ve
 
 	//Update actor
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
-	for (int i = 1; i != batch_size; i++){
+	for (size_t i = 1; i != batch_size; i++){
 		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
 		states_ = torch::cat({states_,temp},0);
 	}
@@ -187,7 +187,7 @@ void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::ve
 
 	torch::Tensor final_actions = torch::tensor(all_actions[0]).unsqueeze(0);	
 	final_actions[0][agentNumber] = actions[0][0];
-	for (int i = 1; i != batch_size; i++){
+	for (size_t i = 1; i != batch_size; i++){
 		torch::Tensor temp = torch::tensor(all_actions[i]).unsqueeze(0);		
 		temp[0][agentNumber] = actions[i][0];		
 		final_actions = torch::cat({final_actions,temp},0);		
@@ -216,7 +216,7 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 
 	//Update actor
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
-	for (int i = 1; i != batch_size; i++){
+	for (size_t i = 1; i != batch_size; i++){
 		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
 		states_ = torch::cat({states_,temp},0);
 	}
@@ -242,7 +242,7 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 **Method:Print Various Metrics about the agent's neural Networks				*
 *************************************************************************************************/
 void DDPGAgent::printAboutNN(){
-	for (int i = 0; i < muNN->parameters().size(); i++ ){
+	for (size_t i = 0; i < muNN->parameters().size(); i++ ){
 		torch::Tensor t = muNN->parameters()[i].detach().clone();
 		torch::Tensor tt = mutNN->parameters()[i].detach().clone();
 

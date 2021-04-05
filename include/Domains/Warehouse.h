@@ -20,22 +20,19 @@
 
 #define N_EDGES whGraph->GetEdges().size()
 
-using std::ifstream;
-using std::stringstream;
-
 enum class algo_type{ddpg};
 
 enum class agent_def{
-		centralized,
-		link,
-		intersection
+	centralized,
+	link,
+	intersection
 };
 
 struct epoch_results{
-		size_t totalDeliveries;
-		size_t totalMove;
-		size_t totalEnter;
-		size_t totalWait;
+	uint totalDeliveries;
+	uint totalMove;
+	uint totalEnter;
+	uint totalWait;
 };
 
 class Warehouse{
@@ -43,24 +40,22 @@ class Warehouse{
 		Warehouse(YAML::Node);
 		virtual ~Warehouse(void);
 
-		virtual void InitialiseMATeam(){ // create agents for the graph
-			std::cout << "This function initialises the multiagent team.\n";
-		}
+		virtual void InitialiseMATeam() = 0; // create agents for the graph
 		void initialise_wh_agents();
 
 		void OutputPerformance(std::string) __attribute__ ((deprecated));
 		void OutputControlPolicies(std::string) __attribute__ ((deprecated));
 		void OutputEpisodeReplay(std::string, std::string, std::string, std::string) __attribute__ ((deprecated));
-		void DisableEpisodeReplayOutput()__attribute__ ((deprecated)) {outputEpReplay = false;}
+		void DisableEpisodeReplayOutput()__attribute__ ((deprecated));
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual epoch_results SimulateEpoch(bool verbose){return {0,0,0,0};}
+		virtual epoch_results SimulateEpoch(bool verbose) = 0;
 
 	protected:
 		void replan_AGVs(const std::vector<float> final_cost);
 		void transition_AGVs(bool verbose = false);
 		void traverse_one_step(const std::vector<float> final_cost);
-		void GetJointState(std::vector<Edge *> e, std::vector<size_t> &s);//__attribute__((deprecated))
+		void GetJointState(std::vector<size_t> &s);//__attribute__((deprecated))
 		void print_warehouse_state();
 		vector<float> get_edge_utilization() __attribute__ ((pure));
 
@@ -84,15 +79,6 @@ class Warehouse{
 		void InitialiseNewEpoch(); // reset simulation for each episode/epoch
 
 		void UpdateGraphCosts(vector<float>);
-
-		bool outputEvals;
-		bool outputEpReplay;
-
-		std::ofstream evalFile;
-		std::ofstream agvStateFile;
-		std::ofstream agvEdgeFile;
-		std::ofstream agentStateFile;
-		std::ofstream agentActionFile;
 
 		bool incorporates_time; //True means that the domain incorpated time to it's state
 		//as described in github.io/anthropomorphic/Papers/Chung2018multiagent.pdf
