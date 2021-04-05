@@ -7,6 +7,4 @@ config.yaml
 libtorch
 build*
 Results*
-*Domains*
-*Domains/Results*
 Results

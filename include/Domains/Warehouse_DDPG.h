@@ -10,10 +10,10 @@
 #include "Planning/Search.h"
 
 
-class WarehouseCentralised : public Warehouse {
+class Warehouse_DDPG : public Warehouse {
 	public:
-		WarehouseCentralised(YAML::Node configs) : Warehouse(configs){}
-		~WarehouseCentralised(void);
+		Warehouse_DDPG(YAML::Node configs) : Warehouse(configs){}
+		~Warehouse_DDPG(void);
 
 		epoch_results SimulateEpochDDPG(bool verbose = false);
 

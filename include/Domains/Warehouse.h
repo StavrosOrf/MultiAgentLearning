@@ -28,20 +28,20 @@ using std::ifstream;
 using std::stringstream;
 
 enum algo_type{
-    ddpg
+		ddpg
 };
 
 enum class agent_def{
-    centralized,
-    link,
-    intersection
+		centralized,
+		link,
+		intersection
 };
 
 struct epoch_results{
-    size_t totalDeliveries;
-    size_t totalMove;
-    size_t totalEnter;
-    size_t totalWait;
+		size_t totalDeliveries;
+		size_t totalMove;
+		size_t totalEnter;
+		size_t totalWait;
 };
 
 class Warehouse{
@@ -67,13 +67,12 @@ class Warehouse{
 		void replan_AGVs(const std::vector<float> final_cost);
 		void transition_AGVs(bool verbose = false);
 		void traverse_one_step(const std::vector<float> final_cost);
-		void GetJointState(vector<Edge *> e, vector<size_t> &s) ;//__attribute__((deprecated))
+		void GetJointState(vector<Edge *> e, vector<size_t> &s);//__attribute__((deprecated))
 		void print_warehouse_state();
 		vector<float> get_edge_utilization() __attribute__ ((pure));
 
 		size_t nSteps; //number of steps per simulation
-		size_t nAgents __attribute__ ((deprecated));
-		size_t nAGVs;
+		size_t nAGVs __attribute__ ((deprecated));
 		vector<float> baseCosts;
 		vector<size_t> capacities;
 

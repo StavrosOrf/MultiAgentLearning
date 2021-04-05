@@ -35,7 +35,6 @@ add_subdirectory(tests)
 #link_directories(libraries)
 
 set( LIBS_TO_LINK
-                  Learning
                   Domains
                   Agents
                   Planning

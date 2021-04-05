@@ -65,7 +65,7 @@ std::vector<float> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<float> s){
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
-std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<float> s,  std::vector<float> a){
+std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<float> s,	std::vector<float> a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());

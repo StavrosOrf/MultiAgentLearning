@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 #include "Domains/Warehouse.h"
-#include "Domains/WarehouseCentralised.h"
+#include "Domains/Warehouse_DDPG.h"
 
 char mkdir[100];
 std::string resFolder;
@@ -87,13 +87,13 @@ void WarehouseSimulation(std::string config_file, int thrds){
  ************************************************************************************************/
 Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
-	new_warehouse = new WarehouseCentralised(configs);
+	new_warehouse = new Warehouse_DDPG(configs);
 	new_warehouse->InitialiseMATeam();
 	return new_warehouse;
 }
 
 void create_results_folder(YAML::Node configs){
-	resFolder  = //configs["domain"]["folder"].as<std::string>() +
+	resFolder	= //configs["domain"]["folder"].as<std::string>() +
 		configs["results"]["folder"].as<std::string>();
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
 	system(mkdir);

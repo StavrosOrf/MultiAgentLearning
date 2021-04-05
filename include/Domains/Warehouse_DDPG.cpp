@@ -1,6 +1,6 @@
-#include "WarehouseCentralised.h"
+#include "Warehouse_DDPG.h"
 
-WarehouseCentralised::~WarehouseCentralised(void){
+Warehouse_DDPG::~Warehouse_DDPG(void){
 	delete whGraph;
 	whGraph = 0;
 	for (size_t i = 0; i < whAGVs.size(); i++){
@@ -22,16 +22,15 @@ WarehouseCentralised::~WarehouseCentralised(void){
 	}
 }
 
-epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
+epoch_results Warehouse_DDPG::SimulateEpochDDPG(bool verbose){
 	InitialiseNewEpoch();
-	float totalDeliveries = 0;
-	std::normal_distribution<float> n_process(0.0, 0.1);
+	float totalDeliveries = 0; //Perfomance Counter
+	std::normal_distribution<float> n_process(0.0, 0.05);
 	std::default_random_engine n_generator(time(NULL));
 	epoch_results results = {0,0,0,0};
 	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
-	std::vector<float> temp_state;
 
 	if(verbose)
 		print_warehouse_state();
@@ -44,17 +43,18 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 		float value_of_state = 0 , value_of_prev_state = 0, reward = 0;
 		
 		const vector<float> actions = QueryActorMATeam(cur_state);
+		assert(actions.size() == N_EDGES);
+		
 		if(verbose){
-			std::cout<<"State: "<< cur_state <<std::endl;
+			std::cout<<"State: " << cur_state << std::endl;
 			ddpg_maTeam[0]->printAboutNN();
 		
-			printf("Actions:     ");
-			for (size_t n = 0; n < actions.size(); n++){
+			printf("Actions:		 ");
+			for (size_t n = 0; n < actions.size(); n++)
 				printf(" %4.2f",actions[n]);
-			}
 			printf("\n");
 		}
-		// std::cout<<"Actions: "<< actions <<std::endl;
+
 		vector<float> final_costs = baseCosts;
 		// Add Random Noise from process N
 		for (size_t n = 0; n < N_EDGES; n++){
@@ -66,16 +66,15 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 
 		if(verbose){
 			printf("CostsAdd: ");
-			for (size_t n = 0; n < final_costs.size(); n++){
+			for (size_t n = 0; n < final_costs.size(); n++)
 				printf(" %4.1f",final_costs[n]-baseCosts[n]);
-			}
 			printf("\n");
 		}
 
 		traverse_one_step(final_costs);
 
 		//update current state
-		temp_state = cur_state;
+		std::vector<float> temp_state = cur_state;
 		cur_state = get_edge_utilization();
 		if(verbose)
 			print_warehouse_state();
@@ -105,7 +104,6 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 			a->ResetPerformanceCounters();
 
 		//Create and Save replay to buffer
-		// reward = (float)totalMove/whAGVs.size();
 		{
 			//TODO optimize Perfomance (with LUTs?)
 			whGraph->reset_edge_costs();
@@ -139,17 +137,11 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 			value_of_prev_state = value_of_state;
 			assert(!std::isnan(reward));
 		}
-		// reward =0;
-		// reward = whAGVs.size()-totalEnter;
-		//TODO
-		//Reward idea: (different weight for each type of edge)
-		//           * (Number of AGVs moving on that edge)
-		// 					 - w1*(Number of AGVs waiting)
+
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;
 
 		replay r = {temp_state,cur_state,actions,reward};
-		// ddpg_maTeam[0]->addToReplayBuffer(r);
 		DDPGAgent::addToReplayBuffer(r);
 
 		if(DDPGAgent::get_replay_buffer_size() > BATCH_SIZE * 2 && t%TRAINING_STEP == 0){
@@ -187,11 +179,11 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 				//Update all the NNs
 				ddpg_maTeam[n]->updateQCritic(Qvals, Qprime);
 
-				if (agent_type == agent_def::centralized){
+				if (agent_type == agent_def::centralized)
 					ddpg_maTeam[n]->updateMuActor(states);	
-				}else if (agent_type == agent_def::link){
+				else if (agent_type == agent_def::link)
 					ddpg_maTeam[n]->updateMuActorLink(states,all_actions,n,incorporates_time);					
-				}													
+				else if (agent_type == agent_def::intersection){/*TODO*/}
 			}
 
 			for (size_t n = 0; n < ddpg_maTeam.size(); n++)
@@ -204,7 +196,7 @@ epoch_results WarehouseCentralised::SimulateEpochDDPG(bool verbose){
 	return results;
 }
 
-void WarehouseCentralised::InitialiseMATeam(){
+void Warehouse_DDPG::InitialiseMATeam(){
 	// Initialise NE component and domain housekeeping components of the centralised agent
 	if(agent_type == agent_def::centralized){
 		vector<size_t> eIDs;
@@ -213,14 +205,14 @@ void WarehouseCentralised::InitialiseMATeam(){
 		iAgent * agent = new iAgent{0, eIDs}; // only one centralised agent controlling all traffic
 		whAgents.push_back(agent);
 	}else if(agent_type == agent_def::link){
-		vector<int> v = whGraph->GetVertices() ;
-	  vector<Edge *> e = whGraph->GetEdges() ;
-	  for (size_t i = 0; i < e.size(); i++){
-	    vector<size_t> vIDs ;
-	    vIDs.push_back(e[i]->GetVertex1()) ;
-	    vIDs.push_back(e[i]->GetVertex2()) ;
-	    iAgent * agent = new iAgent{i, vIDs} ;
-	    whAgents.push_back(agent);
+		vector<int> v = whGraph->GetVertices();
+		vector<Edge *> e = whGraph->GetEdges();
+		for (size_t i = 0; i < e.size(); i++){
+			vector<size_t> vIDs;
+			vIDs.push_back(e[i]->GetVertex1());
+			vIDs.push_back(e[i]->GetVertex2());
+			iAgent * agent = new iAgent{i, vIDs};
+			whAgents.push_back(agent);
 		}
 	}else if(agent_type == agent_def::intersection){
 		for (int v : whGraph->GetVertices()){
@@ -235,46 +227,47 @@ void WarehouseCentralised::InitialiseMATeam(){
 	
 	if (algo == algo_type::ddpg){
 		assert(ddpg_maTeam.empty());
-		if(agent_type == agent_def::centralized){
-			ddpg_maTeam.push_back(new DDPGAgent(N_EDGES*(1+incorporates_time), N_EDGES,N_EDGES*(1+incorporates_time), N_EDGES));	
-		}	else if(agent_type == agent_def::link){
-			for (Edge* e : whGraph->GetEdges()){
-				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time), 1,(1+incorporates_time)*N_EDGES, N_EDGES));	
-			}
- 		}else if (agent_type == agent_def::intersection){
-			for (int v : whGraph->GetVertices()){
+		if(agent_type == agent_def::centralized)
+			ddpg_maTeam.push_back(new DDPGAgent(N_EDGES*(1+incorporates_time), N_EDGES,N_EDGES*(1+incorporates_time), N_EDGES));
+		else if(agent_type == agent_def::link)
+			for (Edge* e : whGraph->GetEdges())
+				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time), 1,(1+incorporates_time)*N_EDGES, N_EDGES));
+ 		else if (agent_type == agent_def::intersection)
+			for (int v : whGraph->GetVertices())
 				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size(), (1+incorporates_time)*N_EDGES, N_EDGES));
-			}
-		}
 	}
 	else{
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
 		exit(EXIT_FAILURE);
-	} 
+	}
 	assert(!ddpg_maTeam.empty());
 }
 
-std::vector<float> WarehouseCentralised::QueryActorMATeam(std::vector<float> states){
+std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
  	assert(states.size() == N_EDGES*(1 + incorporates_time));
- 	if(agent_type == agent_def::centralized){
+ 	if(agent_type == agent_def::centralized)
  		return ddpg_maTeam[0]->EvaluateActorNN_DDPG(states);
- 	}else if (agent_type == agent_def::link){
+ 	else if (agent_type == agent_def::link){
  		std::vector<float> actions;
  		actions.reserve(N_EDGES);
 
- 		for (int i = 0; i < ddpg_maTeam.size(); i++){
- 			if(incorporates_time){
+ 		for (int i = 0; i < ddpg_maTeam.size(); i++)
+ 			if(incorporates_time)
  				actions.push_back(ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i], states[i+N_EDGES]})[0]);
- 			}else{
- 				// std::cout << "Si" << (states[i])<<std::endl;
- 				// std::cout << (ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i]}))<<std::endl;
+ 			else{
  				float t = (ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i]}))[0];
  				actions.push_back(t);
- 			} 				
- 		}
+ 			}
  		return actions;
  	}else if (agent_type == agent_def::intersection){
-		
+ 		std::vector<float> actions;
+ 		actions.reserve(N_EDGES);
+
+		for (int i = 0; i < ddpg_maTeam.size(); i++)
+			for (int j = 0; whAgents[i]->eIDs.size(); j++)
+				actions[whAgents[i]->eIDs[j]] =
+					ddpg_maTeam[i]->EvaluateActorNN_DDPG(states)[j];
+		return actions;
 	}
 	else{
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
@@ -284,23 +277,35 @@ std::vector<float> WarehouseCentralised::QueryActorMATeam(std::vector<float> sta
 }
 
 
-std::vector<float>  WarehouseCentralised::QueryTargetActorMATeam(std::vector<float> states){
+std::vector<float> Warehouse_DDPG::QueryTargetActorMATeam(std::vector<float> states){
  	assert(states.size() == N_EDGES*(1 + incorporates_time));
- 	if(agent_type == agent_def::centralized){
- 		return ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(states);
- 	// }else if(agent_type == agent_def::link){
- 	}else{
+ 	if(agent_type == agent_def::centralized)
+ 		return ddpg_maTeam[0]->EvaluateActorNN_DDPG(states);
+ 	else if (agent_type == agent_def::link){
  		std::vector<float> actions;
  		actions.reserve(N_EDGES);
 
- 		for (int i = 0; i < ddpg_maTeam.size(); i++){
- 			if(incorporates_time){
+ 		for (int i = 0; i < ddpg_maTeam.size(); i++)
+ 			if(incorporates_time)
  				actions.push_back(ddpg_maTeam[i]->EvaluateTargetActorNN_DDPG({states[i], states[i+N_EDGES]})[0]);
- 			}else{
+ 			else{
  				float t = (ddpg_maTeam[i]->EvaluateTargetActorNN_DDPG({states[i]}))[0];
  				actions.push_back(t);
- 			} 				
- 		}
+ 			}
  		return actions;
- 	}
+ 	}else if (agent_type == agent_def::intersection){
+ 		std::vector<float> actions;
+ 		actions.reserve(N_EDGES);
+
+		for (int i = 0; i < ddpg_maTeam.size(); i++)
+			for (int j = 0; whAgents[i]->eIDs.size(); j++)
+				actions[whAgents[i]->eIDs[j]] =
+					ddpg_maTeam[i]->EvaluateTargetActorNN_DDPG(states)[j];
+		return actions;
+	}
+	else{
+		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
+		exit(EXIT_FAILURE);
+		return {0};
+	} 
 }

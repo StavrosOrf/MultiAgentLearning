@@ -13,7 +13,7 @@
 #define REPLAY_BUFFER_SIZE 100000000
 #define GAMMA 0.99
 #define TAU 0.005
-#define BATCH_SIZE 50
+#define BATCH_SIZE 200
 #define TRAINING_STEP 1
 
 struct replay{
@@ -30,8 +30,10 @@ struct Net : torch::nn::Module {
 	}
 	torch::Tensor forward(torch::Tensor input) {
 		torch::Tensor hidden_layer, output_layer;
-		hidden_layer = (torch::mm(input, weightsA));
-		output_layer = (torch::mm(hidden_layer, weightsB));
+		//hidden_layer = (torch::mm(input, weightsA));
+		//output_layer = (torch::mm(hidden_layer, weightsB));
+		hidden_layer = torch::tanh(torch::mm(input, weightsA));
+		output_layer = torch::tanh(torch::mm(hidden_layer, weightsB));
 		return output_layer;
 	}
 	torch::Tensor weightsA, weightsB;

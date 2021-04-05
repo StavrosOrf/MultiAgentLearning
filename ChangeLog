@@ -131,3 +131,8 @@ trace if Eigen, Threadpool.cpp
   (will do tests to prove that is not necessary to train in each step)
 - TODO link_t doesn't reads state correctly ( the time part is always 0)
 
+##v 0.00023k
+- renamed WarehouseCentraised Class to Warehouse_DDPG
+- added options for number of AGVs
+- Deprecated Learning library
+- added Tiny Warehouse
