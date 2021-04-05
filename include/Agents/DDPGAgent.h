@@ -11,9 +11,8 @@
 #include <torch/torch.h>
 
 #define REPLAY_BUFFER_SIZE 100000000
-#define GAMMA 0.99
-#define TAU 0.005
-#define BATCH_SIZE 200
+#define GAMMA 0.90
+#define TAU 0.02
 #define TRAINING_STEP 1
 
 struct replay{
@@ -40,17 +39,17 @@ struct Net : torch::nn::Module {
 	// torch::nn::Linear weightsA,weightsB;
 };
 
-
 class DDPGAgent{
 	public:
 		DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space );
 		~DDPGAgent();
+
 		std::vector<float> EvaluateCriticNN_DDPG(const std::vector<float> s, const std::vector<float> a);
 		std::vector<float> EvaluateActorNN_DDPG(const std::vector<float> s);
 		std::vector<float> EvaluateTargetActorNN_DDPG(const std::vector<float> s);
 		std::vector<float> EvaluateTargetCriticNN_DDPG(const std::vector<float> s, const std::vector<float> a);
 
-		static std::vector<replay> getReplayBufferBatch(size_t size = BATCH_SIZE);
+		static std::vector<replay> getReplayBufferBatch(size_t size = batch_size);
 		static void addToReplayBuffer(replay r);
 		static size_t get_replay_buffer_size(){return replay_buffer.size();}
 
@@ -58,13 +57,16 @@ class DDPGAgent{
 		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime);
 		void updateMuActor(const std::vector<std::vector<float>> states);
 		void updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber,bool withTime);
+
 		void printAboutNN();
+
+		static void set_batch_size(int i){batch_size = i;}
+		static uint get_batch_size(){return batch_size;}
 	protected:
-		Net* qNN;
-		Net* qtNN;
-		Net* muNN;
-		Net* mutNN;
+		Net* qNN, *qtNN;
+		Net* muNN, *mutNN;
 		inline static std::vector<replay> replay_buffer;
+		inline static uint batch_size;
 };
 
 #endif // DDPG_AGENT_H_

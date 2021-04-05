@@ -13,9 +13,6 @@
 #include "Domains/Warehouse.h"
 #include "Domains/Warehouse_DDPG.h"
 
-char mkdir[100];
-std::string resFolder;
-
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
 
@@ -25,26 +22,26 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	const int runs = configs["DDPG"]["runs"].as<int>();
 	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
 	const std::string agentType = configs["domain"]["agents"].as<std::string>();
+	std::string resFolder = create_results_folder(configs);
 
 	std::clock_t start;
 	std::clock_t startTotalRun;
 	std::clock_t startTotalExperiment = std::clock();
 
 	double duration;
-	create_results_folder(configs);
 	int max_G = 0; //Maximum Total Deliveries
 
 	for (int run = 0; run != runs; run ++){
 		std::ofstream eval_file(resFolder + warehouse_type + '_' + agentType + '_' + std::to_string(run) + ".csv");
 		assert(eval_file.is_open());
-		eval_file << "run,Epoch,G,tMove,tEnter,tWait";
+		eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
 		startTotalRun = std::clock();
 		Warehouse * trainDomain = create_warehouse(configs);
 
 		std::cout << "Starting Run: " << run << std::endl;
 		for (int n = 0; n < nEps; n++){
 			start = std::clock();
-			epoch_results t = trainDomain->SimulateEpochDDPG(false);//simulate
+			epoch_results t = trainDomain->SimulateEpoch(false);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			if (t.totalDeliveries > max_G){
 				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4lu\e[0m, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
@@ -54,7 +51,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 			else
 				std::printf("Epoch %3d (%5.1f sec): G=%4lu, tMove=%6lu, tEnter=%6lu, tWait=%6lu\n",
 					n,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
-			eval_file<<"\n"<<run<<','<<n<<','<<t.totalDeliveries<<','<<t.totalMove<<','<<t.totalEnter<<','<<t.totalWait;
+			eval_file<<run<<','<<n<<','<<t.totalDeliveries<<','<<t.totalMove<<','<<t.totalEnter<<','<<t.totalWait << std::endl;
 		}
 		duration = ( std::clock() - startTotalRun ) / ((double) CLOCKS_PER_SEC );
 		std::cout<<"Total time elapsed for Run "<<run<<" ( "<<duration<<" sec)"<<std::endl; 
@@ -89,6 +86,7 @@ void WarehouseSimulation(std::string config_file, int thrds){
 Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
 	new_warehouse = new Warehouse_DDPG(configs);
+	new_warehouse->initialise_wh_agents();
 	new_warehouse->InitialiseMATeam();
 	return new_warehouse;
 }
@@ -98,8 +96,8 @@ Warehouse* create_warehouse(YAML::Node configs){
 **Output:Returns the string of the file result's folder file path				*
 *************************************************************************************************/
 std::string create_results_folder(YAML::Node configs){
-	resFolder	= //configs["domain"]["folder"].as<std::string>() +
-		configs["results"]["folder"].as<std::string>();
+	std::string resFolder = configs["results"]["folder"].as<std::string>();
+	char mkdir[100];
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
 	system(mkdir);
 	return resFolder;
@@ -120,10 +118,10 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-	string config_file;
+	std::string config_file;
 	int thrds = 2; // Default number of threads
 	for (int i = 1; i < argc; ++i){
-		string arg = argv[i];
+		std::string arg = argv[i];
 		//std::cout << "main"<<std::endl;
 		// Display help
 		if ((arg == "-h") || (arg == "--help")){
@@ -134,7 +132,6 @@ int main(int argc, char* argv[]){
 		else if ((arg == "-c") || (arg == "--config")){
 			if (i + 1 < argc)
 				config_file = argv[++i];
-				//config_file = "../config.yaml";i++;
 			else {
 				std::cerr << "--config option requires one argument.\n";
 				return 1;

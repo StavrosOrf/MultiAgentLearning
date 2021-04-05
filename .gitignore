@@ -3,6 +3,11 @@
 *.pdf
 *.fig
 *.yaml
+*.json
+*.py
+.clangd
+.clangd/
+.clangd*
 config.yaml
 libtorch
 build*

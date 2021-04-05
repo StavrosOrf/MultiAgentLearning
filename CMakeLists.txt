@@ -14,9 +14,14 @@ find_package(Threads REQUIRED)
 find_package(Torch REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
-if(NOT Torch_FOUND)
-	message(STATUS "FUCK MY LIFE")
-endif()
+SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
+IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
+  EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+  )
+ENDIF()
 
 include_directories( ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}

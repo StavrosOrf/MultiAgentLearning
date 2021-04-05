@@ -2,15 +2,15 @@
 
 Warehouse::Warehouse(YAML::Node configs){
 	// Read in graph definition from vertices and edges files (directories stored in configs)
-	string domainDir = configs["domain"]["folder"].as<string>() +
-		configs["domain"]["warehouse"].as<string>() + '/';
-	string vFile = domainDir + configs["graph"]["vertices"].as<string>();
-	string eFile = domainDir + configs["graph"]["edges"].as<string>();
-	string cFile = domainDir + configs["graph"]["capacities"].as<string>();
+	std::string domainDir = configs["domain"]["folder"].as<std::string>() +
+		configs["domain"]["warehouse"].as<std::string>() + '/';
+	std::string vFile = domainDir + configs["graph"]["vertices"].as<std::string>();
+	std::string eFile = domainDir + configs["graph"]["edges"].as<std::string>();
+	std::string cFile = domainDir + configs["graph"]["capacities"].as<std::string>();
 	nSteps = configs["simulation"]["steps"].as<size_t>();
 
 	outputEvals = false;
-	if(configs["mode"]["algo"].as<string>() == "DDPG")
+	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		algo = algo_type::ddpg;
 	else{
 		std::cout << "ERROR: Currently only configured for 'DDPG' and ''! Exiting.\n";
@@ -25,7 +25,7 @@ Warehouse::Warehouse(YAML::Node configs){
 	else if(agentType.starts_with("intersection"))
 		agent_type = agent_def::intersection;
 	else{
-		std:cout<<"Error in agent definition"<<std::endl;
+		std::cout<<"Error in agent definition"<<std::endl;
 		exit(1);
 	}
 	incorporates_time = agentType.ends_with("_t");
@@ -54,7 +54,7 @@ Warehouse::~Warehouse(void){
 	}
 }
 
-void Warehouse::OutputPerformance(string eval_str){
+void Warehouse::OutputPerformance(std::string eval_str){
 	if (evalFile.is_open())
 		evalFile.close();
 	evalFile.open(eval_str.c_str(),std::ios::app);
@@ -64,11 +64,11 @@ void Warehouse::OutputPerformance(string eval_str){
 	std::cout << "Writing evaluation outputs to file: " << eval_str << "\n";
 }
 
-void Warehouse::OutputControlPolicies(string nn_str){
+void Warehouse::OutputControlPolicies(std::string nn_str){
 	//TODO
 }
 
-void Warehouse::OutputEpisodeReplay(string agv_s_str, string agv_e_str, string a_s_str, string a_a_str){
+void Warehouse::OutputEpisodeReplay(std::string agv_s_str, std::string agv_e_str, std::string a_s_str, std::string a_a_str){
 	if (agvStateFile.is_open())
 		agvStateFile.close();
 	agvStateFile.open(agv_s_str.c_str(),std::ios::app);
@@ -96,7 +96,7 @@ void Warehouse::OutputEpisodeReplay(string agv_s_str, string agv_e_str, string a
 	std::cout << "\t" << a_a_str << "\n";
 }
 
-void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::Node configs, bool verbose){
+void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::string c_str, YAML::Node configs, bool verbose){
 	vector<int> vertices;
 	vector< vector<int> > edges;
 	vector< float > costs;
@@ -111,7 +111,7 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 		std::cout << "\nFile: " << v_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
-	string line;
+	std::string line;
 	while (getline(verticesFile,line))
 		vertices.push_back(atoi(line.c_str()));
 	if (verbose)
@@ -128,7 +128,7 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 	}
 	while (getline(edgesFile,line)){
 		stringstream lineStream(line);
-		string cell;
+		std::string cell;
 		vector<float> ec;
 		while (getline(lineStream,cell,','))
 			ec.push_back(atof(cell.c_str()));
@@ -167,36 +167,41 @@ void Warehouse::InitialiseGraph(string v_str, string e_str, string c_str, YAML::
 	InitialiseAGVs(configs);
 }
 
-void Warehouse::InitialiseAGVs(YAML::Node configs){
-	string domainDir = configs["domain"]["folder"].as<string>() +
-		configs["domain"]["warehouse"].as<string>() + '/';
+void Warehouse::InitialiseAGVs(YAML::Node configs, bool verbose){
+	std::string domainDir = configs["domain"]["folder"].as<std::string>() +
+		configs["domain"]["warehouse"].as<std::string>() + '/';
 	// Initialise AGV objects
-	string agv_str = domainDir + configs["simulation"]["agvs"].as<string>();
+	std::string agv_str = domainDir + configs["simulation"]["agvs"].as<std::string>();
 
 	// Read in data from files
-	std::cout << "Reading AGVs from file: ";
+	if (verbose)
+		std::cout << "Reading AGVs from file: ";
 	ifstream AGVFile(agv_str.c_str());
-	std::cout << agv_str.c_str() << "...";
+	if (verbose)
+		std::cout << agv_str.c_str() << "...";
 	if (!AGVFile.is_open()){
 		std::cout << "\nFile: " << agv_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
-	nAGVs = 0;
+	int nAGVs = 0;
 	vector<size_t> agvOrigins;
-	string line;
+	std::string line;
 	while (getline(AGVFile,line)){
 		agvOrigins.push_back((size_t)atoi(line.c_str()));
 		nAGVs++;
 	}
-	std::cout << "complete. Created " << nAGVs << " AGVs.\n";
+	if (verbose)
+		std::cout << "complete. Created " << nAGVs << " AGVs.\n";
 
 	// Store valid destination vertex IDs
-	string goal_str = domainDir + configs["simulation"]["goals"].as<string>();
+	std::string goal_str = domainDir + configs["simulation"]["goals"].as<std::string>();
 
 	// Read in data from files
-	std::cout << "Reading goal vertex IDs from file: ";
+	if (verbose)
+		std::cout << "Reading goal vertex IDs from file: ";
 	ifstream goalFile(goal_str.c_str());
-	std::cout << goal_str.c_str() << "...";
+	if (verbose)
+		std::cout << goal_str.c_str() << "...";
 	if (!goalFile.is_open()){
 		std::cout << "\nFile: " << goal_str.c_str() << " not found, exiting.\n";
 		exit(1);
@@ -204,7 +209,8 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 	vector<int> agvGoals;
 	while (getline(goalFile,line))
 		agvGoals.push_back(atoi(line.c_str()));
-	std::cout << "complete. " << agvGoals.size() << " goal vertices.\n";
+	if (verbose)
+		std::cout << "complete. " << agvGoals.size() << " goal vertices.\n";
 
 //	std::cout << "Number of possible goals: " << agvGoals.size() << "\n";
 
@@ -212,34 +218,17 @@ void Warehouse::InitialiseAGVs(YAML::Node configs){
 		AGV * agv = new AGV(agvOrigins[i], agvGoals, whGraph);
 		whAGVs.push_back(agv);
 	}
-	assert(nAGVs == whAGVs.size());
+	//assert(nAGVs == whAGVs.size());
 }
 
 /************************************************************************************************
  **Method:Resets all AGVs to there Original position						*
  ************************************************************************************************/
 void Warehouse::InitialiseNewEpoch(){
-	for (size_t i = 0; i < nAGVs; i++)// Reset all AGVs
+	for (size_t i = 0; i < whAGVs.size(); i++)// Reset all AGVs
 		whAGVs[i]->ResetAGV();
 	for (size_t i = 0; i < whAgents.size(); i++)
 		whAgents[i]->agvIDs.clear();
-}
-
-vector< vector<size_t> > Warehouse::RandomiseTeams(size_t n){ // n = number of agents in each team
-	vector< vector<size_t> > teams;
-	vector<size_t> order;
-	for (size_t i = 0; i < n; i++){
-		order.push_back(i);
-	}
-
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-
-	for (size_t j = 0; j < whAgents.size(); j++){
-		shuffle (order.begin(), order.end(), std::default_random_engine(seed));
-		teams.push_back(order);
-	}
-
-	return teams;
 }
 
 /************************************************************************************************
@@ -294,7 +283,7 @@ vector<float> Warehouse::get_edge_utilization(){
  * ************************************************************************************************/
 void Warehouse::replan_AGVs(std::vector<float> cost_add){
 	// Replan AGVs as necessary
-	for (size_t k = 0; k < nAGVs; k++){
+	for (size_t k = 0; k < whAGVs.size(); k++){
 		whAGVs[k]->CompareCosts(cost_add); // set replanning flags
 
 		if (whAGVs[k]->GetIsReplan()) // replanning needed
@@ -364,12 +353,39 @@ void Warehouse::traverse_one_step(std::vector<float> final_costs){
 	UpdateGraphCosts(final_costs);
 	replan_AGVs(final_costs);
 	transition_AGVs();
-	for (size_t k = 0; k < nAGVs; k++)// Traverse
+	for (size_t k = 0; k < whAGVs.size(); k++)// Traverse
 		whAGVs[k]->Traverse();
 }
 
+ // Initialise NE components and domain housekeeping components of the agent type
+void Warehouse::initialise_wh_agents(){
+	if(agent_type == agent_def::centralized){
+		vector<size_t> eIDs;
+		for (size_t j = 0; j < N_EDGES; j++)
+			eIDs.push_back(j);
+		whAgents.push_back(new iAgent{0, eIDs});// only one centralised agent controlling all traffic
+	}else if(agent_type == agent_def::link){
+		vector<int> v = whGraph->GetVertices();
+		vector<Edge *> e = whGraph->GetEdges();
+		for (size_t i = 0; i < e.size(); i++){
+			vector<size_t> vIDs;
+			vIDs.push_back(e[i]->GetVertex1());
+			vIDs.push_back(e[i]->GetVertex2());
+			whAgents.push_back(new iAgent{i, vIDs});
+		}
+	}else if(agent_type == agent_def::intersection)
+		for (size_t v : whGraph->GetVertices()){
+			std::vector<size_t> eIDs;
+			for (size_t i = 0; i != whGraph->GetEdges().size(); i++)
+				if (whGraph->GetEdges()[i]->GetVertex2() == v)
+					eIDs.push_back(i);
+			whAgents.push_back(new iAgent{v, eIDs});
+		}
+}
+
+
 void Warehouse::GetJointState(vector<Edge *> e, vector<size_t> &s){
-	for (size_t i = 0; i < nAGVs; i++){
+	for (size_t i = 0; i < whAGVs.size(); i++){
 		Edge * curEdge = whAGVs[i]->GetCurEdge();
 		size_t j = whGraph->GetEdgeID(curEdge);
 		if (j < s.size())

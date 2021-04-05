@@ -132,7 +132,10 @@ trace if Eigen, Threadpool.cpp
 - TODO link_t doesn't reads state correctly ( the time part is always 0)
 
 ##v 0.00023k
-- renamed WarehouseCentraised Class to Warehouse_DDPG
-- added options for number of AGVs
+- Renamed WarehouseCentraised Class to Warehouse_DDPG
+- Added options for number of AGVs
 - Deprecated Learning library
-- added Tiny Warehouse
+- Added Tiny Warehouse
+- Added a bool verbose argmument to all function that print
+- Moved some constant DDPG arguments from #define to config.yaml
+- General Code Cleanup

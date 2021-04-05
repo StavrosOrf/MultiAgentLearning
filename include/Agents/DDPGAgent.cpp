@@ -153,7 +153,7 @@ void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprim
 	optimezerQNN.step();
 
 	// std::cout<<"QVals \t\t Qprime"<<std::endl;
-	// for (int i = 0; i != BATCH_SIZE; i++){
+	// for (int i = 0; i != batch_size; i++){
 	// 	std::cout<<Qvals[i]<<"\t\t"<<Qprime[i]<<std::endl;
 	// }
 
@@ -166,7 +166,7 @@ void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::ve
 
 	//Update actor
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
-	for (int i = 1; i != BATCH_SIZE; i++){
+	for (int i = 1; i != batch_size; i++){
 		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
 		states_ = torch::cat({states_,temp},0);
 	}
@@ -187,7 +187,7 @@ void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::ve
 
 	torch::Tensor final_actions = torch::tensor(all_actions[0]).unsqueeze(0);	
 	final_actions[0][agentNumber] = actions[0][0];
-	for (int i = 1; i != BATCH_SIZE; i++){
+	for (int i = 1; i != batch_size; i++){
 		torch::Tensor temp = torch::tensor(all_actions[i]).unsqueeze(0);		
 		temp[0][agentNumber] = actions[i][0];		
 		final_actions = torch::cat({final_actions,temp},0);		
@@ -216,7 +216,7 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 
 	//Update actor
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
-	for (int i = 1; i != BATCH_SIZE; i++){
+	for (int i = 1; i != batch_size; i++){
 		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
 		states_ = torch::cat({states_,temp},0);
 	}
@@ -238,6 +238,9 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
 }
 
+/************************************************************************************************
+**Method:Print Various Metrics about the agent's neural Networks				*
+*************************************************************************************************/
 void DDPGAgent::printAboutNN(){
 	for (int i = 0; i < muNN->parameters().size(); i++ ){
 		torch::Tensor t = muNN->parameters()[i].detach().clone();
