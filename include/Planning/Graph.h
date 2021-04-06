@@ -7,8 +7,7 @@
 #include "Node.h"
 
 // Graph class to create and store graph structure
-class Graph
-{
+class Graph{
 	public:
 		Graph(std::vector<int> &vertices, std::vector< std::vector<int> > &edges, std::vector<float> &costs): itsVertices(vertices){
 			numVertices = itsVertices.size();

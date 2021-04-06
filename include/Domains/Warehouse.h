@@ -57,8 +57,9 @@ class Warehouse{
 		void traverse_one_step(const std::vector<float> final_cost);
 		void GetJointState(std::vector<size_t> &s);//__attribute__((deprecated))
 		void print_warehouse_state();
-		std::vector<float> get_edge_utilization() __attribute__ ((pure));
+		std::vector<float> get_edge_utilization(bool care_about_time = true) __attribute__ ((pure));
 		std::vector<float> get_vertex_utilization() __attribute__ ((pure));
+		float get_vertex_reamaining_outgoing_capacity(int vertex) __attribute__ ((pure));
 
 		size_t nSteps; //number of steps per simulation
 		std::vector<float> baseCosts;

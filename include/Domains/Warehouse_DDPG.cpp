@@ -35,6 +35,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose){
 			std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
 		float value_of_state = 0, value_of_prev_state = 0, reward = 0;
+		const std::vector<float> vertex_util = get_vertex_utilization();
 
 		const std::vector<float> actions = QueryActorMATeam(cur_state);
 		assert(actions.size() == N_EDGES);
@@ -65,7 +66,11 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose){
 			printf("\n");
 		}
 
-		int routable_AGVs = 0;
+		float routable_agvs = 0;//total number of agvs that could be routed in the graph
+		{
+			for (int v = 0; v != whGraph->GetNumVertices(); v++)
+				routable_agvs += std::min<float>(get_vertex_reamaining_outgoing_capacity(v), get_vertex_utilization()[v]);
+		}
 		traverse_one_step(final_costs);
 
 		//update current state
@@ -131,6 +136,11 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose){
 			value_of_prev_state = value_of_state;
 			assert(!std::isnan(reward));
 		}
+
+		float total_AGVs_that_entered_an_edge_this_step = 0;
+		for(AGV* a : whAGVs)
+			total_AGVs_that_entered_an_edge_this_step += a->entered_edge_this_step();
+		reward = total_AGVs_that_entered_an_edge_this_step - routable_agvs;
 
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;

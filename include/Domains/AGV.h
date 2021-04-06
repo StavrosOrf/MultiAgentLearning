@@ -31,7 +31,9 @@ class AGV{
 		size_t GetNumCommanded(){return ncDel;}
 		Search * GetAGVPlanner(){return agvPlanner;}
 		bool is_on_graph(){return nextVertex!=-1;}
+		bool entered_edge_this_step(){return just_entered_edge;}
 		std::vector<int> get_possible_goals() const {return agvGoals;}
+		void reset_edge_enter(){just_entered_edge = false;}
 
 		int GetOriginVertex(){return origin;}
 		int GetDestinationVertex(){return goal;}
@@ -51,6 +53,8 @@ class AGV{
 		size_t tEnter;			 // time waiting to enter graph
 		size_t tWait;				// time waiting to cross intersections
 		std::vector<int> agvGoals;// vector of valid goal vertices
+		bool just_entered_edge;
+
 		bool isReplan;			 // true if replanning is needed
 
 		Search * agvPlanner; // planning routine

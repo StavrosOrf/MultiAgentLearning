@@ -206,8 +206,8 @@ void Warehouse::print_warehouse_state(){
 *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
 *	And the minimum remaining distance of AGVs on edge indexed by EdgeID+N_EDGES		*
 ************************************************************************************************/
-std::vector<float> Warehouse::get_edge_utilization(){
-	std::vector<float> edge_utilization(N_EDGES * (1+incorporates_time));
+std::vector<float> Warehouse::get_edge_utilization(bool care_about_time){
+	std::vector<float> edge_utilization(N_EDGES * (1+(incorporates_time && care_about_time)));
 	for(size_t i = 0; i < N_EDGES; i++)
 		edge_utilization[i] = 0;
 	for(AGV* a: whAGVs){
@@ -216,7 +216,7 @@ std::vector<float> Warehouse::get_edge_utilization(){
 		if(e != NULL){//check if AGVs are at an edge
 			assert(Edge_ID < edge_utilization.size()/(1+incorporates_time));
 			edge_utilization[Edge_ID]++;
-			if (incorporates_time)
+			if (incorporates_time && care_about_time)
 				edge_utilization[Edge_ID + N_EDGES] = std::min<float>(
 					edge_utilization[Edge_ID + N_EDGES], a->GetT2V());
 		}
@@ -232,6 +232,7 @@ void Warehouse::replan_AGVs(std::vector<float> cost_add){
 	// Replan AGVs as necessary
 	for (size_t k = 0; k < whAGVs.size(); k++){
 		whAGVs[k]->CompareCosts(cost_add); // set replanning flags
+		whAGVs[k]->reset_edge_enter();
 
 		if (whAGVs[k]->GetIsReplan()) // replanning needed
 			whAGVs[k]->PlanAGV(cost_add);
@@ -368,3 +369,12 @@ std::vector<float> Warehouse::get_vertex_utilization(){
 
 	return vertex_population;
 }
+
+float Warehouse::get_vertex_reamaining_outgoing_capacity(int vertex){
+	float t = 0;
+	for (Edge* e : whGraph->get_outgoing_edges_of_a_vertex(vertex))
+		t += capacities[whGraph->GetEdgeID(e)] - 
+			get_edge_utilization(false)[whGraph->GetEdgeID(e)];
+	return t;
+}
+

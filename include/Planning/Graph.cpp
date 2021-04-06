@@ -76,6 +76,10 @@ void Graph::reset_edge_costs(){
 		e->SetCost(e->GetLength());
 }
 
+/************************************************************************************************
+**Input:An int indicating the [vertex] of the graph						*
+**Output:All the incomming edges to that [vertex]						*
+*************************************************************************************************/
 std::vector<Edge*> Graph::get_incoming_edges_of_a_vertex(int vertex){
 	std::vector<Edge*> edges;
 	for(Edge* e : itsEdges)
@@ -85,6 +89,10 @@ std::vector<Edge*> Graph::get_incoming_edges_of_a_vertex(int vertex){
 	return edges;
 }
 
+/************************************************************************************************
+**Input:An int indicating the [vertex] of the graph						*
+**Output:All the outgoing edges to that [vertex]						*
+*************************************************************************************************/
 std::vector<Edge*> Graph::get_outgoing_edges_of_a_vertex(int vertex){
 	std::vector<Edge*> edges;
 	for(Edge* e : itsEdges)

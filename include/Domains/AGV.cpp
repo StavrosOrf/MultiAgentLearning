@@ -10,6 +10,7 @@ AGV::AGV(int initV, std::vector<int> goalVs, Graph * graph){
 	tMove = 0;
 	tEnter = 0;
 	tWait = 0;
+	just_entered_edge = false;
 	agvGoals = goalVs;
 	isReplan = true;
 	agvPlanner = new Search(graph, origin, goal);
@@ -98,13 +99,12 @@ void AGV::PlanAGV(std::vector<float> c){
 		int v1 = curNode->GetVertex();
 
 		bool edgeFound = false;
-		for (size_t i = 0; i < nEdges; i++){
+		for (size_t i = 0; i < nEdges; i++)
 			if (edges[i]->GetVertex1() == v1 && edges[i]->GetVertex2() == v2){
 				path.push_front(edges[i]);
 				edgeFound = true;
 				break;
 			}
-		}
 		if (!edgeFound){
 			std::cout << "Error: cannot find path through graph edges! Exiting.\n";
 			exit(1);
