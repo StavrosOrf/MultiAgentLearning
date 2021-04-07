@@ -1,5 +1,5 @@
 mode:
-  algo: DDPG #Valid Options: 'DDPG'
+  algo: DDPG #Valid Options: 'DDPG', 'DDPG_MERGED'
   type: train
 # NOTE: agent_policies and eval_file are only used if [mode][type] = test
 # agent_policies: ../Domains/Small_120_AGVs_SS_centralised_no_time/Results/neural_nets.csv # file containing agent policies
@@ -7,13 +7,13 @@ mode:
 domain:
   folder: ../Domains/
   warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS'
-  agents: centralized_t #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
+  agents: centralized #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
 graph:
   vertices:   vertices.csv
   edges:      edges.csv
   capacities: capacities.csv
 DDPG:
-  epochs: 500 # set to 1 in test mode
+  epochs: 1000 # set to 1 in test mode
   runs: 1
   rand_proc_std_dev: 0.25
   batch_size: 100

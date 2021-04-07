@@ -1,5 +1,5 @@
-#ifndef WAREHOUSE_CENTRALISED_H_
-#define WAREHOUSE_CENTRALISED_H_
+#ifndef WAREHOUSE_DDPG_H
+#define WAREHOUSE_DDPG_H
 
 #include <vector>
 #include <list>
@@ -19,14 +19,14 @@ class Warehouse_DDPG : public Warehouse {
 		}
 		~Warehouse_DDPG(void);
 
-		epoch_results SimulateEpoch (bool verbose = false);
+		virtual epoch_results SimulateEpoch (bool verbose = false);
 
 		void InitialiseMATeam(); // create agents for each vertex in graph
-	private:
+	protected:
 		std::vector<float> QueryActorMATeam(std::vector<float> states);
 		std::vector<float> QueryTargetActorMATeam(std::vector<float> states);
 		float N_proc_std_dev;
 		std::vector<DDPGAgent *> ddpg_maTeam;
 };
 
-#endif // WAREHOUSE_CENTRALISED_H_
+#endif // WAREHOUSE_DDPG_H

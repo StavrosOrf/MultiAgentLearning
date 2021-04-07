@@ -139,3 +139,6 @@ trace if Eigen, Threadpool.cpp
 - Added a bool verbose argmument to all function that print
 - Moved some constant DDPG arguments from #define to config.yaml
 - General Code Cleanup
+
+##v 0.00024k
+- Wrote Skeleton for DDPG_merged_step (need to be renamed)

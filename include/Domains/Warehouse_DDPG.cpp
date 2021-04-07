@@ -146,7 +146,10 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose){
 			std::cout<<"Reward: "<<reward<<std::endl;
 
 		replay r = {temp_state,cur_state,actions,reward};
-		DDPGAgent::addToReplayBuffer(r);
+		if (routable_agvs != 0)
+			DDPGAgent::addToReplayBuffer(r);
+		else
+			std::cout << "Skipping adding it to the replay buffer" << std::endl;
 
 		if(DDPGAgent::get_replay_buffer_size() > DDPGAgent::get_batch_size() * 2 && t%TRAINING_STEP == 0){
 			

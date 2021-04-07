@@ -20,7 +20,7 @@
 
 #define N_EDGES whGraph->GetEdges().size()
 
-enum class algo_type{ddpg};
+enum class algo_type{ddpg, ddpg_merged};
 
 enum class agent_def{
 	centralized,

@@ -3,6 +3,7 @@
 
 #include <iostream> //std::cout
 #include <vector> // std::vector
+#include <stddef.h>
 #include "Edge.h"
 #include "Node.h"
 

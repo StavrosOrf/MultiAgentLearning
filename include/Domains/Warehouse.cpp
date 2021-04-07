@@ -11,6 +11,8 @@ Warehouse::Warehouse(YAML::Node configs){
 
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		algo = algo_type::ddpg;
+	else if(configs["mode"]["algo"].as<std::string>() == "DDPG_MERGED")
+		algo = algo_type::ddpg_merged;
 	else{
 		std::cout << "ERROR: Currently only configured for 'DDPG' and ''! Exiting.\n";
 		exit(1);
@@ -191,11 +193,13 @@ void Warehouse::UpdateGraphCosts(std::vector<float> costs){
  * *Output:Print and number of AGVs that are on each edge					*
  ************************************************************************************************/
 void Warehouse::print_warehouse_state(){
-	std::vector<float> cur_state = get_edge_utilization();
-	std::cout << "Warehouse utilization: {";
+	const std::vector<float> cur_state = get_edge_utilization(false);
+	std::cout << "Warehouse edge utilization: {";
 	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n] > 0 )
 			std::cout<<"[e_"<< n << ",p= " << cur_state[n] << "], ";
+	std::cout << '}' << std::endl;
+	std::cout << "Warehouse Vertex utilization: {";
 	std::cout << '}' << std::endl;
 }
 
