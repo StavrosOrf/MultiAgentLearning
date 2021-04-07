@@ -17,7 +17,7 @@ class Warehouse_DDPG_merged_step : public Warehouse_DDPG {
 		Warehouse_DDPG_merged_step(YAML::Node configs) : Warehouse_DDPG(configs){}
 		~Warehouse_DDPG_merged_step(void);
 
-		epoch_results SimulateEpoch (bool verbose = false);
+		epoch_results SimulateEpoch (bool verbose = false,int epoch = 1);
 	private:
 };
 

@@ -214,17 +214,24 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time){
 	std::vector<float> edge_utilization(N_EDGES * (1+(incorporates_time && care_about_time)));
 	for(size_t i = 0; i < N_EDGES; i++)
 		edge_utilization[i] = 0;
+	if (incorporates_time && care_about_time)
+		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
+			edge_utilization[i] = 99999; //TODO FLOAT MAX
 	for(AGV* a: whAGVs){
 		Edge* e = a->GetCurEdge();
 		int Edge_ID = whGraph->GetEdgeID(e);
 		if(e != NULL){//check if AGVs are at an edge
-			assert(Edge_ID < edge_utilization.size()/(1+incorporates_time));
+			assert(Edge_ID < edge_utilization.size()/(1+(incorporates_time && care_about_time)));
 			edge_utilization[Edge_ID]++;
 			if (incorporates_time && care_about_time)
 				edge_utilization[Edge_ID + N_EDGES] = std::min<float>(
 					edge_utilization[Edge_ID + N_EDGES], a->GetT2V());
 		}
 	}
+	if (incorporates_time && care_about_time)
+		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
+			if (edge_utilization[i] == 99999) //TODO FLOAT MAX
+				edge_utilization[i] = 0;
 	return edge_utilization;
 }
 

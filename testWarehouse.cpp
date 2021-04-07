@@ -23,6 +23,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	const int runs = configs["DDPG"]["runs"].as<int>();
 	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
 	const std::string agentType = configs["domain"]["agents"].as<std::string>();
+	const bool verbose = configs["simulation"]["verbose"].as<bool>();
 	const std::string resFolder = create_results_folder(configs);
 
 	std::clock_t start, startTotalRun, startTotalExperiment = std::clock();
@@ -40,7 +41,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		std::cout << "Starting Run: " << run << std::endl;
 		for (int n = 0; n < nEps; n++){
 			start = std::clock();
-			epoch_results t = trainDomain->SimulateEpoch(false);//simulate
+			epoch_results t = trainDomain->SimulateEpoch(verbose,n);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			if (t.totalDeliveries > max_G){
 				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4u\e[0m, tMove=%6u, tEnter=%6u, tWait=%6u\n",
@@ -84,9 +85,9 @@ void WarehouseSimulation(std::string config_file){
  ************************************************************************************************/
 Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
-	if(configs["mode"]["algo"].as<std::string>() == "ddpg")
+	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		new_warehouse = new Warehouse_DDPG(configs);
-	else if(configs["mode"]["algo"].as<std::string>() == "ddpg_merged")
+	else if(configs["mode"]["algo"].as<std::string>() == "DDPG_MERGED")
 		new_warehouse = new Warehouse_DDPG_merged_step(configs);
 	else{
 		std::cout << "error: currently only configured for 'ddpg' and ''! exiting.\n";

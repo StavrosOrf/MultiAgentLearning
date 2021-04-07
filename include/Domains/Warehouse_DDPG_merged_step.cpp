@@ -17,7 +17,7 @@ Warehouse_DDPG_merged_step::~Warehouse_DDPG_merged_step(void){
 	}
 }
 
-epoch_results Warehouse_DDPG_merged_step::SimulateEpoch(bool verbose){
+epoch_results Warehouse_DDPG_merged_step::SimulateEpoch(bool verbose,int epoch){
 	InitialiseNewEpoch();
 	std::normal_distribution<float> n_process(0, N_proc_std_dev);
 	std::default_random_engine n_generator(time(NULL));

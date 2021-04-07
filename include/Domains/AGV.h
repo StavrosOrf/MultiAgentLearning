@@ -18,7 +18,7 @@ class AGV{
 		void CompareCosts(std::vector<float>);
 		void PlanAGV(std::vector<float>);
 		int GetNextVertex(){return nextVertex;}
-		int get_cur_vertex(){assert(t2v>0); return nextVertex;}
+		int get_cur_vertex(){assert(t2v==0); return nextVertex;}
 		Edge * GetCurEdge(){return curEdge;}
 		size_t GetT2V(){return t2v;}
 		bool GetIsReplan(){return isReplan;}

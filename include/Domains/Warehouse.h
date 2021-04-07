@@ -49,7 +49,7 @@ class Warehouse{
 		void DisableEpisodeReplayOutput()__attribute__ ((deprecated));
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual epoch_results SimulateEpoch(bool verbose) = 0;
+		virtual epoch_results SimulateEpoch(bool verbose,int epoch) = 0;
 
 	protected:
 		void replan_AGVs(const std::vector<float> final_cost);

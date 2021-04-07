@@ -19,7 +19,7 @@ class Warehouse_DDPG : public Warehouse {
 		}
 		~Warehouse_DDPG(void);
 
-		virtual epoch_results SimulateEpoch (bool verbose = false);
+		virtual epoch_results SimulateEpoch (bool verbose = false, int epoch = 1);
 
 		void InitialiseMATeam(); // create agents for each vertex in graph
 	protected:

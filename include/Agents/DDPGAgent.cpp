@@ -157,7 +157,7 @@ void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprim
 	// 	std::cout<<Qvals[i]<<"\t\t"<<Qprime[i]<<std::endl;
 	// }
 
-	// std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;
+	std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;
 }
 
 void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber,bool withTime){
@@ -235,7 +235,7 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 	policy_loss.backward();
 	optimezerMuNN.step();
 
-	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
+	std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
 }
 
 /************************************************************************************************
