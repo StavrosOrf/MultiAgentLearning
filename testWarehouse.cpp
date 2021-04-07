@@ -6,6 +6,7 @@
 #include <yaml-cpp/yaml.h>
 #include <time.h>
 #include <ctime>
+#include <filesystem>
 #include <cassert>
 #include <stdio.h>
 #include <unistd.h>
@@ -16,6 +17,7 @@
 
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
+std::string config_file;
 
 void WarehouseSimulationDDPG(YAML::Node configs){
 	srand(time(NULL)); // increment random seed
@@ -31,8 +33,8 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	double duration;
 	uint max_G = 0; //Maximum Total Deliveries
 
+	std::ofstream eval_file(resFolder + warehouse_type + '_' + agentType + ".csv");
 	for (int run = 0; run != runs; run++){
-		std::ofstream eval_file(resFolder + warehouse_type + '_' + agentType + '_' + std::to_string(run) + ".csv");
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
 		startTotalRun = std::clock();
@@ -104,10 +106,12 @@ Warehouse* create_warehouse(YAML::Node configs){
 **Output:Returns the string of the file result's folder file path				*
 *************************************************************************************************/
 std::string create_results_folder(YAML::Node configs){
-	std::string resFolder = configs["results"]["folder"].as<std::string>();
-	char mkdir[100];
+	std::string resFolder = configs["results"]["folder"].as<std::string>()
+		+ std::to_string(rand()) + '/';
+	char mkdir[10000];
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
 	system(mkdir);
+	std::filesystem::copy_file(config_file, resFolder+config_file.substr(3));
 	return resFolder;
 }
 
@@ -126,7 +130,6 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-	std::string config_file;
 	int thrds = 2; // Default number of threads
 	for (int i = 1; i < argc; ++i){
 		std::string arg = argv[i];
