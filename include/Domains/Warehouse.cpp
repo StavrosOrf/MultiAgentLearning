@@ -193,13 +193,20 @@ void Warehouse::UpdateGraphCosts(std::vector<float> costs){
  * *Output:Print and number of AGVs that are on each edge					*
  ************************************************************************************************/
 void Warehouse::print_warehouse_state(){
-	const std::vector<float> cur_state = get_edge_utilization(false);
+	const std::vector<float> cur_state = get_edge_utilization(true);
 	std::cout << "Warehouse edge utilization: {";
 	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n] > 0 )
 			std::cout<<"[e_"<< n << ",p= " << cur_state[n] << "], ";
+	for (size_t n = 0; n < N_EDGES; n++)
+		if (cur_state[n+N_EDGES] > 0 )
+			std::cout<<"[e_"<< n << ",t= " << cur_state[n+N_EDGES] << "], ";
 	std::cout << '}' << std::endl;
+
 	std::cout << "Warehouse Vertex utilization: {";
+	for (size_t n = 0; n < whGraph->GetNumVertices(); n++)
+		if (get_vertex_utilization()[n])
+			std::cout<<"[v_"<< n << ",p= " << get_vertex_utilization()[n] << "], ";
 	std::cout << '}' << std::endl;
 }
 
@@ -210,27 +217,28 @@ void Warehouse::print_warehouse_state(){
 *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
 *	And the minimum remaining distance of AGVs on edge indexed by EdgeID+N_EDGES		*
 ************************************************************************************************/
+std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time);}
 std::vector<float> Warehouse::get_edge_utilization(bool care_about_time){
-	std::vector<float> edge_utilization(N_EDGES * (1+(incorporates_time && care_about_time)));
+	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time)));
 	for(size_t i = 0; i < N_EDGES; i++)
 		edge_utilization[i] = 0;
-	if (incorporates_time && care_about_time)
+	if (care_about_time)
 		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
-			edge_utilization[i] = 99999; //TODO FLOAT MAX
+			edge_utilization[i] = std::numeric_limits<float>::infinity();
 	for(AGV* a: whAGVs){
 		Edge* e = a->GetCurEdge();
 		int Edge_ID = whGraph->GetEdgeID(e);
 		if(e != NULL){//check if AGVs are at an edge
-			assert(Edge_ID < edge_utilization.size()/(1+(incorporates_time && care_about_time)));
+			assert(Edge_ID < edge_utilization.size()/(1+(care_about_time)));
 			edge_utilization[Edge_ID]++;
-			if (incorporates_time && care_about_time)
+			if (care_about_time)
 				edge_utilization[Edge_ID + N_EDGES] = std::min<float>(
 					edge_utilization[Edge_ID + N_EDGES], a->GetT2V());
 		}
 	}
-	if (incorporates_time && care_about_time)
+	if (care_about_time)
 		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
-			if (edge_utilization[i] == 99999) //TODO FLOAT MAX
+			if (std::isinf(edge_utilization[i]))
 				edge_utilization[i] = 0;
 	return edge_utilization;
 }

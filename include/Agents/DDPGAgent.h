@@ -24,22 +24,22 @@ struct replay{
 
 struct Net : torch::nn::Module {
 	Net(int32_t numIn, int32_t numOut, int32_t numHid) {
-		weightsA = register_parameter("input1", torch::rand({numIn, numHid}))*0.013;
-		weightsB = register_parameter("input2", torch::rand({numHid, numHid}))*0.013;
-		weightsC = register_parameter("input3", torch::rand({numHid, numHid}))*0.013;
-		weightsD = register_parameter("input4", torch::rand({numHid, numHid}))*0.013;
-		weightsE = register_parameter("input5", torch::rand({numHid, numHid}))*0.013;
-		weightsF = register_parameter("input6", torch::rand({numHid, numOut}))*0.013;
+		weightsA = register_parameter("input1", torch::rand({numIn, numHid}))/numHid;
+		weightsB = register_parameter("input2", torch::rand({numHid, numHid}))/numHid;
+		weightsC = register_parameter("input3", torch::rand({numHid, numHid}))/numHid;
+		weightsD = register_parameter("input4", torch::rand({numHid, numHid}))/numHid;
+		weightsE = register_parameter("input5", torch::rand({numHid, numHid}))/numHid;
+		weightsF = register_parameter("input6", torch::rand({numHid, numOut}))/numOut;
 		// weightsB = register_parameter("output", torch::rand({numHid, numOut}))*0.013;		
 	}
 	torch::Tensor forward(torch::Tensor input) {
 		torch::Tensor hidden_layer, output_layer,h1,h2,h3,h4,h5;
-		h1 = (torch::mm(input, weightsA));
-		h2 = (torch::mm(h1, weightsB));
-		h3 = (torch::mm(h2, weightsC));
-		h4 = (torch::mm(h3, weightsD));
-		h5 = (torch::mm(h4, weightsE));
-		output_layer = (torch::mm(h5, weightsF));
+		h1 = torch::sigmoid(torch::mm(input, weightsA));
+		h2 = torch::sigmoid(torch::mm(h1, weightsB));
+		h3 = torch::sigmoid(torch::mm(h2, weightsC));
+		h4 = torch::sigmoid(torch::mm(h3, weightsD));
+		h5 = torch::sigmoid(torch::mm(h4, weightsE));
+		output_layer = torch::sigmoid(torch::mm(h5, weightsF));
 
 		// hidden_layer = (torch::mm(input, weightsA));
 		// output_layer = (torch::mm(hidden_layer, weightsB));

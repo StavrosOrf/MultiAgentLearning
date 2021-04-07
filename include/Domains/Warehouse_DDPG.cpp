@@ -26,9 +26,6 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
 
-	if(verbose)
-		print_warehouse_state();
-
 	// each timestep
 	for (size_t t = 0; t < nSteps; t++){
 		if(verbose)
@@ -37,32 +34,29 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		float value_of_state = 0, value_of_prev_state = 0, reward = 0;
 		const std::vector<float> vertex_util = get_vertex_utilization();
 
-		const std::vector<float> actions = QueryActorMATeam(cur_state);
-		assert(actions.size() == N_EDGES);
+		std::vector<float> actions = QueryActorMATeam(cur_state);
 
 		if(verbose){
-			std::cout<<"State: " << cur_state << std::endl;
+			//std::cout<<"State: " << cur_state << std::endl;
 			ddpg_maTeam[0]->printAboutNN();
 		
-			printf("Actions:		 ");
+			printf("Actions: ");
 			for (size_t n = 0; n < actions.size(); n++)
-				printf(" %4.2f",actions[n]);
+				printf(" %4.6f",actions[n]);
 			printf("\n");
 		}
 
 		std::vector<float> final_costs = baseCosts;
-		// Add Random Noise from process N
-		for (size_t n = 0; n < N_EDGES; n++){
-			// final_costs[n] += std::clamp<float>(actions[n]+n_process(n_generator), -1, 1) * maxBaseCost;
-			final_costs[n] += (actions[n]) * maxBaseCost + n_process(n_generator)*maxBaseCost;
-			// assert(final_costs[n] <= maxBaseCost + baseCosts[n]);
+		for (size_t n = 0; n < N_EDGES; n++){ // Add Random Noise from process N
+			//actions[n] = QueryActorMATeam(cur_state)[n]*maxBaseCost + n_process(n_generator)*baseCosts[n];
+			actions[n] = QueryActorMATeam(cur_state)[n]*maxBaseCost*n_process(n_generator);
+			final_costs[n] += actions[n];
 		}
-		assert(final_costs.size() == N_EDGES);
 
 		if(verbose){
 			printf("CostsAdd: ");
 			for (size_t n = 0; n < final_costs.size(); n++)
-				printf(" %4.1f",final_costs[n]-baseCosts[n]);
+				printf(" %4.6f",final_costs[n]-baseCosts[n]);
 			printf("\n");
 		}
 
@@ -71,13 +65,13 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			for (int v = 0; v != whGraph->GetNumVertices(); v++)
 				routable_agvs += std::min<float>(get_vertex_reamaining_outgoing_capacity(v), get_vertex_utilization()[v]);
 		}
+		if(verbose)
+			print_warehouse_state();
 		traverse_one_step(final_costs);
 
 		//update current state
-		std::vector<float> temp_state = cur_state;
+		const std::vector<float> temp_state = cur_state;
 		cur_state = get_edge_utilization();
-		if(verbose)
-			print_warehouse_state();
 
 		// Log Perfomance Counters
 		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
@@ -89,9 +83,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			totalCommand += whAGVs[k]->GetNumCommanded();
 		}
 		if(verbose)
-			std::cout<<"Stats: \nTotal Move:\t"<<totalMove<<" \nTotal Enter:\t"<<totalEnter<<
-					"\nTotal wait:\t"<<totalWait<< "\nTotal Success:\t"<<totalSuccess<<
-					"\nTotal Command:\t"<<totalCommand<<std::endl;
+			std::cout<<"Stats: Total Move: "<<totalMove<<"\tTotal Enter: "<<totalEnter<<
+					"\tTotal wait: "<<totalWait<< "\tTotal Success: "<<totalSuccess<<
+					"\tTotal Command: "<<totalCommand<<std::endl;
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
 		
 		results.totalDeliveries += totalSuccess;
@@ -137,10 +131,10 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			assert(!std::isnan(reward));
 		}
 
-		// float total_AGVs_that_entered_an_edge_this_step = 0;
-		// for(AGV* a : whAGVs)
-		// 	total_AGVs_that_entered_an_edge_this_step += a->entered_edge_this_step();
-		// reward = total_AGVs_that_entered_an_edge_this_step - routable_agvs;
+		float total_AGVs_that_entered_an_edge_this_step = 0;
+		for(AGV* a : whAGVs)
+			total_AGVs_that_entered_an_edge_this_step += a->entered_edge_this_step();
+		reward = total_AGVs_that_entered_an_edge_this_step - routable_agvs;
 		// reward = rand()%100 - 50;
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;
@@ -240,6 +234,7 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
  				float t = (ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i]}))[0];
  				actions.push_back(t);
  			}
+		assert(actions.size() == N_EDGES);
  		return actions;
  	}else if (agent_type == agent_def::intersection){
  		std::vector<float> actions(N_EDGES);
@@ -248,6 +243,7 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
 			for (int j = 0; whAgents[i]->eIDs.size(); j++)
 				actions[whAgents[i]->eIDs[j]] =
 					ddpg_maTeam[i]->EvaluateActorNN_DDPG(states)[j];
+
 		return actions;
 	}
 	else{

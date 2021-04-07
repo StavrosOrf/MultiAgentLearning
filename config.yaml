@@ -6,19 +6,19 @@ mode:
 # eval_file: ../Domains/Small_120_AGVs_SS_centralised_no_time/Results/evaluation_29.csv # file containing best teams
 domain:
   folder: ../Domains/
-  warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS'
+  warehouse: Tiny_SS #Valid Opt: 'Small_SS', 'Tiny_SS'
   agents: centralized #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
 graph:
   vertices:   vertices.csv
   edges:      edges.csv
   capacities: capacities.csv
 DDPG:
-  epochs: 1 # set to 1 in test mode
+  epochs: 500 # set to 1 in test mode
   runs: 1
-  rand_proc_std_dev: 0.5
+  rand_proc_std_dev: 0.019
   batch_size: 50
 simulation:
-  verbose: true
+  verbose: false
   steps: 200
   agvs: origins_120.csv #Valid options: 70,90,120,200,400
   goals: goals.csv
