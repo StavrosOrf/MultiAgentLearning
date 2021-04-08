@@ -15,7 +15,6 @@ find_package(Torch REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 SET( CMAKE_EXPORT_COMPILE_COMMANDS ON )
-
 IF( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json" )
   EXECUTE_PROCESS( COMMAND ${CMAKE_COMMAND} -E copy_if_different
     ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json

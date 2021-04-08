@@ -44,7 +44,7 @@ void AGV::Traverse(){
 		t2v--;
 		tMove++;
 		// manage end of path transitions here
-		if (t2v == 0)
+		if (t2v == 0){
 			if (nextVertex == goal){ // end of path
 				nsDel++; // increment number of sucessful deliveries
 				agvPlanner->SetSource(goal); // set current vertex as new source
@@ -52,9 +52,11 @@ void AGV::Traverse(){
 				nextVertex = -1; // agv must re-enter graph
 				ncDel++; // increment number of commanded deliveries
 				agvPlanner->ResetSearch();
-				curEdge = NULL; // remove it from its final edge
+				//curEdge = NULL; // remove it from its final edge
 				isReplan = true;
 			}
+			curEdge = NULL;
+		}
 	}
 	else
 		if (nextVertex < 0) // waiting to enter

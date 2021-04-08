@@ -197,16 +197,16 @@ void Warehouse::print_warehouse_state(){
 	std::cout << "Warehouse edge utilization: {";
 	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n] > 0 )
-			std::cout<<"[e_"<< n << ",p= " << cur_state[n] << "], ";
+			std::cout<<"[e_"<< n << "p=" << cur_state[n] << "], ";
 	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n+N_EDGES] > 0 )
-			std::cout<<"[e_"<< n << ",t= " << cur_state[n+N_EDGES] << "], ";
+			std::cout<<"[e_"<< n << "t=" << cur_state[n+N_EDGES] << "], ";
 	std::cout << '}' << std::endl;
 
 	std::cout << "Warehouse Vertex utilization: {";
 	for (size_t n = 0; n < whGraph->GetNumVertices(); n++)
 		if (get_vertex_utilization()[n])
-			std::cout<<"[v_"<< n << ",p= " << get_vertex_utilization()[n] << "], ";
+			std::cout<<"[v_"<< n << "p=" << get_vertex_utilization()[n] << "], ";
 	std::cout << '}' << std::endl;
 }
 
@@ -219,34 +219,33 @@ void Warehouse::print_warehouse_state(){
 ************************************************************************************************/
 std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time);}
 std::vector<float> Warehouse::get_edge_utilization(bool care_about_time){
-	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time)));
-	for(size_t i = 0; i < N_EDGES; i++)
-		edge_utilization[i] = 0;
+	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time)),0);
 	if (care_about_time)
 		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
 			edge_utilization[i] = std::numeric_limits<float>::infinity();
-	for(AGV* a: whAGVs){
-		Edge* e = a->GetCurEdge();
-		int Edge_ID = whGraph->GetEdgeID(e);
-		if(e != NULL){//check if AGVs are at an edge
-			assert(Edge_ID < edge_utilization.size()/(1+(care_about_time)));
+	for(AGV* a: whAGVs)
+		if(a->is_on_edge()){
+			const int Edge_ID = whGraph->GetEdgeID(a->GetCurEdge());
+			//assert(Edge_ID < edge_utilization.size()/(1+(care_about_time)));
 			edge_utilization[Edge_ID]++;
 			if (care_about_time)
-				edge_utilization[Edge_ID + N_EDGES] = std::min<float>(
-					edge_utilization[Edge_ID + N_EDGES], a->GetT2V());
+				edge_utilization[Edge_ID+N_EDGES] = std::min<float>(
+						edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
 		}
-	}
 	if (care_about_time)
 		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
 			if (std::isinf(edge_utilization[i]))
 				edge_utilization[i] = 0;
+	if (care_about_time)
+		for(size_t i = 0; i < N_EDGES; i++)
+			assert((edge_utilization[i+N_EDGES]==0) == (edge_utilization[i]==0));
 	return edge_utilization;
 }
 
 /************************************************************************************************
- * *Input:[cost_add] a vector containing aditional planing costs indexed by EdgedIDs		*
- * *Method:Replans the AGVs using Methos of the {Graph} class					*
- * ************************************************************************************************/
+**Input:[cost_add] a vector containing aditional planing costs indexed by EdgedIDs		*
+**Method:Replans the AGVs using Methos of the {Graph} class					*
+*************************************************************************************************/
 void Warehouse::replan_AGVs(std::vector<float> cost_add){
 	// Replan AGVs as necessary
 	for (size_t k = 0; k < whAGVs.size(); k++){

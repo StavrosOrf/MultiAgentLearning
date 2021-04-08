@@ -59,7 +59,8 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		std::vector<float> final_costs = baseCosts;
 		for (size_t n = 0; n < N_EDGES; n++){ // Add Random Noise from process N
 			//actions[n] = QueryActorMATeam(cur_state)[n]*maxBaseCost + n_process(n_generator)*baseCosts[n];
-			actions[n] = QueryActorMATeam(cur_state)[n]*maxBaseCost*n_process(n_generator);
+			//actions[n] = QueryActorMATeam(cur_state)[n]*maxBaseCost*n_process(n_generator);
+			actions[n] = actions[n]*maxBaseCost*n_process(n_generator);
 			final_costs[n] += actions[n];
 		}
 
@@ -267,7 +268,7 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
 std::vector<float> Warehouse_DDPG::QueryTargetActorMATeam(std::vector<float> states){
  	assert(states.size() == N_EDGES*(1 + incorporates_time));
  	if(agent_type == agent_def::centralized)
- 		return ddpg_maTeam[0]->EvaluateActorNN_DDPG(states);
+ 		return ddpg_maTeam[0]->EvaluateTargetActorNN_DDPG(states);
  	else if (agent_type == agent_def::link){
  		std::vector<float> actions;
  		actions.reserve(N_EDGES);

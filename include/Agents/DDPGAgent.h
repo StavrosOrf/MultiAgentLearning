@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <torch/serialize/input-archive.h>
 #include <vector>
 #include <random>
 #include <cassert>
@@ -23,31 +24,30 @@ struct replay{
 };
 
 struct Net : torch::nn::Module {
-	Net(int32_t numIn, int32_t numOut, int32_t numHid) {
-		weightsA = register_parameter("input1", torch::rand({numIn, numHid}))/numHid;
-		weightsB = register_parameter("input2", torch::rand({numHid, numHid}))/numHid;
-		weightsC = register_parameter("input3", torch::rand({numHid, numHid}))/numHid;
-		weightsD = register_parameter("input4", torch::rand({numHid, numHid}))/numHid;
-		weightsE = register_parameter("input5", torch::rand({numHid, numHid}))/numHid;
-		weightsF = register_parameter("input6", torch::rand({numHid, numOut}))/numOut;
+	Net(int numIn, int numOut, int numHid, const size_t hid_count=1) {
+		assert(hid_count > 0);
+		first = register_parameter("inputW", torch::rand({numIn, numHid}))/numHid;
+		middle = new torch::Tensor[hid_count];
+		h_c = hid_count;
+		for (int i = 0; i != hid_count; i++)
+			middle[i] = register_parameter("hidW"+std::to_string(i), torch::rand({numHid, numHid}))/numHid;
+		last = register_parameter("outputW", torch::rand({numHid, numOut}))/numOut;
 		// weightsB = register_parameter("output", torch::rand({numHid, numOut}))*0.013;		
 	}
 	torch::Tensor forward(torch::Tensor input) {
-		torch::Tensor hidden_layer, output_layer,h1,h2,h3,h4,h5;
-		h1 = torch::sigmoid(torch::mm(input, weightsA));
-		h2 = torch::sigmoid(torch::mm(h1, weightsB));
-		h3 = torch::sigmoid(torch::mm(h2, weightsC));
-		h4 = torch::sigmoid(torch::mm(h3, weightsD));
-		h5 = torch::sigmoid(torch::mm(h4, weightsE));
-		output_layer = torch::sigmoid(torch::mm(h5, weightsF));
+		torch::Tensor output_layer,h;
+		h = torch::sigmoid(torch::mm(input, first));
+		for (int i = 0; i != h_c; i++)
+			h = torch::sigmoid(torch::mm(h, middle[i]));
+		output_layer = torch::sigmoid(torch::mm(h, last));
 
-		// hidden_layer = (torch::mm(input, weightsA));
-		// output_layer = (torch::mm(hidden_layer, weightsB));
 		// hidden_layer = torch::sigmoid(torch::mm(input, weightsA));
 		// output_layer = torch::sigmoid(torch::mm(hidden_layer, weightsB));
 		return output_layer;
 	}
-	torch::Tensor weightsA, weightsB,weightsC,weightsD,weightsE,weightsF;
+	//torch::Tensor weightsA, weightsB,weightsC,weightsD,weightsE,weightsF;
+	torch::Tensor first, last, *middle;
+	size_t h_c;
 	// torch::nn::Linear weightsA,weightsB;
 };
 
