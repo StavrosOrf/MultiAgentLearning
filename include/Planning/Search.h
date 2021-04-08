@@ -12,8 +12,7 @@
 
 
 // Dijkstra's path search class to store and search a graph
-class Search
-{
+class Search{
 	public:
 		Search(Graph * graph, int source, int goal):itsGraph(graph), itsQueue(0), itsSource(source), itsGoal(goal){}
 
@@ -32,7 +31,6 @@ class Search
 		Node * PathSearch();
 		float PathSearchLenght(); //return the cost/lenght of the path returned by PathSearch()
 		void ResetSearch();
-
 	private:
 		Graph * itsGraph;
 		Queue * itsQueue;

@@ -136,9 +136,13 @@ trace if Eigen, Threadpool.cpp
 - Added options for number of AGVs
 - Deprecated Learning library
 - Added Tiny Warehouse
-- Added a bool verbose argmument to all function that print
+- Added a bool verbose argument to all function that print
 - Moved some constant DDPG arguments from #define to config.yaml
 - General Code Cleanup
 
 ##v 0.00024k
 - Wrote Skeleton for DDPG_merged_step (need to be renamed)
+
+##v 0.00025k
+- Code Cleanup and performance optimizations
+- Fix Bug related to AGV routing

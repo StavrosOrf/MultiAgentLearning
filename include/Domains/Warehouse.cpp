@@ -375,16 +375,8 @@ std::vector<float> Warehouse::get_vertex_utilization(){
 	for (AGV* a: whAGVs)
 		if (a->is_on_graph() && a->GetT2V() == 0)
 			vertex_population[a->get_cur_vertex()]++;
-		else if(!a->is_on_graph()){
-			if (a->GetOriginVertex() != a->GetDestinationVertex())
-				vertex_population[a->GetOriginVertex()]++;
-			else if (a->GetOriginVertex() == a->GetDestinationVertex()){
-				if (a->get_possible_goals()[0] == a->GetOriginVertex())
-					vertex_population[a->get_possible_goals()[1]]++;
-				else
-					vertex_population[a->get_possible_goals()[0]]++;
-			}
-		}
+		else if(!a->is_on_graph())
+			vertex_population[a->get_start_vertex()]++;
 
 	return vertex_population;
 }
@@ -396,4 +388,3 @@ float Warehouse::get_vertex_reamaining_outgoing_capacity(int vertex){
 			get_edge_utilization(false)[whGraph->GetEdgeID(e)];
 	return t;
 }
-

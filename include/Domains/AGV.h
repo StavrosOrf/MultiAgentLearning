@@ -33,10 +33,11 @@ class AGV{
 		bool is_on_graph(){return nextVertex!=-1;}
 		bool is_on_edge(){return nextVertex > 0;}
 		bool entered_edge_this_step(){return just_entered_edge;}
+		int get_start_vertex(){return agvPlanner->GetSource();}
 		std::vector<int> get_possible_goals() const {return agvGoals;}
 		void reset_edge_enter(){just_entered_edge = false;}
 
-		int GetOriginVertex(){return origin;}
+		//int GetOriginVertex(){return origin;}
 		int GetDestinationVertex(){return goal;}
 
 		void DisplayPath();
@@ -45,23 +46,23 @@ class AGV{
 	private:
 		Edge * curEdge;			// current edge
 		int nextVertex;			// next vertex
-		size_t t2v;					// time to next intersection
-		int origin;					// origin vertex for initialisation
-		int goal;						// goal vertex
-		size_t nsDel;				// number of successful deliveries
-		size_t ncDel;				// number of commanded deliveries
-		size_t tMove;				// moving time
-		size_t tEnter;			 // time waiting to enter graph
-		size_t tWait;				// time waiting to cross intersections
-		std::vector<int> agvGoals;// vector of valid goal vertices
+		size_t t2v;			// time to next intersection
+		int origin;			// origin vertex for initialisation
+		int goal;			// goal vertex
+		size_t nsDel;			// number of successful deliveries
+		size_t ncDel;			// number of commanded deliveries
+		size_t tMove;			// moving time
+		size_t tEnter;			// time waiting to enter graph
+		size_t tWait;			// time waiting to cross intersections
+		std::vector<int> agvGoals;	// vector of valid goal vertices
 		bool just_entered_edge;
 
-		bool isReplan;			 // true if replanning is needed
+		bool isReplan;			// true if replanning is needed
 
-		Search * agvPlanner; // planning routine
-		std::vector<float> costs;// graph costs used to generate current plan
-		std::list<Edge *> path;	 // current path as ordered list of edges
-		void SetNewGoal();	 // set new goal vertex
+		Search * agvPlanner;		// planning routine
+		std::vector<float> costs;	// graph costs used to generate current plan
+		std::list<Edge *> path;		// current path as ordered list of edges
+		void SetNewGoal();		// set new goal vertex
 };
 
 #endif // AGV_H_

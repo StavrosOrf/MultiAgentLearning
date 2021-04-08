@@ -1,6 +1,6 @@
 #include "Warehouse_DDPG.h"
 
-#define REWARD_METHOD 0
+#define REWARD_METHOD 1
 //0 Random
 //1 Value of state
 //2 Routability
@@ -22,6 +22,7 @@ Warehouse_DDPG::~Warehouse_DDPG(void){
 }
 
 epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
+	assert(0);
 	InitialiseNewEpoch();
 	std::normal_distribution<float> n_process(0, N_proc_std_dev);
 	std::default_random_engine n_generator(time(NULL));
@@ -39,14 +40,12 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		float value_of_state = 0, value_of_prev_state = 0;
 #endif
 		float reward = 0;
-		const std::vector<float> vertex_util = get_vertex_utilization();
-
 		std::vector<float> actions = QueryActorMATeam(cur_state);
 
 		if(verbose){
 			//std::cout<<"State: " << cur_state << std::endl;
 			ddpg_maTeam[0]->printAboutNN();
-		
+
 			printf("Actor: ");
 			for (size_t n = 0; n < actions.size(); n++)
 				printf(" %4.6f", actions[n]);
@@ -114,19 +113,18 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 
 			for (AGV* a : whAGVs)
 				if (a->is_on_edge()){
-					Search s0(whGraph, a->GetOriginVertex(),
-							a->GetCurEdge()->GetVertex1());
+					Search s0(whGraph, a->get_start_vertex(),
+							a->GetNextVertex());
 					Search s1(whGraph, a->GetNextVertex(),
 							a->GetDestinationVertex());
 					float totalInverse = 0;
 					totalInverse += s0.PathSearchLenght();
 					totalInverse += s1.PathSearchLenght();
-					totalInverse += a->GetCurEdge()->GetLength();
 					total += 1/totalInverse;
 				} else if (a->is_on_graph()){
-					Search s0(whGraph, a->GetOriginVertex(),
-							a->GetNextVertex());
-					Search s1(whGraph, a->GetNextVertex(),
+					Search s0(whGraph, a->get_start_vertex(),
+							a->get_cur_vertex());
+					Search s1(whGraph, a->get_cur_vertex(),
 							a->GetDestinationVertex());
 					float totalInverse = 0;
 					totalInverse += s0.PathSearchLenght();
@@ -137,7 +135,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			reward = (value_of_state - value_of_prev_state)*32;
 
 			value_of_prev_state = value_of_state;
-			assert(!std::isnan(reward));
+			assert(!std::isnan(reward) && !std::isinf(reward));
 		}
 #endif
 
