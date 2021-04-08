@@ -13,7 +13,7 @@
 
 #include "Domains/Warehouse.h"
 #include "Domains/Warehouse_DDPG.h"
-#include "Domains/Warehouse_DDPG_merged_step.h"
+//#include "Domains/Warehouse_DDPG_merged_step.h"
 
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
@@ -89,8 +89,8 @@ Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		new_warehouse = new Warehouse_DDPG(configs);
-	else if(configs["mode"]["algo"].as<std::string>() == "DDPG_MERGED")
-		new_warehouse = new Warehouse_DDPG_merged_step(configs);
+	else if(configs["mode"]["algo"].as<std::string>() == "DDPG_MERGED");
+		//new_warehouse = new Warehouse_DDPG_merged_step(configs);
 	else{
 		std::cout << "error: currently only configured for 'ddpg' and ''! exiting.\n";
 		exit(1);

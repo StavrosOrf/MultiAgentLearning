@@ -31,7 +31,8 @@ class AGV{
 		size_t GetNumCommanded(){return ncDel;}
 		Search * GetAGVPlanner(){return agvPlanner;}
 		bool is_on_graph(){return nextVertex!=-1;}
-		bool is_on_edge(){return nextVertex > 0;}
+		bool is_on_edge(){return nextVertex > -1;}
+		//bool is_on_edge(){return t2v > 0;}
 		bool entered_edge_this_step(){return just_entered_edge;}
 		int get_start_vertex(){return agvPlanner->GetSource();}
 		std::vector<int> get_possible_goals() const {return agvGoals;}
