@@ -33,6 +33,12 @@ struct epoch_results{
 	uint totalMove;
 	uint totalEnter;
 	uint totalWait;
+	void update(uint tD, uint tM, uint tE, uint tW){
+		totalDeliveries += tD;
+		totalMove += tM;
+		totalEnter += tE;
+		totalWait += tW;
+	}
 };
 
 class Warehouse{

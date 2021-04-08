@@ -1,5 +1,9 @@
 #include "Warehouse_DDPG.h"
 
+#define REWARD_METHOD 0
+//0 Random
+//1 Value of state
+//2 Routability
 Warehouse_DDPG::~Warehouse_DDPG(void){
 	delete whGraph;
 	whGraph = 0;
@@ -31,7 +35,10 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		if(verbose)
 			std::cout <<"==============================================================Step - "<<t<<std::endl;
 		//Select action
-		float value_of_state = 0, value_of_prev_state = 0, reward = 0;
+#if REWARD_METHOD == 1
+		float value_of_state = 0, value_of_prev_state = 0;
+#endif
+		float reward = 0;
 		const std::vector<float> vertex_util = get_vertex_utilization();
 
 		std::vector<float> actions = QueryActorMATeam(cur_state);
@@ -40,9 +47,14 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			//std::cout<<"State: " << cur_state << std::endl;
 			ddpg_maTeam[0]->printAboutNN();
 		
-			printf("Actions: ");
+			printf("Actor: ");
 			for (size_t n = 0; n < actions.size(); n++)
-				printf(" %4.6f",actions[n]);
+				printf(" %4.6f", actions[n]);
+			printf("\n");
+
+			printf("TActor: ");
+			for (size_t n = 0; n < actions.size(); n++)
+				printf(" %4.6f", QueryTargetActorMATeam(cur_state)[n]);
 			printf("\n");
 		}
 
@@ -53,7 +65,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			final_costs[n] += actions[n];
 		}
 
-		if(verbose){
+		if (verbose){
 			printf("CostsAdd: ");
 			for (size_t n = 0; n < final_costs.size(); n++)
 				printf(" %4.6f",final_costs[n]-baseCosts[n]);
@@ -61,11 +73,10 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		}
 
 		float routable_agvs = 0;//total number of agvs that could be routed in the graph
-		{
-			for (int v = 0; v != whGraph->GetNumVertices(); v++)
-				routable_agvs += std::min<float>(get_vertex_reamaining_outgoing_capacity(v), get_vertex_utilization()[v]);
-		}
-		if(verbose)
+		for (int v = 0; v != whGraph->GetNumVertices(); v++)
+			routable_agvs += std::min<float>(get_vertex_reamaining_outgoing_capacity(v), get_vertex_utilization()[v]);
+
+		if (verbose)
 			print_warehouse_state();
 		traverse_one_step(final_costs);
 
@@ -88,23 +99,21 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 					"\tTotal Command: "<<totalCommand<<std::endl;
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
 		
-		results.totalDeliveries += totalSuccess;
-		results.totalMove += totalMove;
-		results.totalEnter += totalEnter;
-		results.totalWait += totalWait;
+		results.update(totalSuccess, totalMove, totalEnter, totalWait);
 
 		for (AGV* a : whAGVs) //Reset AGVs counters
 			a->ResetPerformanceCounters();
 
+#if REWARD_METHOD == 1
 		//Create and Save replay to buffer
 		{
-			//TODO optimize Perfomance (with LUTs?)
 			whGraph->reset_edge_costs();
+			//TODO optimize Perfomance (with LUTs?)
 
 			float total = 0;
 
 			for (AGV* a : whAGVs)
-				if (a->GetT2V() != 0){//Make Sure the AGV is on an Edge
+				if (a->is_on_edge()){
 					Search s0(whGraph, a->GetOriginVertex(),
 							a->GetCurEdge()->GetVertex1());
 					Search s1(whGraph, a->GetNextVertex(),
@@ -130,25 +139,28 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			value_of_prev_state = value_of_state;
 			assert(!std::isnan(reward));
 		}
+#endif
 
+#if REWARD_METHOD == 2
 		float total_AGVs_that_entered_an_edge_this_step = 0;
 		for(AGV* a : whAGVs)
 			total_AGVs_that_entered_an_edge_this_step += a->entered_edge_this_step();
 		reward = total_AGVs_that_entered_an_edge_this_step - routable_agvs;
-		// reward = rand()%100 - 50;
+#endif
+#if REWARD_METHOD == 0
+		reward = rand()%100 - 50;
+#endif
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;
 
 		replay r = {temp_state,cur_state,actions,reward};
 		if (routable_agvs != 0)
 			DDPGAgent::addToReplayBuffer(r);
-		else{
+		else
 			if(verbose)
 				std::cout << "Skipping adding it to the replay buffer" << std::endl;
-		}
 
 		if(DDPGAgent::get_replay_buffer_size() > DDPGAgent::get_batch_size() * 2 && t%TRAINING_STEP == 0){
-
 			for (size_t n = 0; n < ddpg_maTeam.size(); n++){
 				std::vector<replay> miniBatch = DDPGAgent::getReplayBufferBatch();
 				std::vector<float> Qvals;//Qvals
@@ -172,9 +184,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 					Qvals.push_back(q);
 					Qprime.push_back(y);
 
-					if (agent_type == agent_def::centralized){
+					if (agent_type == agent_def::centralized)
 						states.push_back(b.current_state);						
-					}else if (agent_type == agent_def::link){
+					else if (agent_type == agent_def::link){
 							states.push_back(b.current_state);
 							all_actions.push_back(b.action);																		
 					}					
