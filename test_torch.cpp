@@ -8,6 +8,9 @@
 #include <yaml-cpp/yaml.h>
 #include <time.h>
 
+#include "Agents/DDPGAgent.h"
+
+
 
 //Various Tests here
 int main(int argc, char* argv[]){
@@ -21,5 +24,18 @@ int main(int argc, char* argv[]){
 	for (int i = 0; i != t.numel(); i++)
 		assert(t[0][i].item<float>() == v0[i]);
 
-}
+	const int input_nodes = 20, output_nodes=1, hidden_count = 1;
+	Net nn (input_nodes, output_nodes, hidden_count);
 
+	std::cout << "Number of hidden layers: " << hidden_count << std::endl;
+	for (int i = 0; i != 15; i++)
+		//std::cout << nn.forward(torch::rand({output_nodes,input_nodes})).item<float>() << std::endl;
+		std::cout << nn.forward(torch::zeros({output_nodes,input_nodes})).item<float>() << std::endl;
+
+	/*
+	torch::Tensor fir = torch::rand({10, 5});
+	for (int i = 0; i != 15; i++)
+		std::cout << torch::mm(fir, torch::rand({5,1})) << std::endl;
+	*/
+
+}

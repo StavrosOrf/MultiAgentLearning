@@ -20,13 +20,10 @@
 
 #define N_EDGES whGraph->GetEdges().size()
 
+
 enum class algo_type{ddpg, ddpg_merged};
 
-enum class agent_def{
-	centralized,
-	link,
-	intersection
-};
+enum class agent_def{centralized, link, intersection};
 
 struct epoch_results{
 	uint totalDeliveries;
@@ -64,9 +61,11 @@ class Warehouse{
 		void GetJointState(std::vector<size_t> &s);//__attribute__((deprecated))
 		void print_warehouse_state();
 		std::vector<float> get_edge_utilization() __attribute__ ((pure));
-		std::vector<float> get_edge_utilization(bool with_time) __attribute__ ((pure));
+		std::vector<float> get_edge_utilization(bool with_time, bool normalize=false) __attribute__ ((pure));
 		std::vector<float> get_vertex_utilization() __attribute__ ((pure));
 		float get_vertex_reamaining_outgoing_capacity(int vertex) __attribute__ ((pure));
+		const float max_base_travel_cost() const{return *std::max_element(baseCosts.begin(), baseCosts.end());}
+		const float max_edge_capacity() const{return *std::max_element(capacities.begin(), capacities.end());}
 
 		size_t nSteps; //number of steps per simulation
 		std::vector<float> baseCosts;
@@ -94,5 +93,4 @@ class Warehouse{
 
 		agent_def agent_type;
 };
-
 #endif // WAREHOUSE_H_

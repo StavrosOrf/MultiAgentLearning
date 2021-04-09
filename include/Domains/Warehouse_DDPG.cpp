@@ -26,7 +26,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 	std::normal_distribution<float> n_process(0, N_proc_std_dev);
 	std::default_random_engine n_generator(time(NULL));
 	epoch_results results = {0,0,0,0};
-	const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
+	//const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
 
@@ -60,7 +60,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		for (size_t n = 0; n < N_EDGES; n++){ // Add Random Noise from process N
 			//actions[n] = QueryActorMATeam(cur_state)[n]*maxBaseCost + n_process(n_generator)*baseCosts[n];
 			//actions[n] = QueryActorMATeam(cur_state)[n]*maxBaseCost*n_process(n_generator);
-			actions[n] = actions[n]*maxBaseCost*n_process(n_generator);
+			actions[n] = actions[n]*max_base_travel_cost()*n_process(n_generator);
 			final_costs[n] += actions[n];
 		}
 

@@ -211,18 +211,22 @@ void Warehouse::print_warehouse_state(){
 }
 
 /************************************************************************************************
-*Input:	[verbose] which if true will print progress						*
+*Input:	[verbose] which if true will print progress, [normalize] which if true normalized the	*
+*	outputs to [0,1]									*
 *Method:Count for each edge how many AGVs are on it and if it [incorporates_time] also		*
-*	observe what is the remaining time of the closest to finish AGV				*
+*	observe what is the remaining time of the closest to finish AGV,			*
+*	finnaly if [normalize] is true, divide edge count by the maximum base travel among all	*
+*	the edges and (if [incorporates_time] is true) divide edge time left with it's capacity	*
 *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
 *	And the minimum remaining distance of AGVs on edge indexed by EdgeID+N_EDGES		*
 ************************************************************************************************/
-std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time);}
-std::vector<float> Warehouse::get_edge_utilization(bool care_about_time){
+std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, true);}
+std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool normalize){
 	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time)),0);
 	if (care_about_time)
 		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
 			edge_utilization[i] = std::numeric_limits<float>::infinity();
+
 	for(AGV* a: whAGVs)
 		if(a->is_on_edge()){
 			const int Edge_ID = whGraph->GetEdgeID(a->GetCurEdge());
@@ -232,6 +236,7 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time){
 				edge_utilization[Edge_ID+N_EDGES] = std::min<float>(
 						edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
 		}
+
 	if (care_about_time)
 		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
 			if (std::isinf(edge_utilization[i]))
@@ -239,6 +244,15 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time){
 	if (care_about_time)
 		for(size_t i = 0; i < N_EDGES; i++)
 			assert((edge_utilization[i+N_EDGES]==0) == (edge_utilization[i]==0));
+
+	if(normalize){
+		for (int i = 0; i != N_EDGES; i++)
+			edge_utilization[i] /= max_base_travel_cost();
+		if(care_about_time)
+			for(size_t i = N_EDGES; i < N_EDGES*2; i++)
+				edge_utilization[i] /= capacities[i];
+	}
+
 	return edge_utilization;
 }
 

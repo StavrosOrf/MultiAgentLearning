@@ -15,8 +15,8 @@ graph:
 DDPG:
   epochs: 1000 # set to 1 in test mode
   runs: 1
-  rand_proc_std_dev: 1
-  batch_size: 50
+  rand_proc_std_dev: 0.02
+  batch_size: 200
 simulation:
   verbose: true
   steps: 200
