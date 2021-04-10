@@ -11,10 +11,15 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state
 	mutNN = new Net(state_space, action_space, action_space*2);
 
 	//copy {Q', Mu'} <- {Q, Mu}
-	for (size_t i = 0; i < qNN->parameters().size(); i++ )
+	for (size_t i = 0; i < qNN->parameters().size(); i++)
 		qtNN->parameters()[i].set_data(qNN->parameters()[i].detach().clone());
-	for (size_t i = 0; i < muNN->parameters().size(); i++ )
+	for (size_t i = 0; i < muNN->parameters().size(); i++)
 		mutNN->parameters()[i].set_data(muNN->parameters()[i].detach().clone());
+
+	//TODO does not copy
+	for (size_t i = 0; i < qNN->parameters().size(); i++){
+	}
+
 
 	DDPGAgent::replay_buffer.reserve(REPLAY_BUFFER_SIZE);
 
