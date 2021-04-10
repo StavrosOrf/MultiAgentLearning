@@ -25,20 +25,27 @@ int main(int argc, char* argv[]){
 		assert(t[0][i].item<float>() == v0[i]);
 
 
-	//std::cout << "Number of hidden layers: " << hidden_count << std::endl;
-	//for (int i = 0; i != 15; i++)
-		//std::cout << nn.forward(torch::zeros({output_nodes,input_nodes})).item<float>() << std::endl;
+	{//test div
+		assert(torch::ones(1).div(2).item<float>() == 0.5);
+	}
+
+	{//assert that fowarding the same NN with the same inputs provides the same output
+		const int input_nodes = 20, output_nodes=10, hidden_nodes = 2, hidden_count = 1;
+		Net nn0 (input_nodes, output_nodes, hidden_nodes, hidden_count);
+		const torch::Tensor input = torch::rand({1,input_nodes});
+		assert(torch::sum(nn0.forward(input) == nn0.forward(input)).item<float>() == (float) output_nodes);
+	}
 
 	/*
 	torch::Tensor fir = torch::rand({10, 5});
 	for (int i = 0; i != 15; i++)
 		std::cout << torch::mm(fir, torch::rand({5,1})) << std::endl;
 	*/
+
 	{//copy parameters
 		//torch::Tensor t0 = torch::rand(1);
-		torch::Tensor t0 = torch::zeros(1);
-		torch::Tensor t1 = torch::ones(1);
-		t1 = t0.detach().clone();//does not work
+		torch::Tensor t0 = torch::zeros(1), t1 = t0.detach().clone();
+		t1 = t0.detach().clone();//works
 		//t1 = t0.clone();//does not work
 		//t1 = t0.detach();//does not work
 		//t1 = t0.clone().detach();//does not work
@@ -50,17 +57,28 @@ int main(int argc, char* argv[]){
 		//t1 = t0.data;
 		assert((t1 == t0).item<bool>());//Verify that copy was succefull
 
-		const int input_nodes = 20, output_nodes=1, hidden_nodes = 1, hidden_count = 1;
+		const int input_nodes = 20, output_nodes=10, hidden_nodes = 2, hidden_count = 1;
 		Net nn0 (input_nodes, output_nodes, hidden_nodes, hidden_count);
 		Net nn1 (input_nodes, output_nodes, hidden_nodes, hidden_count);
-		for (size_t i = 0; i < nn.parameters().size(); i++ ){
-			//torch::Tensor t = nn0.parameters()[i].detach().clone();
-			//nn1.parameters()[i].set_data(t);
-			nn1.parameters()[i] = nn0.parameters()[i].detach().clone();
+		for (size_t i = 0; i < nn0.parameters().size(); i++ ){
+			torch::Tensor t = nn0.parameters()[i].detach().clone();
+			nn1.parameters()[i].set_data(t);
+			//nn1.parameters()[i] = nn0.parameters()[i].detach().clone();
 		}
-		torch::Tensor input = torch::rand({1,input_nodes});
-		assert((nn.forward(input) == nn1.forward(input)).item<bool>());
-		//std::cout << (nn.forward(input) == nn1.forward(input)) << std::endl;
+		for (size_t i = 0; i < nn0.parameters().size(); i++ )//assert that all the parameters are equal
+			assert(torch::sum(nn1.parameters()[i] == nn0.parameters()[i]).item<float>() == nn0.parameters()[i].numel());
+
+		//std::cout << "nn0 first parameter:"<<nn0.parameters()[0];
+		//std::cout << "nn0 first:" <<nn0.first;
+		//std::cout << "nn1 first parameter:"<<nn1.parameters()[0];
+		//std::cout << "nn1 first:" <<nn1.first;
+		assert(torch::sum(nn1.parameters()[0] == nn1.first).item<float>() == nn1.parameters()[0].numel());
+
+		const torch::Tensor input = torch::ones({1,input_nodes});
+		//assert that the foward run of 2 identical NNs gives the same output
+		assert(torch::sum(nn0.forward(input) == nn1.forward(input)).item<float>() == (float) output_nodes);
 	}
 
+	{// test
+	}
 }

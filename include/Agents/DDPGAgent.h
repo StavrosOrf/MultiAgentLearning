@@ -26,30 +26,28 @@ struct replay{
 struct Net : torch::nn::Module {
 	Net(int numIn, int numOut, int numHid, const size_t hid_count=1) {
 		assert(hid_count >= 1);
-		first = register_parameter("inputW", torch::rand({numIn, numHid}))/numHid;
+		//first = register_parameter("inputW", torch::rand({numIn, numHid}))/numHid;
+		first = register_parameter("inputW", torch::randn({numIn, numHid}));
 		middle = new torch::Tensor[hid_count-1];
 		for (int i = 1; i != hid_count; i++)
-			middle[i] = register_parameter("hidW"+std::to_string(i), torch::rand({numHid, numHid}))/numHid;
-		last = register_parameter("outputW", torch::rand({numHid, numOut}))/numOut;
+			//middle[i] = register_parameter("hidW"+std::to_string(i), torch::rand({numHid, numHid}))/numHid;
+			middle[i] = register_parameter("hidW"+std::to_string(i), torch::randn({numHid, numHid}));
+		//last = register_parameter("outputW", torch::rand({numHid, numOut}))/numOut;
+		last = register_parameter("outputW", torch::randn({numHid, numOut}));
 		h_c = hid_count;
-		n_h = numHid;
-		// weightsB = register_parameter("output", torch::rand({numHid, numOut}))*0.013;		
 	}
-	torch::Tensor forward(torch::Tensor input) {
+	torch::Tensor forward(const torch::Tensor input) {
+		assert(torch::sum(first == parameters()[0]).item<float>() == first.numel());
 		torch::Tensor output_layer,h;
-		h = (torch::mm(input, first));
+		const torch::Tensor r_input = (input-0.5)*2;
+		h = torch::tanh(torch::mm(r_input, first));
 		for (int i = 1; i != h_c; i++)
-			h = torch::sigmoid(torch::mm(h, middle[i]));
-		//output_layer = torch::sigmoid(torch::mm(h, last));
-		output_layer = (torch::mm(h, last));
-
-		// hidden_layer = torch::sigmoid(torch::mm(input, weightsA));
-		// output_layer = torch::sigmoid(torch::mm(hidden_layer, weightsB));
+			h = torch::tanh(torch::mm(h, middle[i]));
+		output_layer = torch::tanh(torch::mm(h, last));
 		return output_layer;
 	}
-	//torch::Tensor weightsA, weightsB,weightsC,weightsD,weightsE,weightsF;
 	torch::Tensor first, last, *middle;
-	size_t h_c, n_h;
+	size_t h_c;
 };
 
 class DDPGAgent{

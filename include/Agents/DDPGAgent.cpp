@@ -16,10 +16,11 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state
 	for (size_t i = 0; i < muNN->parameters().size(); i++)
 		mutNN->parameters()[i].set_data(muNN->parameters()[i].detach().clone());
 
-	//TODO does not copy
-	for (size_t i = 0; i < qNN->parameters().size(); i++){
-	}
-
+	//assert that copy was successfull
+	for (size_t i = 0; i < qNN->parameters().size(); i++ )
+		assert(torch::sum(qNN->parameters()[i] == qtNN->parameters()[i]).item<float>() == qNN->parameters()[i].numel());
+	for (size_t i = 0; i < muNN->parameters().size(); i++ )
+		assert(torch::sum(muNN->parameters()[i] == mutNN->parameters()[i]).item<float>() == muNN->parameters()[i].numel());
 
 	DDPGAgent::replay_buffer.reserve(REPLAY_BUFFER_SIZE);
 
