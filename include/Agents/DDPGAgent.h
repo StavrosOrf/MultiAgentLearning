@@ -13,8 +13,8 @@
 #include <torch/torch.h>
 
 #define REPLAY_BUFFER_SIZE 100000000
-#define GAMMA 0.90
-#define TAU 0.02
+#define GAMMA 0.99
+#define TAU 0.01
 #define TRAINING_STEP 1
 
 struct replay{
@@ -43,10 +43,10 @@ struct Net : torch::nn::Module {
 	torch::Tensor forward(const torch::Tensor input) {
 		assert(torch::sum(first == parameters()[0]).item<float>() == first.numel());
 		torch::Tensor output_layer,h;
-		const torch::Tensor r_input = (input-0.5)*2;
-		h = torch::tanh(torch::mm(r_input, first));
+		// const torch::Tensor r_input = (input-0.5)*2;
+		h = torch::tanh(torch::mm(input, first));
 		for (int i = 1; i != h_c; i++)
-			h = torch::tanh(torch::mm(h, middle[i]));
+			h = (torch::mm(h, middle[i]));
 		output_layer = torch::tanh(torch::mm(h, last));
 		return output_layer;
 	}
