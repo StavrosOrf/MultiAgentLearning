@@ -29,6 +29,10 @@ int main(int argc, char* argv[]){
 		assert(torch::ones(1).div(2).item<float>() == 0.5);
 	}
 
+	{//test minus
+		assert((torch::ones(1)-1 == torch::zeros(1)).item<bool>());
+	}
+
 	{//assert that fowarding the same NN with the same inputs provides the same output
 		const int input_nodes = 20, output_nodes=10, hidden_nodes = 2, hidden_count = 1;
 		Net nn0 (input_nodes, output_nodes, hidden_nodes, hidden_count);

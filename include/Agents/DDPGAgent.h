@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <torch/csrc/autograd/generated/variable_factories.h>
 #include <torch/serialize/input-archive.h>
 #include <vector>
 #include <random>
@@ -28,12 +29,15 @@ struct Net : torch::nn::Module {
 		assert(hid_count >= 1);
 		//first = register_parameter("inputW", torch::rand({numIn, numHid}))/numHid;
 		first = register_parameter("inputW", torch::randn({numIn, numHid}));
+		parameters()[0].set_data((parameters()[0]-0.5)/numHid*2);
 		middle = new torch::Tensor[hid_count-1];
-		for (int i = 1; i != hid_count; i++)
-			//middle[i] = register_parameter("hidW"+std::to_string(i), torch::rand({numHid, numHid}))/numHid;
+		for (int i = 1; i != hid_count; i++){
 			middle[i] = register_parameter("hidW"+std::to_string(i), torch::randn({numHid, numHid}));
+			parameters()[i].set_data((parameters()[i]-0.5)/numHid*2);
+		}
 		//last = register_parameter("outputW", torch::rand({numHid, numOut}))/numOut;
 		last = register_parameter("outputW", torch::randn({numHid, numOut}));
+		parameters()[hid_count].set_data((parameters()[hid_count]-0.5)/numHid*2);
 		h_c = hid_count;
 	}
 	torch::Tensor forward(const torch::Tensor input) {

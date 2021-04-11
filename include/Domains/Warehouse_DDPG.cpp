@@ -26,7 +26,6 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 	std::normal_distribution<float> n_process(0, N_proc_std_dev);
 	std::default_random_engine n_generator(time(NULL));
 	epoch_results results = {0,0,0,0};
-	//const float maxBaseCost=*std::max_element(baseCosts.begin(), baseCosts.end());
 
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
 
@@ -93,9 +92,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			totalCommand += whAGVs[k]->GetNumCommanded();
 		}
 		if(verbose)
-			std::cout<<"Stats: Total Move: "<<totalMove<<"\tTotal Enter: "<<totalEnter<<
-					"\tTotal wait: "<<totalWait<< "\tTotal Success: "<<totalSuccess<<
-					"\tTotal Command: "<<totalCommand<<std::endl;
+			std::cout<<"Stats: Total Move: "<<totalMove<<", Total Enter: "<<totalEnter<<
+					", Total wait: "<<totalWait<< ", Total Success: "<<totalSuccess<<
+					", Total Command: "<<totalCommand<<std::endl;
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
 		
 		results.update(totalSuccess, totalMove, totalEnter, totalWait);
@@ -133,11 +132,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 					total += 1/totalInverse;
 				}
 			value_of_state = total;
-			reward = (value_of_state - value_of_prev_state)*32;
-
-			value_of_prev_state = value_of_state;
-			assert(!std::isnan(reward) && !std::isinf(reward));
 		}
+			reward = (value_of_state - value_of_prev_state)*16;
+			value_of_prev_state = value_of_state;
 #endif
 
 #if REWARD_METHOD == 2
@@ -152,6 +149,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;
 
+		assert(!std::isnan(reward) && !std::isinf(reward));
 		replay r = {temp_state,cur_state,actions,reward};
 		if (routable_agvs != 0)
 			DDPGAgent::addToReplayBuffer(r);

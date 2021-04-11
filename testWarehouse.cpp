@@ -92,7 +92,7 @@ Warehouse* create_warehouse(YAML::Node configs){
 	else if(configs["mode"]["algo"].as<std::string>() == "DDPG_MERGED");
 		//new_warehouse = new Warehouse_DDPG_merged_step(configs);
 	else{
-		std::cout << "error: currently only configured for 'ddpg' and ''! exiting.\n";
+		std::cout << "ERROR: currently only configured for 'ddpg' and ''! exiting.\n";
 		exit(1);
 	}
 
