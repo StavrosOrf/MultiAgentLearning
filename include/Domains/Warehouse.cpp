@@ -409,3 +409,17 @@ float Warehouse::get_vertex_reamaining_outgoing_capacity(int vertex){
 			get_edge_utilization(false)[whGraph->GetEdgeID(e)];
 	return t;
 }
+
+
+/*******************************
+** Print Agvs Paths
+********************************/
+void Warehouse::printAgvPaths(){
+
+	for (size_t k = 0; k < whAGVs.size(); k++){
+		std::cout<<", AGV_"<<k<<":";
+		whAGVs[k]->DisplayPath();
+	}
+	std::cout<<'\n';
+}
+

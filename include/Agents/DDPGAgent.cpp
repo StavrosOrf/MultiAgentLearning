@@ -3,12 +3,12 @@
 
 DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space){
 	//Create NNs
-	qNN = new Net(global_state_space+global_action_space,
+	qNN = new CriticNN(global_state_space+global_action_space,
 		1, (global_state_space + global_action_space) * 2);
-	qtNN = new Net(global_state_space+global_action_space,
+	qtNN = new CriticNN(global_state_space+global_action_space,
 		1, (global_state_space + global_action_space) * 2);
-	muNN = new Net(state_space, action_space, action_space*2);
-	mutNN = new Net(state_space, action_space, action_space*2);
+	muNN = new ActorNN(state_space, action_space, action_space*2);
+	mutNN = new ActorNN(state_space, action_space, action_space*2);
 
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN->parameters().size(); i++)
@@ -35,7 +35,8 @@ DDPGAgent::~DDPGAgent(){
 	delete(qtNN);
 	delete(muNN);
 	delete(mutNN);
-	qNN = qtNN = muNN = mutNN = NULL;
+	qNN = qtNN = NULL;
+	muNN = mutNN = NULL;
 }
 
 /************************************************************************************************
@@ -258,5 +259,15 @@ void DDPGAgent::printAboutNN(){
 			<<" MutNN "<<i<<": "<< torch::sum(tt).item<float>();
 		std::cout << '\n';
 	}
+
+	// for (size_t i = 0; i < qNN->parameters().size(); i++ ){
+
+	// 	torch::Tensor q = qNN->parameters()[i].detach().clone();
+	// 	torch::Tensor qq = qtNN->parameters()[i].detach().clone();
+
+	// 	std::cout<<" QuNN "<<i<<": "<< torch::sum(q).item<float>()
+	// 		<<" QutNN "<<i<<": "<< torch::sum(qq).item<float>();
+	// 	std::cout << '\n';
+	// }
 	
 }

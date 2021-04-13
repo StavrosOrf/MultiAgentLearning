@@ -11,7 +11,8 @@
 #include <cassert>
 #include <algorithm>
 #include <torch/torch.h>
-#include <typeinfo>
+#include <cmath>
+#include <cstdio>
 
 #define REPLAY_BUFFER_SIZE 100000000
 #define GAMMA 0.99
@@ -56,21 +57,59 @@ struct Net : torch::nn::Module {
 };
 
 struct ActorNN : torch::nn::Module {
-	ActorNN (int numIn, int numOut, int numHid, const size_t hid_count=1) {
+	ActorNN (int numIn, int numOut, int numHid) {		
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid*2));
+		fc2 = register_module("fc2",torch::nn::Linear(numHid*2,numOut));
+		// fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
+	}
+	torch::Tensor forward(torch::Tensor x) {
 
+		auto m = torch::mean(x);
+		auto s = torch::std(x);		
+		if(torch::is_nonzero(torch::sum(x)))
+			x = (x-m)/s;		
+
+		// x = torch::relu(fc1->forward(x));
+		// x = torch::relu(fc2->forward(x));
+		x = (fc1->forward(x));
+		x = (fc2->forward(x));
+
+		// return -x;
+		m = torch::mean(x);
+		s = torch::std(x);		
+		if(torch::is_nonzero(torch::sum(x)))
+			x = (x-m)/s;			
+
+		return x;
+	}
+	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};	
+};
+
+struct CriticNN : torch::nn::Module {
+	CriticNN (int numIn, int numOut, int numHid) {
+
+		// n1 = register_module("n1",torch::nn::LayerNorm(numIn));
 		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));
 		fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
 		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
 	}
-	torch::Tensor forward(torch::Tensor x) {
-		// x = torch::nn
-		x = torch::relu(fc1->forward(x));
-		x = torch::dropout(x,0.5,is_training());
-		x = torch::relu(fc2->forward(x));
-		x = torch::relu(fc3->forward(x));
+	torch::Tensor forward(torch::Tensor x) {	
+		auto m = torch::mean(x);
+		auto s = torch::std(x);		
+		if(torch::is_nonzero(torch::sum(x)))
+			x = (x-m)/s;	
+
+		x = (fc1->forward(x));
+		x = (fc2->forward(x));
+		x = (fc3->forward(x));
+		
+		// m = torch::mean(x);
+		// s = torch::std(x);		
+		// if(torch::is_nonzero(torch::sum(x)))
+		// 	x = (x-m)/s;							
 		return x;
 	}
-	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};	
+	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
 class DDPGAgent{
@@ -97,18 +136,21 @@ class DDPGAgent{
 		static void set_batch_size(int i){batch_size = i;}
 		static size_t get_batch_size(){return batch_size;}
 	protected:
-		Net* qNN, *qtNN;
-		Net* muNN, *mutNN;
-		
+		// Net* qNN, *qtNN;
+		// Net* muNN, *mutNN;
+
+		CriticNN* qNN, *qtNN;
+		ActorNN* muNN, *mutNN;
 		inline static std::vector<replay> replay_buffer;
 		inline static size_t batch_size;
 
 		Net* temp = new Net(1, 1, 1*2);
 
+		// We need a global optimizer, not a new one in each step!!!!!!!!
 		torch::optim::Adam optimizerMuNN = torch::optim::Adam(temp->parameters(),0.01);
 		torch::optim::Adam optimizerQNN = torch::optim::Adam(temp->parameters(),0.01);
 		
-		// We need a global optimizer, not a new one in each step!!!!!!!!
+		
 };
 
 #endif // DDPG_AGENT_H_

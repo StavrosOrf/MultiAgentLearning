@@ -23,7 +23,7 @@ Warehouse_DDPG::~Warehouse_DDPG(void){
 
 epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 	InitialiseNewEpoch();
-	std::normal_distribution<float> n_process(0, N_proc_std_dev);
+	std::normal_distribution<float> n_process(1, N_proc_std_dev);
 	std::default_random_engine n_generator(time(NULL));
 	epoch_results results = {0,0,0,0};
 
@@ -32,7 +32,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 	// each timestep
 	for (size_t t = 0; t < nSteps; t++){
 		if(verbose)
-			std::cout <<"==============================================================Step - "<<t<<std::endl;
+			std::cout <<"=== Epoch: "<<epoch<<" ==============================================================Step - "<<t<<std::endl;
 		//Select action
 #if REWARD_METHOD == 1
 		float value_of_state = 0, value_of_prev_state = 0;
@@ -41,8 +41,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		std::vector<float> actions = QueryActorMATeam(cur_state);
 
 		if(verbose){
-			std::cout<<"State: " << cur_state << std::endl;
 			ddpg_maTeam[0]->printAboutNN();
+
+			std::cout<<"-\nState: " << cur_state <<"\n-"<< std::endl;			
 
 			printf("Actor: ");
 			for (size_t n = 0; n < actions.size(); n++)
@@ -57,16 +58,30 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 
 		std::vector<float> final_costs = baseCosts;
 		for (size_t n = 0; n < N_EDGES; n++){ // Add Random Noise from process N
-			actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*max_base_travel_cost();			
+			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*max_base_travel_cost();			
 			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*baseCosts[n];			
 			// actions[n] = actions[n]*max_base_travel_cost()*n_process(n_generator);
-			final_costs[n] += actions[n];
+			actions[n] = actions[n]*n_process(n_generator); //4th ?
+			// final_costs[n] += actions[n];
 		}
+		final_costs = actions;
+		//Final costs must be >= 0
+		float min = *min_element(final_costs.begin(),final_costs.end());
+		if( min < 0 )
+			for (size_t n = 0; n < N_EDGES; n++)
+				final_costs[n] += (-min);
+		else
+			min = 0;
 
 		if (verbose){
-			printf("CostsAdd: ");
+			// printf("CostsAdd: ");
+			// for (size_t n = 0; n < final_costs.size(); n++)
+			// 	printf(" %.1f",final_costs[n]-baseCosts[n] + min);
+			// printf("\n");
+
+			printf("\nFinalCosts: ");
 			for (size_t n = 0; n < final_costs.size(); n++)
-				printf(" %.2f",final_costs[n]-baseCosts[n]);
+				printf(" %.1f",final_costs[n]);
 			printf("\n");
 		}
 
@@ -74,9 +89,12 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		for (int v = 0; v != whGraph->GetNumVertices(); v++)
 			routable_agvs += std::min<float>(get_vertex_reamaining_outgoing_capacity(v), get_vertex_utilization()[v]);
 
-		if (verbose)
-			print_warehouse_state();
+		// final_costs[1] = final_costs[5] = 0.1; // sanity check-> Passed
+		// if (verbose)
+		// 	print_warehouse_state();
 		traverse_one_step(final_costs);
+
+		// printAgvPaths();
 
 		//update current state
 		const std::vector<float> temp_state = cur_state;
@@ -151,11 +169,11 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 
 		assert(!std::isnan(reward) && !std::isinf(reward));
 		replay r = {temp_state,cur_state,actions,reward};
-		if (routable_agvs != 0)
-			DDPGAgent::addToReplayBuffer(r);
-		else
-			if(verbose)
-				std::cout << "Skipping adding it to the replay buffer" << std::endl;
+		// if (routable_agvs != 0)
+		DDPGAgent::addToReplayBuffer(r);
+		// else
+		// 	if(verbose)
+		// 		std::cout << "Skipping adding it to the replay buffer" << std::endl;
 
 		if(DDPGAgent::get_replay_buffer_size() > DDPGAgent::get_batch_size() * 2 && t%TRAINING_STEP == 0){
 			for (size_t n = 0; n < ddpg_maTeam.size(); n++){
@@ -172,7 +190,8 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 				for (size_t i = 0; i < DDPGAgent::get_batch_size(); i++){
 					replay b = miniBatch[i];
 					std::vector<float> nta = QueryTargetActorMATeam(b.next_state);
-
+					// std::cout <<"nstate: "<<b.next_state.size()<<std::endl;
+					// std::cout <<"nta: "<<nta.size()<<std::endl;
 					assert(N_EDGES && nta.size() == N_EDGES);
 					float y = b.reward + GAMMA *
 						ddpg_maTeam[n]->EvaluateTargetCriticNN_DDPG(b.next_state,nta)[0];

@@ -53,6 +53,7 @@ class Warehouse{
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
 		virtual epoch_results SimulateEpoch(bool verbose,int epoch) = 0;
+		void printAgvPaths();
 
 	protected:
 		void replan_AGVs(const std::vector<float> final_cost);

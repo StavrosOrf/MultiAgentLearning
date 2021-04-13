@@ -10,7 +10,6 @@
 #include "Planning/Search.h"
 #include "Agents/DDPGAgent.h"
 
-
 class Warehouse_DDPG : public Warehouse {
 	public:
 		Warehouse_DDPG(YAML::Node configs) : Warehouse(configs){

@@ -122,7 +122,7 @@ void AGV::PlanAGV(std::vector<float> c){
 void AGV::DisplayPath(){
 	for (std::list<Edge *>::iterator it = path.begin(); it != path.end(); it++)
 		std::cout << "(" << (*it)->GetVertex1() << "," << (*it)->GetVertex2() << ") ";
-	std::cout << "\n";
+	// std::cout << "\n";
 }
 
 void AGV::SetNewGoal(){
