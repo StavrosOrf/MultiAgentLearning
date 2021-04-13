@@ -198,9 +198,9 @@ void Warehouse::print_warehouse_state(){
 	for (size_t n = 0; n < N_EDGES; n++)
 		if (cur_state[n] > 0 )
 			std::cout<<"[e_"<< n << "p=" << cur_state[n] << "], ";
-	for (size_t n = 0; n < N_EDGES; n++)
-		if (cur_state[n+N_EDGES] > 0 )
-			std::cout<<"[e_"<< n << "t=" << cur_state[n+N_EDGES] << "], ";
+	// for (size_t n = 0; n < N_EDGES; n++)
+	// 	if (cur_state[n+N_EDGES] > 0 )
+	// 		std::cout<<"[e_"<< n << "t=" << cur_state[n+N_EDGES] << "], ";
 	std::cout << '}' << std::endl;
 
 	std::cout << "Warehouse Vertex utilization: {";
@@ -245,21 +245,21 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool no
 		for(size_t i = 0; i < N_EDGES; i++)
 			assert((edge_utilization[i+N_EDGES]==0) == (edge_utilization[i]==0));
 
-	if(normalize){//TODO update doc
-		for (int i = 0; i != N_EDGES; i++){
-			edge_utilization[i] /= max_base_travel_cost();
-			// edge_utilization[i] = edge_utilization[i]*2-1;//normalize to -[1,1]
-			 edge_utilization[i] = edge_utilization[i]*1.8-0.9;//normalize to [-0.9,0.9]
-		}
-		if(care_about_time){
-			for(size_t i = N_EDGES; i < N_EDGES*2; i++){
-				edge_utilization[i] /= capacities[i];
-				// edge_utilization[i] = edge_utilization[i]*2-1;
-				edge_utilization[i] = edge_utilization[i]*1.8-0.9;
-			}
+	// if(normalize){//TODO update doc
+	// 	for (int i = 0; i != N_EDGES; i++){
+	// 		edge_utilization[i] /= max_base_travel_cost();
+	// 		// edge_utilization[i] = edge_utilization[i]*2-1;//normalize to -[1,1]
+	// 		 edge_utilization[i] = edge_utilization[i]*1.8-0.9;//normalize to [-0.9,0.9]
+	// 	}
+	// 	if(care_about_time){
+	// 		for(size_t i = N_EDGES; i < N_EDGES*2; i++){
+	// 			edge_utilization[i] /= capacities[i];
+	// 			// edge_utilization[i] = edge_utilization[i]*2-1;
+	// 			edge_utilization[i] = edge_utilization[i]*1.8-0.9;
+	// 		}
 				
-		}
-	}
+	// 	}
+	// }
 
 	return edge_utilization;
 }

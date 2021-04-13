@@ -11,6 +11,7 @@
 #include <cassert>
 #include <algorithm>
 #include <torch/torch.h>
+#include <typeinfo>
 
 #define REPLAY_BUFFER_SIZE 100000000
 #define GAMMA 0.99
@@ -54,6 +55,24 @@ struct Net : torch::nn::Module {
 	size_t h_c;
 };
 
+struct ActorNN : torch::nn::Module {
+	ActorNN (int numIn, int numOut, int numHid, const size_t hid_count=1) {
+
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));
+		fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
+		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
+	}
+	torch::Tensor forward(torch::Tensor x) {
+		// x = torch::nn
+		x = torch::relu(fc1->forward(x));
+		x = torch::dropout(x,0.5,is_training());
+		x = torch::relu(fc2->forward(x));
+		x = torch::relu(fc3->forward(x));
+		return x;
+	}
+	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};	
+};
+
 class DDPGAgent{
 	public:
 		DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space );
@@ -69,8 +88,8 @@ class DDPGAgent{
 		static size_t get_replay_buffer_size(){return replay_buffer.size();}
 
 		void updateTargetWeights();
-		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime);
-		void updateMuActor(const std::vector<std::vector<float>> states);
+		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime,bool verbose);
+		void updateMuActor(const std::vector<std::vector<float>> states, bool verbose);
 		void updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber,bool withTime);
 
 		void printAboutNN();
@@ -80,8 +99,16 @@ class DDPGAgent{
 	protected:
 		Net* qNN, *qtNN;
 		Net* muNN, *mutNN;
+		
 		inline static std::vector<replay> replay_buffer;
 		inline static size_t batch_size;
+
+		Net* temp = new Net(1, 1, 1*2);
+
+		torch::optim::Adam optimizerMuNN = torch::optim::Adam(temp->parameters(),0.01);
+		torch::optim::Adam optimizerQNN = torch::optim::Adam(temp->parameters(),0.01);
+		
+		// We need a global optimizer, not a new one in each step!!!!!!!!
 };
 
 #endif // DDPG_AGENT_H_

@@ -146,3 +146,7 @@ trace if Eigen, Threadpool.cpp
 ##v 0.00025k
 - Code Cleanup and performance optimizations
 - Fix Bug related to AGV routing
+
+##v 0.00026o
+- Optimizers are now correctly initialized and used
+

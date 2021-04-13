@@ -24,10 +24,10 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state
 
 	DDPGAgent::replay_buffer.reserve(REPLAY_BUFFER_SIZE);
 
-	// torch::optim::SGD optimezerQNN(qNN->parameters(),0.01);
-	// torch::optim::SGD optimezerQtNN(qNN->parameters(),0.01);
-	// torch::optim::SGD optimezerMuNN(qNN->parameters(),0.01);
-	// torch::optim::SGD optimezerMuTNN(qNN->parameters(),0.01);
+
+	optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
+	optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
+
 }
 
 DDPGAgent::~DDPGAgent(){
@@ -144,9 +144,9 @@ void DDPGAgent::updateTargetWeights(){
 	// std::cout<<torch::all(qtNN->parameters()[0].eq(qNN->parameters()[0]))<<std::endl;
 	// std::cout<<torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0]))<<std::endl;
 }
-void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprime){
+void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprime,bool verbose){
 	//TODO try other optimizers too(etc SGD)
-	torch::optim::Adam optimezerQNN(qNN->parameters(),0.01);
+	// torch::optim::Adam optimizerQNN(qNN->parameters(),0.01);
 
 	torch::Tensor QprimeTensor = torch::tensor(Qprime).unsqueeze(0);
 	torch::Tensor QvalsTensor = torch::tensor(Qvals).unsqueeze(0);
@@ -154,21 +154,21 @@ void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprim
 	//Update critic loss
 	torch::Tensor loss= torch::mse_loss(QvalsTensor,QprimeTensor);
 
-	optimezerQNN.zero_grad();
+	optimizerQNN.zero_grad();
 	loss.backward();
-	optimezerQNN.step();
+	optimizerQNN.step();
 
 	// std::cout<<"QVals \t\t Qprime"<<std::endl;
 	// for (int i = 0; i != batch_size; i++){
 	// 	std::cout<<Qvals[i]<<"\t\t"<<Qprime[i]<<std::endl;
 	// }
-
-	// std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;
+	if (verbose)
+		std::cout<<"QcriticLoss:\t"<<loss.item<float>()<<std::endl;
 }
 
 void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber,bool withTime){
 	//TODO SCALE INPUTS OF Q NETWORK(if necessary)
-	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
+	// torch::optim::Adam optimizerMuNN(muNN->parameters(),0.01);
 
 	//Update actor
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
@@ -209,16 +209,16 @@ void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::ve
 	// std::cout<<qNN->forward(input)<<std::endl;
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 
-	optimezerMuNN.zero_grad();
+	optimizerMuNN.zero_grad();
 	policy_loss.backward();
-	optimezerMuNN.step();
+	optimizerMuNN.step();
 
 	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
 }
 
-void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
+void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states,bool verbose){
 	//TODO SCALE INPUTS OF Q NETWORK(if necessary)
-	torch::optim::Adam optimezerMuNN(muNN->parameters(),0.01);
+	// torch::optim::Adam optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
 
 	//Update actor
 	torch::Tensor states_ = torch::tensor(states[0]).unsqueeze(0);
@@ -238,11 +238,12 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states){
 
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 
-	optimezerMuNN.zero_grad();
+	optimizerMuNN.zero_grad();
 	policy_loss.backward();
-	optimezerMuNN.step();
+	optimizerMuNN.step();
 
-	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
+	if(verbose)
+		std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
 }
 
 /************************************************************************************************
@@ -253,8 +254,9 @@ void DDPGAgent::printAboutNN(){
 		torch::Tensor t = muNN->parameters()[i].detach().clone();
 		torch::Tensor tt = mutNN->parameters()[i].detach().clone();
 
-		std::cout<<"MuNN "<<i<<": "<< torch::sum(t).item<float>()
+		std::cout<<" MuNN "<<i<<": "<< torch::sum(t).item<float>()
 			<<" MutNN "<<i<<": "<< torch::sum(tt).item<float>();
+		std::cout << '\n';
 	}
-	std::cout << '\n';
+	
 }

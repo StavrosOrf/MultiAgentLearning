@@ -41,24 +41,24 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		std::vector<float> actions = QueryActorMATeam(cur_state);
 
 		if(verbose){
-			//std::cout<<"State: " << cur_state << std::endl;
+			std::cout<<"State: " << cur_state << std::endl;
 			ddpg_maTeam[0]->printAboutNN();
 
 			printf("Actor: ");
 			for (size_t n = 0; n < actions.size(); n++)
-				printf(" %4.6f", actions[n]);
+				printf(" %.2f", actions[n]);
 			printf("\n");
 
-			printf("TActor: ");
-			for (size_t n = 0; n < actions.size(); n++)
-				printf(" %4.6f", QueryTargetActorMATeam(cur_state)[n]);
-			printf("\n");
+			// printf("TActor: ");
+			// for (size_t n = 0; n < actions.size(); n++)
+			// 	printf(" %4.6f", QueryTargetActorMATeam(cur_state)[n]);
+			// printf("\n");
 		}
 
 		std::vector<float> final_costs = baseCosts;
 		for (size_t n = 0; n < N_EDGES; n++){ // Add Random Noise from process N
 			actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*max_base_travel_cost();			
-			actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*baseCosts[n];			
+			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*baseCosts[n];			
 			// actions[n] = actions[n]*max_base_travel_cost()*n_process(n_generator);
 			final_costs[n] += actions[n];
 		}
@@ -66,7 +66,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		if (verbose){
 			printf("CostsAdd: ");
 			for (size_t n = 0; n < final_costs.size(); n++)
-				printf(" %4.6f",final_costs[n]-baseCosts[n]);
+				printf(" %.2f",final_costs[n]-baseCosts[n]);
 			printf("\n");
 		}
 
@@ -92,8 +92,8 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			totalCommand += whAGVs[k]->GetNumCommanded();
 		}
 		if(verbose)
-			std::cout<<"Stats: Total Move: "<<totalMove<<", Total Enter: "<<totalEnter<<
-					", Total wait: "<<totalWait<< ", Total Success: "<<totalSuccess<<
+			std::cout<<"Stats:\n Total Move: "<<totalMove<<"\n Total Enter: "<<totalEnter<<
+					"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<
 					", Total Command: "<<totalCommand<<std::endl;
 		assert(totalMove+totalEnter+totalWait == whAGVs.size());
 		
@@ -190,10 +190,10 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 				}
 				
 				//Update all the NNs
-				ddpg_maTeam[n]->updateQCritic(Qvals, Qprime);
+				ddpg_maTeam[n]->updateQCritic(Qvals, Qprime,verbose);
 
 				if (agent_type == agent_def::centralized)
-					ddpg_maTeam[n]->updateMuActor(states);	
+					ddpg_maTeam[n]->updateMuActor(states,verbose);	
 				else if (agent_type == agent_def::link)
 					ddpg_maTeam[n]->updateMuActorLink(states,all_actions,n,incorporates_time);					
 				else if (agent_type == agent_def::intersection){/*TODO*/}
@@ -261,7 +261,6 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
 		return {0};
 	} 
 }
-
 
 std::vector<float> Warehouse_DDPG::QueryTargetActorMATeam(std::vector<float> states){
  	assert(states.size() == N_EDGES*(1 + incorporates_time));
