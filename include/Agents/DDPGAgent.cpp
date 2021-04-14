@@ -1,4 +1,4 @@
-#include "DDPGAgent.h"
+#include "DDPGAgent.hpp"
 
 
 DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space){
@@ -27,7 +27,6 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state
 
 	optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
 	optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
-
 }
 
 DDPGAgent::~DDPGAgent(){
@@ -44,7 +43,7 @@ DDPGAgent::~DDPGAgent(){
  * *Method:Does a foward pass of the associated NN						*
  * *Output:Returns a vector of the final nodes of the NN					*
  * ************************************************************************************************/
-std::vector<float> DDPGAgent::EvaluateActorNN_DDPG(std::vector<float> s){
+std::vector<float> DDPGAgent::EvaluateActorNN_DDPG(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(s).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
@@ -52,7 +51,7 @@ std::vector<float> DDPGAgent::EvaluateActorNN_DDPG(std::vector<float> s){
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
-std::vector<float> DDPGAgent::EvaluateCriticNN_DDPG(std::vector<float> s,std::vector<float> a){
+std::vector<float> DDPGAgent::EvaluateCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -64,7 +63,7 @@ std::vector<float> DDPGAgent::EvaluateCriticNN_DDPG(std::vector<float> s,std::ve
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
-std::vector<float> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<float> s){
+std::vector<float> DDPGAgent::EvaluateTargetActorNN_DDPG(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(s).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
@@ -72,7 +71,7 @@ std::vector<float> DDPGAgent::EvaluateTargetActorNN_DDPG(std::vector<float> s){
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
-std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<float> s,	std::vector<float> a){
+std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -86,10 +85,10 @@ std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(std::vector<float> s,	
 }
 
 /************************************************************************************************
- * *Input:	a replay [r]									*
+ * *Input:	a experience_replay [r]									*
  * *Method:Adds [r] to the [replay_buffer], if [replay_buffer] is full it evicts a tuple	*
  * ************************************************************************************************/
-void DDPGAgent::addToReplayBuffer(replay r){
+void DDPGAgent::addToReplayBuffer(experience_replay r){
 	assert(r.next_state.size() == r.current_state.size());
 
 	if (DDPGAgent::replay_buffer.size() < REPLAY_BUFFER_SIZE)
@@ -98,13 +97,13 @@ void DDPGAgent::addToReplayBuffer(replay r){
 		DDPGAgent::replay_buffer[rand()%REPLAY_BUFFER_SIZE] = r;
 }
 /************************************************************************************************
- * *Input:[size] of batch to return								*
- * *Method:Selects a non-inclusive (with unique items) minibanch from the replay buffer		*
- * *Output:Returns a non-inclusive miniBatch of [size]						*
- * ************************************************************************************************/
-std::vector<replay> DDPGAgent::getReplayBufferBatch(size_t size){
+**Input:[size] of batch to return								*
+**Method:Selects a non-inclusive (with unique items) minibanch from the experience_replay buffer*
+**Output:Returns a non-inclusive miniBatch of [size]						*
+*************************************************************************************************/
+std::vector<experience_replay> DDPGAgent::getReplayBufferBatch(size_t size){
 	assert(replay_buffer.size()+1 >= size);
-	std::vector<replay> to_return;
+	std::vector<experience_replay> to_return;
 	to_return.reserve(size);
 
 	//generate a list of rand indexes (non inclusive)

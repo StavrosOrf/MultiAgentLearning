@@ -26,10 +26,10 @@ enum class algo_type{ddpg, ddpg_merged};
 enum class agent_def{centralized, link, intersection};
 
 struct epoch_results{
-	uint totalDeliveries;
-	uint totalMove;
-	uint totalEnter;
-	uint totalWait;
+	uint totalDeliveries = 0;
+	uint totalMove = 0;
+	uint totalEnter = 0;
+	uint totalWait = 0;
 	void update(uint tD, uint tM, uint tE, uint tW){
 		totalDeliveries += tD;
 		totalMove += tM;
@@ -64,9 +64,10 @@ class Warehouse{
 		std::vector<float> get_edge_utilization() __attribute__ ((pure));
 		std::vector<float> get_edge_utilization(bool with_time, bool normalize=false) __attribute__ ((pure));
 		std::vector<float> get_vertex_utilization() __attribute__ ((pure));
-		float get_vertex_reamaining_outgoing_capacity(int vertex) __attribute__ ((pure));
+		float get_vertex_remaining_outgoing_capacity(int vertex) __attribute__ ((pure));
 		const float max_base_travel_cost() const{return *std::max_element(baseCosts.begin(), baseCosts.end());}
 		const float max_edge_capacity() const{return *std::max_element(capacities.begin(), capacities.end());}
+		float value_of_current_state();
 
 		size_t nSteps; //number of steps per simulation
 		std::vector<float> baseCosts;

@@ -1,4 +1,4 @@
-#include "Warehouse.h"
+#include "Warehouse.hpp"
 
 Warehouse::Warehouse(YAML::Node configs){
 	// Read in graph definition from vertices and edges files (directories stored in configs)
@@ -390,8 +390,6 @@ void Warehouse::GetJointState(std::vector<size_t> &s){
 *************************************************************************************************/
 std::vector<float> Warehouse::get_vertex_utilization(){
 	std::vector<float> vertex_population(whGraph->GetNumEdges());
-	for (AGV* a: whAGVs)//this function is desinged for possible AGV goal of 2 if you need a more generic function update it
-		assert(a->get_possible_goals().size() == 2);
 
 	for (AGV* a: whAGVs)
 		if (a->is_on_graph() && a->GetT2V() == 0)
@@ -402,7 +400,7 @@ std::vector<float> Warehouse::get_vertex_utilization(){
 	return vertex_population;
 }
 
-float Warehouse::get_vertex_reamaining_outgoing_capacity(int vertex){
+float Warehouse::get_vertex_remaining_outgoing_capacity(int vertex){
 	float t = 0;
 	for (Edge* e : whGraph->get_outgoing_edges_of_a_vertex(vertex))
 		t += capacities[whGraph->GetEdgeID(e)] - 
@@ -415,7 +413,6 @@ float Warehouse::get_vertex_reamaining_outgoing_capacity(int vertex){
 ** Print Agvs Paths
 ********************************/
 void Warehouse::printAgvPaths(){
-
 	for (size_t k = 0; k < whAGVs.size(); k++){
 		std::cout<<", AGV_"<<k<<":";
 		whAGVs[k]->DisplayPath();
@@ -423,3 +420,38 @@ void Warehouse::printAgvPaths(){
 	std::cout<<'\n';
 }
 
+
+
+/************************************************************************************************
+**Waring:This function Reset the current edge cost, must be not be called in between traversing *
+**Method:Returns an evalutation of the current based on the position of the AGVs (in relation	*
+**	to there physical distance of their destination)					*
+**Note:	Can be used as part of a reward or evaluation function					*
+**Output:0 indicates the worst possible state, higher numbers indicate the current state is
+**	better/ more valuable									*
+*************************************************************************************************/
+//TODO optimize Perfomance (with LUTs?)
+float Warehouse::value_of_current_state(){
+	whGraph->reset_edge_costs();
+	float total = 0;
+
+	for (AGV* a : whAGVs)
+		if (a->is_on_edge()){
+			Search s0(whGraph, a->get_start_vertex(), a->GetNextVertex());
+			Search s1(whGraph, a->GetNextVertex(), a->GetDestinationVertex());
+			float total_inverse = 0;
+			total_inverse += s0.PathSearchLenght();
+			total_inverse += s1.PathSearchLenght();
+			total += 1/total_inverse;
+			assert(!std::isinf(total));
+		} else if (a->is_on_graph()){
+			Search s0(whGraph, a->get_start_vertex(), a->get_cur_vertex());
+			Search s1(whGraph, a->get_cur_vertex(), a->GetDestinationVertex());
+			float total_inverse = 0;
+			total_inverse += s0.PathSearchLenght();
+			total_inverse += s1.PathSearchLenght();
+			total += 1/total_inverse;
+		}
+
+	return total;
+}

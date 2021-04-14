@@ -1,30 +1,9 @@
-#ifndef DDPG_AGENT_H_
-#define DDPG_AGENT_H_
+#ifndef NN_MODULE_H
+#define NN_MODULE_H
 
-#include <fstream>
-#include <sstream>
-#include <string>
 #include <torch/csrc/autograd/generated/variable_factories.h>
 #include <torch/serialize/input-archive.h>
-#include <vector>
-#include <random>
-#include <cassert>
-#include <algorithm>
 #include <torch/torch.h>
-#include <cmath>
-#include <cstdio>
-
-#define REPLAY_BUFFER_SIZE 100000000
-#define GAMMA 0.99
-#define TAU 0.01
-#define TRAINING_STEP 1
-
-struct replay{
-	std::vector<float> current_state;
-	std::vector<float> next_state;
-	std::vector<float> action;
-	float reward;
-};
 
 struct Net : torch::nn::Module {
 	Net(int numIn, int numOut, int numHid, const size_t hid_count=1) {
@@ -58,12 +37,11 @@ struct Net : torch::nn::Module {
 
 struct ActorNN : torch::nn::Module {
 	ActorNN (int numIn, int numOut, int numHid) {		
-		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid*2));
-		fc2 = register_module("fc2",torch::nn::Linear(numHid*2,numOut));
-		// fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));
+		fc2 = register_module("fc2",torch::nn::Linear(numHid,numOut));
 	}
+
 	torch::Tensor forward(torch::Tensor x) {
-		
 		//Normalize [0,1] x after each layer		
 		auto m = torch::min(x);
 		auto s = torch::max(x);		
@@ -86,17 +64,18 @@ struct ActorNN : torch::nn::Module {
 
 		return x;
 	}
+
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};	
 };
 
 struct CriticNN : torch::nn::Module {
 	CriticNN (int numIn, int numOut, int numHid) {
-
 		// n1 = register_module("n1",torch::nn::LayerNorm(numIn));
 		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));
 		fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
 		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
 	}
+
 	torch::Tensor forward(torch::Tensor x) {	
 		auto m = torch::min(x);
 		auto s = torch::max(x);		
@@ -113,48 +92,8 @@ struct CriticNN : torch::nn::Module {
 		// 	x = (x-m)/(s-m);								
 		return x;
 	}
+
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
-class DDPGAgent{
-	public:
-		DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space );
-		~DDPGAgent();
-
-		std::vector<float> EvaluateCriticNN_DDPG(const std::vector<float> s, const std::vector<float> a);
-		std::vector<float> EvaluateActorNN_DDPG(const std::vector<float> s);
-		std::vector<float> EvaluateTargetActorNN_DDPG(const std::vector<float> s);
-		std::vector<float> EvaluateTargetCriticNN_DDPG(const std::vector<float> s, const std::vector<float> a);
-
-		static std::vector<replay> getReplayBufferBatch(size_t size = batch_size);
-		static void addToReplayBuffer(replay r);
-		static size_t get_replay_buffer_size(){return replay_buffer.size();}
-
-		void updateTargetWeights();
-		void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime,bool verbose);
-		void updateMuActor(const std::vector<std::vector<float>> states, bool verbose);
-		void updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber,bool withTime);
-
-		void printAboutNN();
-
-		static void set_batch_size(int i){batch_size = i;}
-		static size_t get_batch_size(){return batch_size;}
-	protected:
-		// Net* qNN, *qtNN;
-		// Net* muNN, *mutNN;
-
-		CriticNN* qNN, *qtNN;
-		ActorNN* muNN, *mutNN;
-		inline static std::vector<replay> replay_buffer;
-		inline static size_t batch_size;
-
-		Net* temp = new Net(1, 1, 1*2);
-
-		// We need a global optimizer, not a new one in each step!!!!!!!!
-		torch::optim::Adam optimizerMuNN = torch::optim::Adam(temp->parameters(),0.01);
-		torch::optim::Adam optimizerQNN = torch::optim::Adam(temp->parameters(),0.01);
-		
-		
-};
-
-#endif // DDPG_AGENT_H_
+#endif // NN_MODULE_H

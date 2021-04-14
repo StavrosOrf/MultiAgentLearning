@@ -8,7 +8,7 @@
 #include <yaml-cpp/yaml.h>
 #include <time.h>
 
-#include "Agents/DDPGAgent.h"
+#include "Agents/nn_modules.h"
 
 
 

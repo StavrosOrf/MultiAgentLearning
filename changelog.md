@@ -1,31 +1,31 @@
 changelog format:
-##v [semver][k/o depending on who pushed the update]
+## v [semver][k/o depending on who pushed the update]
 - change #0
 - change #1 blablablablablablablablablablablablablablabla
 blablablablablablabla (no tabs after newline)
 [newline after each version]
 
-##v 0.00000
+## v 0.00000
 -Added (structure for) new Learning Algorithm IterRL
 
-##v 0.00001k
+## v 0.00001k
 - added create_warehouse function
 - fixed typos in testWarehouse.cpp
 - added config.yaml to main directory
 - added Domains/* to main dir
 - added include as to the dir (and removed it from .gitignore)
 
-##v 0.00002k
+## v 0.00002k
 - updated build instructions in readme.md
 
-##v 0.00003k / prep for DDPG
+## v 0.00003k / prep for DDPG
 - changed indent to tabs
 - added new skeleton classes: AgentDDPG
 
-##v 0.00004o
+## v 0.00004o
 - Undocumented
 
-##v 0.00005k
+## v 0.00005k
 - Refactored Agent to NeuroEvoAgent
 - Deprecated Nightbar Agent Night Bar Domain and Night Bar Test (Not Relevant
 to our code base)
@@ -33,15 +33,15 @@ to our code base)
 - Made Progress on DDPG init
 - General Control Flow Fix up
 
-##v 0.00006k
+## v 0.00006k
 - Deprecated Rovers class (and it's associated domains and tests)
 - Implemented DDPG's deconstructor
 
-##v 0.00007o
+## v 0.00007o
 - Implented critic back propagations
 - Finished DDPG constructor
 
-##v 0.00008k / they call me the mop cause i CLEAN UP
+## v 0.00008k / they call me the mop cause i CLEAN UP
 - Deprecated bar.cpp, Target.cpp, MAPElites.cpp, POMDP.cpp (kinda),
 GaussianProcess.h, all POMDPs, testLapackInverse.cpp, testMultiRobotROS.cpp
 - Cleaned up CMAKE files
@@ -51,45 +51,45 @@ GaussianProcess.h, all POMDPs, testLapackInverse.cpp, testMultiRobotROS.cpp
 - Streamlined the results output process in testwarehouse.cpp
 - Found and commented a bunch of bugs
 
-##v 0.00009o
+## v 0.00009o
 - Fixed Warehouse Simulation ( Now all edges properly count edges ),
 might need to restore some basic ware house functions
 - Minor print fixes
 
-##v 0.00010k
+## v 0.00010k
 - sed all the trailing white spaces away
 - minor pefomance tweak
 - added changelog format (top of this file)
 - added testNeuralNet.cpp to cmake list
 - deprecated testNeuralNet.cpp (it is bugged and uses unfinished code)
 
-##v 0.00011k
+## v 0.00011k
 - deprecated NEUROEVO and everything associated with it
 - deprecated allmulti agent structures (will bring back later)
 - Changed source formating now all lines that end with ';' do not contain
 white space characters between the last character and ';'
 - added a bunch of function comments
 
-##v 0.00012k / Light up your (c)torches
+## v 0.00012k / Light up your (c)torches
 - imported the c++ frontent for PyTorch's backend also updated cmake and
 README.md and tested it
 
-##v 0.00013o
+## v 0.00013o
 - fixed compile errors
 - implemented critic update( might need detailed testing after completing the algorithm)
 - implemented actor update ( requires tests and bounds )
 
-##v 0.00014o
+## v 0.00014o
 - fixed and tested "update actor policy"
 - from_blob method doesnt work properly, an other method is proposed in the update actor section
 - TODO fix update Critic, all Evaluate functions
 - TODO implement Update Targe NN weights
 
-##v 0.00015o
+## v 0.00015o
 - fixed the logic errors resulting from the use of "from_blob"
 - started working on update weights
 
-##v 0.00016k
+## v 0.00016k
 - Minor performance tweaks (memory system optimizations)
 - General code clean up
 - Deprecated NeuralNet.cpp & Utilities.cpp (all of them exist in std::), any
@@ -101,37 +101,37 @@ trace if Eigen, Threadpool.cpp
 - Added test_torch.cpp, test_random.cpp, and created new ./result Directory
 - Added cleancode.sh in the main directory
 
-##v 0.00017o
+## v 0.00017o
 - added some metrics ( time, totalMove ...)
 - TODO more metrics can be added like Best G of Run etc
 - TODO add metrics about loss functions of NNs
 - TODO Store Results for each step/Epoch/Run in files so we can get Graphs for our report/paper
 
-##v 0.00018k
+## v 0.00018k
 - Huge Runtime Performance Tweaks
 - Minor Tweaks to reward function (needs more work)
 - testWarehouse now writes Evaluation parameters to results folder
 - Streamlined Domains
 - Now supports centralized warehouse with provided time
 
-##v 0.00019k
+## v 0.00019k
 - bunch of micro optimizations
 - Finalized Reward Function (this is not true)
 - Improved Reward Function
 
-##v 0.00020o
+## v 0.00020o
 - some additions for Link Agent
 
-##v 0.00021k
+## v 0.00021k
 - Initialize Intersection Multi Agent Team Implemented
 
-##v 0.00022o ( yes we have changelog!!!)
+## v 0.00022o ( yes we have changelog!!!)
 - Implemented and tested MADDPG link agents
 - Added Training step to reduce computational requirements
   (will do tests to prove that is not necessary to train in each step)
 - TODO link_t doesn't reads state correctly ( the time part is always 0)
 
-##v 0.00023k
+## v 0.00023k
 - Renamed WarehouseCentraised Class to Warehouse_DDPG
 - Added options for number of AGVs
 - Deprecated Learning library
@@ -140,14 +140,14 @@ trace if Eigen, Threadpool.cpp
 - Moved some constant DDPG arguments from #define to config.yaml
 - General Code Cleanup
 
-##v 0.00024k
+## v 0.00024k
 - Wrote Skeleton for DDPG_merged_step (need to be renamed)
 
-##v 0.00025k
+## v 0.00025k
 - Code Cleanup and performance optimizations
 - Fix Bug related to AGV routing
 
-##v 0.00026o
+## v 0.00026o
 - Optimizers are now correctly initialized and used
 - Changed the way of exploration -> I believe that with this style of 
   "randomness" we better explore the action space
@@ -158,5 +158,7 @@ trace if Eigen, Threadpool.cpp
   (inspired by the lectures)
 - I cannot say that the algorithm works now, but it has potential and 2 more days of tests!!!
 
-
-
+## v 0.00027k
+- ChangeLog (this file) is now a markdown document
+- torch::nn::modules are all in a different file (nn_modules.h)
+- minor code cleanup

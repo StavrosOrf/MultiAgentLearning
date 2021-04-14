@@ -11,8 +11,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "Domains/Warehouse.h"
-#include "Domains/Warehouse_DDPG.h"
+#include "Domains/Warehouse.hpp"
+#include "Domains/Warehouse_DDPG.hpp"
 //#include "Domains/Warehouse_DDPG_merged_step.h"
 
 Warehouse* create_warehouse(YAML::Node configs);
