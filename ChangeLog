@@ -149,4 +149,14 @@ trace if Eigen, Threadpool.cpp
 
 ##v 0.00026o
 - Optimizers are now correctly initialized and used
+- Changed the way of exploration -> I believe that with this style of 
+  "randomness" we better explore the action space
+- Swapped to Register_Module NNs ( now we are sure everything works as intended -bias nodes etc..)    
+  Disclaimer: We, might still need to try some small varainces of Layers,Normalizations etc.
+  but this is not a priority
+- Added an other reward function that calculates the amount of total Deliveries in a given time
+  (inspired by the lectures)
+- I cannot say that the algorithm works now, but it has potential and 2 more days of tests!!!
+
+
 

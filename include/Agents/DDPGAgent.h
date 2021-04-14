@@ -63,22 +63,26 @@ struct ActorNN : torch::nn::Module {
 		// fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
 	}
 	torch::Tensor forward(torch::Tensor x) {
-
-		auto m = torch::mean(x);
-		auto s = torch::std(x);		
+		
+		//Normalize [0,1] x after each layer		
+		auto m = torch::min(x);
+		auto s = torch::max(x);		
 		if(torch::is_nonzero(torch::sum(x)))
-			x = (x-m)/s;		
-
+			x = (x-m)/(s-m);				
 		// x = torch::relu(fc1->forward(x));
 		// x = torch::relu(fc2->forward(x));
 		x = (fc1->forward(x));
+		m = torch::min(x);
+		s = torch::max(x);		
+		if(torch::is_nonzero(torch::sum(x)))
+			x = (x-m)/(s-m);	
 		x = (fc2->forward(x));
 
 		// return -x;
-		m = torch::mean(x);
-		s = torch::std(x);		
+		m = torch::min(x);
+		s = torch::max(x);		
 		if(torch::is_nonzero(torch::sum(x)))
-			x = (x-m)/s;			
+			x = (x-m)/(s-m);				
 
 		return x;
 	}
@@ -94,19 +98,19 @@ struct CriticNN : torch::nn::Module {
 		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
 	}
 	torch::Tensor forward(torch::Tensor x) {	
-		auto m = torch::mean(x);
-		auto s = torch::std(x);		
+		auto m = torch::min(x);
+		auto s = torch::max(x);		
 		if(torch::is_nonzero(torch::sum(x)))
-			x = (x-m)/s;	
+			x = (x-m)/(s-m);		
 
 		x = (fc1->forward(x));
 		x = (fc2->forward(x));
 		x = (fc3->forward(x));
 		
-		// m = torch::mean(x);
-		// s = torch::std(x);		
+		// m = torch::min(x);
+		// s = torch::max(x);		
 		// if(torch::is_nonzero(torch::sum(x)))
-		// 	x = (x-m)/s;							
+		// 	x = (x-m)/(s-m);								
 		return x;
 	}
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
