@@ -1,10 +1,11 @@
 #include "Warehouse_DDPG.hpp"
 
-#define REWARD_METHOD 3
+#define REWARD_METHOD 1
 #define REWARD_METHOD_3_BUFFER_SIZE 30
+//REWARD_METHOD OPTIONS
 //0 Random
 //1 Value of state
-//2 Routability
+//2 Routability (untested)
 //3 Periodic Evaluation of Goal
 
 Warehouse_DDPG::~Warehouse_DDPG(void){
@@ -22,6 +23,7 @@ Warehouse_DDPG::~Warehouse_DDPG(void){
 		delete ddpg_maTeam[i];
 		ddpg_maTeam[i] = NULL;
 	}
+	DDPGAgent::clear_replar_buffer();
 }
 
 epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
@@ -30,7 +32,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 	std::default_random_engine n_generator(time(NULL));
 	epoch_results results;
 
-	//Reward method 3 Variables
+#if REWARD_METHOD == 1
+		float value_of_prev_state = 0;
+#endif
 #if REWARD_METHOD == 3
 	int index = 0;
 	std::vector<float> bufferCurrStates[REWARD_METHOD_3_BUFFER_SIZE];
@@ -47,9 +51,6 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		if(verbose)
 			std::cout <<"=== Epoch: "<<epoch<<" ==============================================================Step - "<<t<<std::endl;
 
-#if REWARD_METHOD == 1
-		float value_of_state = 0, value_of_prev_state = 0;
-#endif
 		float reward = 0;
 		//Select action
 		std::vector<float> actions = QueryActorMATeam(cur_state);
@@ -75,10 +76,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*max_base_travel_cost();			
 			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*baseCosts[n];			
 			// actions[n] = actions[n]*max_base_travel_cost()*n_process(n_generator);
-			// float t = n_process(n_generator);
 
 			//I believe that with this style of "randomness" we better explore the action space
-			if(n_process(n_generator) > (1.1 + 0.0005 * epoch))
+			if(n_process(n_generator) > (1.2 + 0.0005 * epoch))
 				actions[n] = 0;
 			else
 				actions[n] = max_base_travel_cost()*actions[n]; //4th ?
@@ -103,9 +103,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			printf("\n");
 		}
 
-		float routable_agvs = 0;//total number of agvs that could be routed in the graph
-		for (int v = 0; v != whGraph->GetNumVertices(); v++)
-			routable_agvs += std::min<float>(get_vertex_remaining_outgoing_capacity(v), get_vertex_utilization()[v]);
+		//float routable_agvs = 0;//total number of agvs that could be routed in the graph
+		//for (int v = 0; v != whGraph->GetNumVertices(); v++)
+			//routable_agvs += std::min<float>(get_vertex_remaining_outgoing_capacity(v), get_vertex_utilization()[v]);
 
 		if (verbose)
 		 	print_warehouse_state();
@@ -136,7 +136,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			a->ResetPerformanceCounters();
 
 #if REWARD_METHOD == 1
-			value_of_state = value_of_current_state();
+			const float value_of_state = value_of_current_state();
 			reward = (value_of_state - value_of_prev_state)*16;
 			value_of_prev_state = value_of_state;
 #endif
@@ -179,10 +179,10 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;
 		assert(!std::isnan(reward) && !std::isinf(reward));
-		if (routable_agvs != 0)
+		//if (routable_agvs != 0)
 			DDPGAgent::addToReplayBuffer({temp_state,cur_state,actions,reward});
-		else if(verbose)
-			std::cout << "Skipping adding it to the replay buffer" << std::endl;
+		//else if(verbose)
+			//std::cout << "Skipping adding it to the replay buffer" << std::endl;
 #endif		
 
 		if(DDPGAgent::get_replay_buffer_size() > DDPGAgent::get_batch_size() * 2 && t%TRAINING_STEP == 0){

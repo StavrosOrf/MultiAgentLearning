@@ -48,8 +48,8 @@ Warehouse::~Warehouse(void){
 }
 
 void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::string c_str, YAML::Node configs, bool verbose){
-	std::vector<int> vertices;
-	std::vector<std::vector<int>> edges;
+	std::vector<vertex_t> vertices;
+	std::vector<std::vector<vertex_t>> edges;
 	std::vector< float > costs;
 
 	// Read in data from files
@@ -83,9 +83,9 @@ void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::strin
 		std::vector<float> ec;
 		while (getline(lineStream,cell,','))
 			ec.push_back(atof(cell.c_str()));
-		std::vector<int> e;
-		e.push_back((int)ec[0]);
-		e.push_back((int)ec[1]);
+		std::vector<vertex_t> e;
+		e.push_back((vertex_t)ec[0]);
+		e.push_back((vertex_t)ec[1]);
 		costs.push_back(ec[2]);
 		edges.push_back(e);
 	}
@@ -155,7 +155,7 @@ void Warehouse::InitialiseAGVs(YAML::Node configs, bool verbose){
 		std::cout << "\nFile: " << goal_str.c_str() << " not found, exiting.\n";
 		exit(1);
 	}
-	std::vector<int> agvGoals;
+	std::vector<vertex_t> agvGoals;
 	while (getline(goalFile,line))
 		agvGoals.push_back(atoi(line.c_str()));
 	if (verbose)
@@ -355,7 +355,7 @@ void Warehouse::initialise_wh_agents(){
 			eIDs.push_back(j);
 		whAgents.push_back(new iAgent{0, eIDs});// only one centralised agent controlling all traffic
 	}else if(agent_type == agent_def::link){
-		std::vector<int> v = whGraph->GetVertices();
+		std::vector<vertex_t> v = whGraph->GetVertices();
 		std::vector<Edge *> e = whGraph->GetEdges();
 		for (size_t i = 0; i < e.size(); i++){
 			std::vector<size_t> vIDs;
@@ -384,23 +384,38 @@ void Warehouse::GetJointState(std::vector<size_t> &s){
 }
 
 /************************************************************************************************
+**Input: [include_start_vertexes] which if true it will AGVs that outside the graph,		*
+	[goal_vertex] which if inputed it will count AGVs that have that goal_vertex		*
 **Method:Checks how many AGVs are on each Edge, if AGVs are outside the graph they count as	*
 **	Being on their origin vertex								*
 **Output:The number of AGVs on each Vertex							*
 *************************************************************************************************/
-std::vector<float> Warehouse::get_vertex_utilization(){
-	std::vector<float> vertex_population(whGraph->GetNumEdges());
+std::vector<vertex_t> Warehouse::get_vertex_utilization(const bool include_start_vertexes){
+	std::vector<vertex_t> vertex_population(whGraph->GetNumEdges());
 
 	for (AGV* a: whAGVs)
 		if (a->is_on_graph() && a->GetT2V() == 0)
 			vertex_population[a->get_cur_vertex()]++;
-		else if(!a->is_on_graph())
+		else if(include_start_vertexes && !a->is_on_graph())
 			vertex_population[a->get_start_vertex()]++;
 
 	return vertex_population;
 }
+std::vector<vertex_t> Warehouse::get_vertex_utilization(const vertex_t goal_vertex, const bool include_start_vertexes){
+	std::vector<vertex_t> vertex_population(whGraph->GetNumEdges());
 
-float Warehouse::get_vertex_remaining_outgoing_capacity(int vertex){
+	for (AGV* a: whAGVs)
+		if (a->get_goal_vertex() == goal_vertex){
+			if (a->is_on_graph() && a->GetT2V() == 0)
+				vertex_population[a->get_cur_vertex()]++;
+			else if(include_start_vertexes && !a->is_on_graph())
+				vertex_population[a->get_start_vertex()]++;
+		}
+
+	return vertex_population;
+}
+
+float Warehouse::get_vertex_remaining_outgoing_capacity(vertex_t vertex){
 	float t = 0;
 	for (Edge* e : whGraph->get_outgoing_edges_of_a_vertex(vertex))
 		t += capacities[whGraph->GetEdgeID(e)] - 
@@ -424,13 +439,14 @@ void Warehouse::printAgvPaths(){
 
 /************************************************************************************************
 **Waring:This function Reset the current edge cost, must be not be called in between traversing *
+**Note: is only implemented for a warehouse in which all the AGVs have the same possible goals	*
 **Method:Returns an evalutation of the current based on the position of the AGVs (in relation	*
 **	to there physical distance of their destination)					*
 **Note:	Can be used as part of a reward or evaluation function					*
-**Output:0 indicates the worst possible state, higher numbers indicate the current state is
-**	better/ more valuable									*
+**Output:0 indicates the worst possible state, higher numbers indicate the current state is	*
+**	better/more valuable									*
+**TODO: optimize Perfomance (with LUTs?)							*
 *************************************************************************************************/
-//TODO optimize Perfomance (with LUTs?)
 float Warehouse::value_of_current_state(){
 	whGraph->reset_edge_costs();
 	float total = 0;
@@ -438,19 +454,40 @@ float Warehouse::value_of_current_state(){
 	for (AGV* a : whAGVs)
 		if (a->is_on_edge()){
 			Search s0(whGraph, a->get_start_vertex(), a->GetNextVertex());
-			Search s1(whGraph, a->GetNextVertex(), a->GetDestinationVertex());
+			Search s1(whGraph, a->GetNextVertex(), a->get_goal_vertex());
 			float total_inverse = 0;
 			total_inverse += s0.PathSearchLenght();
 			total_inverse += s1.PathSearchLenght();
 			total += 1/total_inverse;
-			assert(!std::isinf(total));
-		} else if (a->is_on_graph()){
-			Search s0(whGraph, a->get_start_vertex(), a->get_cur_vertex());
-			Search s1(whGraph, a->get_cur_vertex(), a->GetDestinationVertex());
-			float total_inverse = 0;
-			total_inverse += s0.PathSearchLenght();
-			total_inverse += s1.PathSearchLenght();
-			total += 1/total_inverse;
+		}
+	
+	{//Assert that all AGVs have the same possible 2 goals 
+		assert(whAGVs[0]->get_possible_goals().size() == 2);
+		for (AGV* a : whAGVs)
+			assert(a->get_possible_goals() == whAGVs[0]->get_possible_goals());
+	}
+
+	const std::vector<vertex_t> goals = whAGVs[0]->get_possible_goals();
+	for (vertex_t g : whAGVs[0]->get_possible_goals())
+		//for (vertex_t v : get_vertex_utilization(g, false))
+		for (int i = 0; i != whGraph->GetNumVertices(); i++){
+			if (get_vertex_utilization(g, false)[i]){
+				int source = 0;
+				if (goals[0] == g)
+					source = goals[1];
+				else if (goals[1] == g)
+					source = goals[1];
+				else {assert(false);}
+				Search s0(whGraph, source, i);
+				Search s1(whGraph, i, g);
+				float total_inverse = 0;
+				total_inverse += s0.PathSearchLenght();
+				total_inverse += s1.PathSearchLenght();
+				int max_length = 0;
+				for (Edge * e: whGraph->get_outgoing_edges_of_a_vertex(i))
+					max_length = std::max<int>(max_length, e->GetLength());
+				total += max_length/total_inverse;
+			}
 		}
 
 	return total;

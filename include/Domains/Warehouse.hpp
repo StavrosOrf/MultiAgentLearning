@@ -16,7 +16,7 @@
 #include <yaml-cpp/yaml.h>
 #include "Planning/Graph.h"
 #include "Planning/Edge.h"
-#include "AGV.h"
+#include "AGV.hpp"
 
 #define N_EDGES whGraph->GetEdges().size()
 
@@ -63,8 +63,9 @@ class Warehouse{
 		void print_warehouse_state();
 		std::vector<float> get_edge_utilization() __attribute__ ((pure));
 		std::vector<float> get_edge_utilization(bool with_time, bool normalize=false) __attribute__ ((pure));
-		std::vector<float> get_vertex_utilization() __attribute__ ((pure));
-		float get_vertex_remaining_outgoing_capacity(int vertex) __attribute__ ((pure));
+		std::vector<vertex_t> get_vertex_utilization(const bool include_start_vertexes=true) __attribute__ ((pure));
+		std::vector<vertex_t> get_vertex_utilization(const vertex_t goal_vertex, const bool include_start_vertexes=true) __attribute__ ((pure));
+		float get_vertex_remaining_outgoing_capacity(vertex_t vertex) __attribute__ ((pure));
 		const float max_base_travel_cost() const{return *std::max_element(baseCosts.begin(), baseCosts.end());}
 		const float max_edge_capacity() const{return *std::max_element(capacities.begin(), capacities.end());}
 		float value_of_current_state();

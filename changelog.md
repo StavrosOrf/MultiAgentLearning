@@ -162,3 +162,9 @@ trace if Eigen, Threadpool.cpp
 - ChangeLog (this file) is now a markdown document
 - torch::nn::modules are all in a different file (nn_modules.h)
 - minor code cleanup
+- minor bug fixing
+- deprecated merged_step.h/.cpp
+- renamed .h header files to .hpp
+- Reduced ddpgAgent::REPLAY_BUFFER_SIZE to 1024*1024 (which results to sub 1 gigabyte of ram needed for one run)
+- Reward Method 2 is now likely broken 
+- Reward Method 1 Now runs Faster and provides a higher accuracy of the value

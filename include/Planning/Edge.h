@@ -3,16 +3,18 @@
 
 #include <stddef.h>
 
+typedef int vertex_t;
+
 // Edge class to contain mean and variance of cost along an edge
 class Edge
 {
 	public:
-		Edge(int v1, int v2, float cost):
+		Edge(vertex_t v1, vertex_t v2, float cost):
 			itsVertex1(v1), itsVertex2(v2), itsCost(cost), itsLength((size_t)cost) {}
 		~Edge(){}
 
-		int GetVertex1() const {return itsVertex1;}
-		int GetVertex2() const {return itsVertex2;}
+		vertex_t GetVertex1() const {return itsVertex1;}
+		vertex_t GetVertex2() const {return itsVertex2;}
 		float GetCost() const {return itsCost;}
 		void SetCost(float cost) {itsCost = cost;}
 		size_t GetLength(){return itsLength;}
@@ -21,8 +23,8 @@ class Edge
 			return lhs.GetVertex1() == rhs.GetVertex1() && lhs.GetVertex2() == rhs.GetVertex2();
 		}
 	private:
-		int itsVertex1;
-		int itsVertex2;
+		vertex_t itsVertex1;
+		vertex_t itsVertex2;
 		float itsCost;
 		size_t itsLength;
 };

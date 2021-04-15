@@ -1,6 +1,6 @@
-#include "AGV.h"
+#include "AGV.hpp"
 
-AGV::AGV(int initV, std::vector<int> goalVs, Graph * graph){
+AGV::AGV(vertex_t initV, std::vector<vertex_t> goalVs, Graph * graph){
 	nextVertex = -1;
 	t2v = 0;
 	origin = initV;
@@ -93,12 +93,12 @@ void AGV::PlanAGV(std::vector<float> c){
 
 	// Assuming agvPlanner is set up with correct start, goal
 	Node * bestPath = agvPlanner->PathSearch();
-	int v2 = bestPath->GetVertex();
+	vertex_t v2 = bestPath->GetVertex();
 
 	path.clear();
 	while (bestPath->GetParent()){
 		Node * curNode = bestPath->GetParent();
-		int v1 = curNode->GetVertex();
+		vertex_t v1 = curNode->GetVertex();
 
 		bool edgeFound = false;
 		for (size_t i = 0; i < nEdges; i++)
@@ -126,7 +126,7 @@ void AGV::DisplayPath(){
 }
 
 void AGV::SetNewGoal(){
-	int newGoal = agvPlanner->GetSource();
+	vertex_t newGoal = agvPlanner->GetSource();
 	while (newGoal == agvPlanner->GetSource()){
 		size_t gID = rand() % agvGoals.size();
 		newGoal = agvGoals[gID];

@@ -12,10 +12,10 @@ enum nodeType {SOURCE, OTHER};
 class Node
 {
 	public:
-		Node(int vertex):
+		Node(vertex_t vertex):
 			itsVertex(vertex), itsParent(0), itsCost(0.0) {}
 
-		Node(int vertex, nodeType n):
+		Node(vertex_t vertex, nodeType n):
 		itsVertex(vertex), itsParent(0)
 		{
 			switch (n)
@@ -41,14 +41,14 @@ class Node
 		void SetParent(Node * parent) {itsParent = parent;}
 		float GetCost() const {return itsCost;}
 		void SetCost(float cost) {itsCost = cost;}
-		int GetVertex() const {return itsVertex;}
-		void SetVertex(int vertex) {itsVertex = vertex;}
+		vertex_t GetVertex() const {return itsVertex;}
+		void SetVertex(vertex_t vertex) {itsVertex = vertex;}
 
 		void DisplayPath();
 		Node * ReverseList(Node * itsChild);
 
 	private:
-		int itsVertex;
+		vertex_t itsVertex;
 		Node * itsParent;
 		float itsCost;
 };

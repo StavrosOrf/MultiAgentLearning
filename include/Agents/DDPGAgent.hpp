@@ -15,7 +15,7 @@
 #include <cstdio>
 #include "nn_modules.hpp"
 
-#define REPLAY_BUFFER_SIZE 100000000
+#define REPLAY_BUFFER_SIZE 1024*1024
 #define GAMMA 0.99
 #define TAU 0.01
 #define TRAINING_STEP 1
@@ -50,6 +50,7 @@ class DDPGAgent{
 
 		static void set_batch_size(int i){batch_size = i;}
 		const static size_t get_batch_size() {return batch_size;}
+		static void clear_replar_buffer(){replay_buffer.clear();}
 	protected:
 		CriticNN* qNN, *qtNN;
 		ActorNN* muNN, *mutNN;
