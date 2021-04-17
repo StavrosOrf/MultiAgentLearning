@@ -1,6 +1,6 @@
 #include "Warehouse_DDPG.hpp"
 
-#define REWARD_METHOD 1
+#define REWARD_METHOD 3
 #define REWARD_METHOD_3_BUFFER_SIZE 30
 //REWARD_METHOD OPTIONS
 //0 Random
@@ -78,7 +78,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			// actions[n] = actions[n]*max_base_travel_cost()*n_process(n_generator);
 
 			//I believe that with this style of "randomness" we better explore the action space
-			if(n_process(n_generator) > (1.2 + 0.0005 * epoch))
+			if(n_process(n_generator) > (1.1 + 0.0005 * epoch))
 				actions[n] = 0;
 			else
 				actions[n] = max_base_travel_cost()*actions[n]; //4th ?
@@ -244,9 +244,11 @@ void Warehouse_DDPG::InitialiseMATeam(){
 		assert(ddpg_maTeam.empty());
 		if(agent_type == agent_def::centralized)
 			ddpg_maTeam.push_back(new DDPGAgent(N_EDGES*(1+incorporates_time), N_EDGES,N_EDGES*(1+incorporates_time), N_EDGES));
-		else if(agent_type == agent_def::link)
-			for (size_t i = 0; whGraph->GetEdges().size(); i++)
+		else if(agent_type == agent_def::link){			
+			for (size_t i = 0; i < whGraph->GetEdges().size(); i++){				
 				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time), 1,(1+incorporates_time)*N_EDGES, N_EDGES));
+			}
+		}
  		else if (agent_type == agent_def::intersection)
 			for (int v : whGraph->GetVertices())
 				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size(), (1+incorporates_time)*N_EDGES, N_EDGES));
@@ -265,14 +267,31 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
  		std::vector<float> actions;
  		actions.reserve(N_EDGES);
 
+		float m = *min_element(states.begin(),states.end());
+		float s = *max_element(states.begin(),states.end());		
+		if(m != s)
+			for ( int k = 0 ; k < states.size(); k++){
+				states[k] = (states[k]-m)/(s-m);	
+			}
+
+
  		for (size_t i = 0; i < ddpg_maTeam.size(); i++)
  			if(incorporates_time)
  				actions.push_back(ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i], states[i+N_EDGES]})[0]);
  			else{
  				float t = (ddpg_maTeam[i]->EvaluateActorNN_DDPG({states[i]}))[0];
+ 				
  				actions.push_back(t);
  			}
 		assert(actions.size() == N_EDGES);
+
+		m = *min_element(actions.begin(),actions.end());
+		s = *max_element(actions.begin(),actions.end());		
+		if(m != s)
+			for ( int k = 0 ; k < actions.size(); k++){
+				actions[k] = (actions[k]-m)/(s-m);	
+			}
+
  		return actions;
  	}else if (agent_type == agent_def::intersection){
  		std::vector<float> actions(N_EDGES);
