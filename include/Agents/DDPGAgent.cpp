@@ -44,7 +44,7 @@ DDPGAgent::~DDPGAgent(){
  * *Output:Returns a vector of the final nodes of the NN					*
  * ************************************************************************************************/
 std::vector<float> DDPGAgent::EvaluateActorNN_DDPG(const std::vector<float>& s){
-	torch::Tensor t = torch::tensor(s).unsqueeze(0);
+	torch::Tensor t = torch::tensor(std::move(s)).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = muNN->forward(t);

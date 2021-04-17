@@ -1,6 +1,6 @@
 #include "Warehouse_DDPG.hpp"
 
-#define REWARD_METHOD 1
+#define REWARD_METHOD 2
 #define REWARD_METHOD_3_BUFFER_SIZE 30
 //REWARD_METHOD OPTIONS
 //0 Random
@@ -103,9 +103,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 			printf("\n");
 		}
 
-		//float routable_agvs = 0;//total number of agvs that could be routed in the graph
-		//for (int v = 0; v != whGraph->GetNumVertices(); v++)
-			//routable_agvs += std::min<float>(get_vertex_remaining_outgoing_capacity(v), get_vertex_utilization()[v]);
+		float routable_agvs = 0;//total number of agvs that could be routed in the graph
+		for (int v = 0; v != whGraph->GetNumVertices(); v++)
+			routable_agvs += std::min<float>(get_vertex_remaining_outgoing_capacity(v), get_vertex_utilization()[v]);
 
 		if (verbose)
 		 	print_warehouse_state();
@@ -179,10 +179,10 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		if(verbose)
 			std::cout<<"Reward: "<<reward<<std::endl;
 		assert(!std::isnan(reward) && !std::isinf(reward));
-		//if (routable_agvs != 0)
+		if (routable_agvs != 0)
 			DDPGAgent::addToReplayBuffer({temp_state,cur_state,actions,reward});
-		//else if(verbose)
-			//std::cout << "Skipping adding it to the replay buffer" << std::endl;
+		else if(verbose)
+			std::cout << "Skipping adding it to the replay buffer" << std::endl;
 #endif		
 
 		if(DDPGAgent::get_replay_buffer_size() > DDPGAgent::get_batch_size() * 2 && t%TRAINING_STEP == 0){
