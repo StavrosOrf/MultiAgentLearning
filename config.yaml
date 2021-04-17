@@ -7,7 +7,11 @@ mode:
 domain:
   folder: ../Domains/
   warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS'
+<<<<<<< HEAD
   agents: centralized #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
+=======
+  agents: link #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
+>>>>>>> 13c1a2b10be95a60def5d464288ca952ce836195
 graph:
   vertices:   vertices.csv
   edges:      edges.csv
@@ -15,10 +19,10 @@ graph:
 DDPG:
   epochs: 50 # set to 1 in test mode
   runs: 1
-  rand_proc_std_dev: 0.01
-  batch_size: 100
+  rand_proc_std_dev: 0.2
+  batch_size: 50
 simulation:
-  verbose: false
+  verbose: true
   steps: 200
   agvs: origins_120.csv #Valid options: 70,90,120,200,400
   goals: goals.csv

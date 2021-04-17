@@ -42,26 +42,28 @@ struct ActorNN : torch::nn::Module {
 	}
 
 	torch::Tensor forward(torch::Tensor x) {
+
+		// std::cout<<std::isnan(x.item<float>())<<std::end;
 		//Normalize [0,1] x after each layer		
 		auto m = torch::min(x);
 		auto s = torch::max(x);		
-		if(torch::is_nonzero(torch::sum(x)))
+		if(torch::is_nonzero(torch::sum(x)) && x.numel() != 1)
 			x = (x-m)/(s-m);				
 		// x = torch::relu(fc1->forward(x));
 		// x = torch::relu(fc2->forward(x));
 		x = (fc1->forward(x));
-		m = torch::min(x);
-		s = torch::max(x);		
-		if(torch::is_nonzero(torch::sum(x)))
-			x = (x-m)/(s-m);	
+		// m = torch::min(x);
+		// s = torch::max(x);		
+		// if(torch::is_nonzero(torch::sum(x)) || x.numel() != 1)
+		// 	x = (x-m)/(s-m);	
 		x = (fc2->forward(x));
 
 		// return -x;
-		m = torch::min(x);
-		s = torch::max(x);		
-		if(torch::is_nonzero(torch::sum(x)))
-			x = (x-m)/(s-m);				
-
+		// m = torch::min(x);
+		// s = torch::max(x);		
+		// if(torch::is_nonzero(torch::sum(x)) || x.numel() != 1 )
+		// 	x = (x-m)/(s-m);				
+		// assert(!std::isnan(x.item<float>()));
 		return x;
 	}
 
