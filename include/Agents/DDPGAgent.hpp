@@ -15,10 +15,10 @@
 #include <cstdio>
 #include "nn_modules.hpp"
 
-#define REPLAY_BUFFER_SIZE 1024*1024
+#define REPLAY_BUFFER_SIZE 200*100 //1024*1024
 #define GAMMA 0.99
 #define TAU 0.01
-#define TRAINING_STEP 1
+#define TRAINING_STEP 10
 
 struct experience_replay{
 	std::vector<float> current_state;
@@ -60,7 +60,7 @@ class DDPGAgent{
 		Net* temp = new Net(1, 1, 1*2);
 
 		// We need a global optimizer, not a new one in each step!!!!!!!!
-		torch::optim::Adam optimizerMuNN = torch::optim::Adam(temp->parameters(),0.001);
+		torch::optim::Adam optimizerMuNN = torch::optim::Adam(temp->parameters(),0.0001);
 		torch::optim::Adam optimizerQNN = torch::optim::Adam(temp->parameters(),0.001);
 };
 

@@ -3,12 +3,14 @@
 
 DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space){
 	//Create NNs
+	const int hiddensize = 256;
+
 	qNN = new CriticNN(global_state_space+global_action_space,
-		1, (global_state_space + global_action_space) * 2);
+		1, hiddensize);
 	qtNN = new CriticNN(global_state_space+global_action_space,
-		1, (global_state_space + global_action_space) * 2);
-	muNN = new ActorNN(state_space, action_space, action_space*2);
-	mutNN = new ActorNN(state_space, action_space, action_space*2);
+		1, hiddensize);
+	muNN = new ActorNN(state_space, action_space, hiddensize);
+	mutNN = new ActorNN(state_space, action_space, hiddensize);
 
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN->parameters().size(); i++)

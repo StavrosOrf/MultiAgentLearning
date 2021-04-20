@@ -1,10 +1,7 @@
 #include "Warehouse_DDPG.hpp"
 
-<<<<<<< HEAD
-#define REWARD_METHOD 2
-=======
 #define REWARD_METHOD 3
->>>>>>> 13c1a2b10be95a60def5d464288ca952ce836195
+
 #define REWARD_METHOD_3_BUFFER_SIZE 30
 //REWARD_METHOD OPTIONS
 //0 Random
