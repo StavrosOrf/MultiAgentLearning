@@ -25,7 +25,7 @@ epoch_resultsES Warehouse_ES::SimulateEpochES(const int epoch, bool verbose){
 	const float random_sample = n_process(n_generator);
 	
 	//for each agent add noise sample * std_dev
-	for (int i = 0; i < maTeam.size(); i++)
+	for (size_t i = 0; i < maTeam.size(); i++)
 		maTeam[i]->updateNNWeights(STD_DEV * random_sample);
 
 	// each timestep
@@ -127,7 +127,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
 }
 
 void Warehouse_ES::set_team_NNs(std::vector<esNN*> teamNNs){
-	for (int i = 0; i < maTeam.size(); i++)	
+	for (size_t i = 0; i < maTeam.size(); i++)	
 		maTeam[i]->setNN(teamNNs[i]);
 }
 

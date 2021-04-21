@@ -52,7 +52,9 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		if(verbose)
 			std::cout <<"=== Epoch: "<<epoch<<" ==============================================================Step - "<<t<<std::endl;
 
+#if REWARD_METHOD != 3
 		float reward = 0;
+#endif
 		//Select action
 		std::vector<float> actions = QueryActorMATeam(cur_state);
 
@@ -105,7 +107,7 @@ epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
 		}
 
 		float routable_agvs = 0;//total number of agvs that could be routed in the graph
-		for (int v = 0; v != whGraph->GetNumVertices(); v++)
+		for (size_t v = 0; v != whGraph->GetNumVertices(); v++)
 			routable_agvs += std::min<float>(get_vertex_remaining_outgoing_capacity(v), get_vertex_utilization()[v]);
 
 		if (verbose)
@@ -271,7 +273,7 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
 		float m = *min_element(states.begin(),states.end());
 		float s = *max_element(states.begin(),states.end());		
 		if(m != s)
-			for ( int k = 0 ; k < states.size(); k++){
+			for ( size_t k = 0 ; k < states.size(); k++){
 				states[k] = (states[k]-m)/(s-m);	
 			}
 
@@ -289,7 +291,7 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
 		m = *min_element(actions.begin(),actions.end());
 		s = *max_element(actions.begin(),actions.end());		
 		if(m != s)
-			for ( int k = 0 ; k < actions.size(); k++){
+			for ( size_t k = 0 ; k < actions.size(); k++){
 				actions[k] = (actions[k]-m)/(s-m);	
 			}
 

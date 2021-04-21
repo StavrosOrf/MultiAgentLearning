@@ -10,8 +10,6 @@
 #include "Agents/ESAgent.hpp" 
 #include "boost/asio.hpp"
 
-#define LEARNING_RATE 0.01
-
 class Warehouse_ES_container {
 	public:
 		Warehouse_ES_container(YAML::Node configs);

@@ -2,7 +2,7 @@
 
 
 ESAgent::ESAgent(size_t state_space, size_t action_space){
-	int hiddensize = 256;
+	//int hiddensize = 256;
 	// TODO Parametrize NN to fit in cache
 	NN = new esNN(state_space, action_space);
 

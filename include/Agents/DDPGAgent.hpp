@@ -49,7 +49,7 @@ class DDPGAgent{
 		void printAboutNN();
 
 		static void set_batch_size(int i){batch_size = i;}
-		const static size_t get_batch_size() {return batch_size;}
+		static size_t get_batch_size() {return batch_size;}
 		static void clear_replar_buffer(){replay_buffer.clear();}
 	protected:
 		CriticNN* qNN, *qtNN;

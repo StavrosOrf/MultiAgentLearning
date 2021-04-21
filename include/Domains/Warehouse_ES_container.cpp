@@ -7,7 +7,7 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs){
 	const size_t population_size = configs["ES"]["population_size"].as<int>();
 	assert(population_size > 0 && epoch > 0);
 
-	for(int i = 0 ; i < population_size; i++){
+	for(size_t i = 0 ; i < population_size; i++){
 		population.push_back(new Warehouse_ES(configs));
 		population[i]->InitialiseMATeam();
 	}
@@ -26,7 +26,7 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose){
 #ifdef MULTITHREADED
 		boost::asio::thread_pool simulator_pool(n_threads);
 #endif
-		for (int j = 0; j < population.size(); j++){
+		for (size_t j = 0; j < population.size(); j++){
 #ifdef MULTITHREADED
 			boost::asio::post(simulator_pool, [i, j, team, &results, this](){
 #endif
@@ -52,9 +52,9 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose){
 		float sum = 0;
 		for (epoch_resultsES r : results)
 			sum += r.totalDeliveries * r.sample;
-		const float scalar = LEARNING_RATE * sum / ( population.size() * STD_DEV);
-		if(verbose)
-			std::cout << "scalar:" << scalar << std::endl;
+		const float scalar = learning_rate * sum / ( population.size() * STD_DEV);
+		//if(verbose)
+			//std::cout << "scalar:" << scalar << std::endl;
 
 		for (esNN* nn: team)
 			for (auto p : nn->parameters())

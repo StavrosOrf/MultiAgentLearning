@@ -12,7 +12,7 @@ struct Net : torch::nn::Module {
 		first = register_parameter("inputW", torch::randn({numIn, numHid}));
 		parameters()[0].set_data((parameters()[0]-0.5)/numHid*2);
 		middle = new torch::Tensor[hid_count-1];
-		for (int i = 1; i != hid_count; i++){
+		for (size_t i = 1; i != hid_count; i++){
 			middle[i] = register_parameter("hidW"+std::to_string(i), torch::randn({numHid, numHid}));
 			parameters()[i].set_data((parameters()[i]-0.5)/numHid*2);
 		}
@@ -26,7 +26,7 @@ struct Net : torch::nn::Module {
 		torch::Tensor output_layer,h;
 		// const torch::Tensor r_input = (input-0.5)*2;
 		h = torch::tanh(torch::mm(input, first));
-		for (int i = 1; i != h_c; i++)
+		for (size_t i = 1; i != h_c; i++)
 			h = (torch::mm(h, middle[i]));
 		output_layer = torch::tanh(torch::mm(h, last));
 		return output_layer;

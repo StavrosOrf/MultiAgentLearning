@@ -245,21 +245,22 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool no
 		for(size_t i = 0; i < N_EDGES; i++)
 			assert((edge_utilization[i+N_EDGES]==0) == (edge_utilization[i]==0));
 
-	// if(normalize){//TODO update doc
-	// 	for (int i = 0; i != N_EDGES; i++){
-	// 		edge_utilization[i] /= max_base_travel_cost();
-	// 		// edge_utilization[i] = edge_utilization[i]*2-1;//normalize to -[1,1]
-	// 		 edge_utilization[i] = edge_utilization[i]*1.8-0.9;//normalize to [-0.9,0.9]
-	// 	}
-	// 	if(care_about_time){
-	// 		for(size_t i = N_EDGES; i < N_EDGES*2; i++){
-	// 			edge_utilization[i] /= capacities[i];
-	// 			// edge_utilization[i] = edge_utilization[i]*2-1;
-	// 			edge_utilization[i] = edge_utilization[i]*1.8-0.9;
-	// 		}
+	assert(!normalize);
+	if(normalize){//TODO update doc
+	 	for (size_t i = 0; i != N_EDGES; i++){
+	 		edge_utilization[i] /= max_base_travel_cost();
+	 		// edge_utilization[i] = edge_utilization[i]*2-1;//normalize to -[1,1]
+	 		 edge_utilization[i] = edge_utilization[i]*1.8-0.9;//normalize to [-0.9,0.9]
+	 	}
+	 	if(care_about_time){
+	 		for(size_t i = N_EDGES; i < N_EDGES*2; i++){
+	 			edge_utilization[i] /= capacities[i];
+				// edge_utilization[i] = edge_utilization[i]*2-1;
+	 			edge_utilization[i] = edge_utilization[i]*1.8-0.9;
+	 		}
 				
-	// 	}
-	// }
+	 	}
+	 }
 
 	return edge_utilization;
 }
@@ -307,7 +308,7 @@ void Warehouse::transition_AGVs(bool verbose){
 			assert(nextID < N_EDGES);
 
 
-			assert(nextID >= 0);
+			//assert(nextID >= 0);
 			if (nextID >= s.size()){
 				std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n";
 				std::cout << "	t2v: " << whAGVs[curAGV]->GetT2V() << "\n";
@@ -470,7 +471,7 @@ float Warehouse::value_of_current_state(){
 	const std::vector<vertex_t> goals = whAGVs[0]->get_possible_goals();
 	for (vertex_t g : whAGVs[0]->get_possible_goals())
 		//for (vertex_t v : get_vertex_utilization(g, false))
-		for (int i = 0; i != whGraph->GetNumVertices(); i++){
+		for (size_t i = 0; i != whGraph->GetNumVertices(); i++){
 			if (get_vertex_utilization(g, false)[i]){
 				int source = 0;
 				if (goals[0] == g)

@@ -82,8 +82,8 @@ class Warehouse{
 		std::vector<vertex_t> get_vertex_utilization(const bool include_start_vertexes=true) __attribute__ ((pure));
 		std::vector<vertex_t> get_vertex_utilization(const vertex_t goal_vertex, const bool include_start_vertexes=true) __attribute__ ((pure));
 		float get_vertex_remaining_outgoing_capacity(vertex_t vertex) __attribute__ ((pure));
-		const float max_base_travel_cost() const{return *std::max_element(baseCosts.begin(), baseCosts.end());}
-		const float max_edge_capacity() const{return *std::max_element(capacities.begin(), capacities.end());}
+		float max_base_travel_cost() const __attribute__ ((const)) {return *std::max_element(baseCosts.begin(), baseCosts.end());}
+		float max_edge_capacity() const __attribute__ ((const)) {return *std::max_element(capacities.begin(), capacities.end());}
 		float value_of_current_state();
 
 		size_t nSteps; //number of steps per simulation

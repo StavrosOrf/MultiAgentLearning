@@ -22,10 +22,17 @@ std::string config_file;
 void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
 	const int runs = configs["ES"]["runs"].as<int>();
 	const bool verbose = configs["simulation"]["verbose"].as<bool>();
+	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
+	const std::string agentType = configs["domain"]["agents"].as<std::string>();
+	const std::string resFolder = create_results_folder(configs);
 
+	std::ofstream eval_file(resFolder + warehouse_type + '_' + "ES" + '_' + agentType + ".csv");
 	for (int i = runs; i != 0; i--){
+		assert(eval_file.is_open());
+		eval_file << "run,G\n";
 		Warehouse_ES_container esc(configs);
-		uint G = esc.evolution_strategy(verbose, n_threads);
+		uint G = esc.evolution_strategy(n_threads, verbose);
+		eval_file << runs << ',' << G << std::endl;
 		std::cout << "run: " << i << " Max G: " << G << std::endl;
 	}
 }
@@ -44,7 +51,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	double duration;
 	uint max_G = 0; //Maximum Total Deliveries
 
-	std::ofstream eval_file(resFolder + warehouse_type + '_' + agentType + ".csv");
+	std::ofstream eval_file(resFolder + warehouse_type + '_' + "DDPG" + '_' + agentType + ".csv");
 	for (int run = 0; run != runs; run++){
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
