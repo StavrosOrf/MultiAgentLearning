@@ -18,7 +18,7 @@ class Warehouse_ES_container {
 		Warehouse_ES_container(YAML::Node configs);
 		~Warehouse_ES_container(void){}
 
-		void evolution_strategy();
+		void evolution_strategy(bool verbose=false);
 
 	protected:
 

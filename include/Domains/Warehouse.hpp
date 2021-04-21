@@ -68,7 +68,7 @@ class Warehouse{
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
 		virtual epoch_results SimulateEpoch(bool verbose,int epoch) {;}
-		virtual epoch_resultsES SimulateEpochES(bool verbose,int epoch,float updatedValue) {;}
+		virtual epoch_resultsES SimulateEpochES(bool verbose,int epoch) {;}
 		void printAgvPaths();
 
 	protected:

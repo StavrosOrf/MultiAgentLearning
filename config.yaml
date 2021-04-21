@@ -13,7 +13,7 @@ graph:
   edges:      edges.csv
   capacities: capacities.csv
 DDPG:
-  epochs: 5 # set to 1 in test mode
+  epochs: 10 # set to 1 in test mode
   runs: 1
   rand_proc_std_dev: 0.2
   batch_size: 50
@@ -21,7 +21,7 @@ ES:
   epochs: 1
   runs: 1
 simulation:
-  verbose: false
+  verbose: true
   steps: 200
   agvs: origins_120.csv #Valid options: 70,90,120,200,400
   goals: goals.csv

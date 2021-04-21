@@ -13,7 +13,7 @@
 
 class Warehouse_ES : public Warehouse {
 	public:
-		Warehouse_ES(YAML::Node configs) : Warehouse(configs){;}
+		Warehouse_ES(YAML::Node configs) : Warehouse(configs){}
 		~Warehouse_ES(void);
 
 		epoch_results SimulateEpoch(bool verbose,int epoch){;}
@@ -28,6 +28,5 @@ class Warehouse_ES : public Warehouse {
 		std::vector<esNN*> produce_random_team_NNs();
 	protected:
 		float N_proc_std_dev;
-		std::vector<ESAgent *> maTeam;
-
+		std::vector<ESAgent *> maTeam;		
 };

@@ -19,10 +19,10 @@ Warehouse_ES::~Warehouse_ES(void){
 
 epoch_resultsES Warehouse_ES::SimulateEpochES(bool verbose, int epoch){
 	InitialiseNewEpoch();
-	std::normal_distribution<float> n_process(0, 1);
+	std::normal_distribution<float> n_process(0,0.1);
 	std::default_random_engine n_generator(time(NULL));
-
-	float random_sample = n_generator();
+	const float random_sample = n_process(n_generator);
+	
 	//for each agent add noise sample * std_dev
 	for (int i = 0; i < maTeam.size(); ++i)
 	{

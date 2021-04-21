@@ -23,8 +23,9 @@ std::string config_file;
 void warehouse_simulate_ES(YAML::Node configs){
 	const int nEps = configs["ES"]["epochs"].as<int>();
 	//const int runs = configs["ES"]["runs"].as<int>();
+	const bool verbose = configs["simulation"]["verbose"].as<bool>();
 	Warehouse_ES_container esc(configs);
-	esc.evolution_strategy();
+	esc.evolution_strategy(verbose);
 	std::cout << "please end up here, thank you" << std::endl;
 }
 
