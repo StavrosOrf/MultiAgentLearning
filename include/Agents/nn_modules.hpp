@@ -100,4 +100,18 @@ struct CriticNN : torch::nn::Module {
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
+struct esNN : torch::nn::Module {
+	esNN (int numIn, int numOut, int numHid=0) {
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numOut));
+	}
+
+	torch::Tensor forward(torch::Tensor x) {	
+		x = torch::sigmoid(fc1->forward(x));
+						
+		return x;
+	}
+
+	torch::nn::Linear fc1{nullptr};		
+};
+
 #endif // NN_MODULE_H

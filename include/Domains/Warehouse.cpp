@@ -11,8 +11,8 @@ Warehouse::Warehouse(YAML::Node configs){
 
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		algo = algo_type::ddpg;
-	else if(configs["mode"]["algo"].as<std::string>() == "DDPG_MERGED")
-		algo = algo_type::ddpg_merged;
+	else if(configs["mode"]["algo"].as<std::string>() == "ES")
+		algo = algo_type::evolutionary_strategies;
 	else{
 		std::cout << "ERROR: Currently only configured for 'DDPG' and ''! Exiting.\n";
 		exit(1);

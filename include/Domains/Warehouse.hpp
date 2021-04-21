@@ -21,7 +21,7 @@
 #define N_EDGES whGraph->GetEdges().size()
 
 
-enum class algo_type{ddpg, ddpg_merged};
+enum class algo_type{ddpg, evolutionary_strategies};
 
 enum class agent_def{centralized, link, intersection};
 
@@ -35,6 +35,21 @@ struct epoch_results{
 		totalMove += tM;
 		totalEnter += tE;
 		totalWait += tW;
+	}
+};
+
+struct epoch_resultsES{
+	uint totalDeliveries = 0;
+	uint totalMove = 0;
+	uint totalEnter = 0;
+	uint totalWait = 0;
+	float sample = 0; 
+	void update(uint tD, uint tM, uint tE, uint tW, float s){
+		totalDeliveries += tD;
+		totalMove += tM;
+		totalEnter += tE;
+		totalWait += tW;
+		sample += s;
 	}
 };
 
@@ -52,7 +67,8 @@ class Warehouse{
 		void DisableEpisodeReplayOutput()__attribute__ ((deprecated));
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual epoch_results SimulateEpoch(bool verbose,int epoch) = 0;
+		virtual epoch_results SimulateEpoch(bool verbose,int epoch) {;}
+		virtual epoch_resultsES SimulateEpochES(bool verbose,int epoch,float updatedValue) {;}
 		void printAgvPaths();
 
 	protected:

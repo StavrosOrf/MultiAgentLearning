@@ -13,11 +13,20 @@
 
 #include "Domains/Warehouse.hpp"
 #include "Domains/Warehouse_DDPG.hpp"
+#include "Domains/Warehouse_ES_container.hpp"
 //#include "Domains/Warehouse_DDPG_merged_step.h"
 
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
 std::string config_file;
+
+void warehouse_simulate_ES(YAML::Node configs){
+	const int nEps = configs["ES"]["epochs"].as<int>();
+	//const int runs = configs["ES"]["runs"].as<int>();
+	Warehouse_ES_container esc(configs);
+	esc.evolution_strategy();
+	std::cout << "please end up here, thank you" << std::endl;
+}
 
 void WarehouseSimulationDDPG(YAML::Node configs){
 	srand(time(NULL)); // increment random seed
@@ -74,8 +83,9 @@ void WarehouseSimulation(std::string config_file){
 	if (algo == "DDPG") {
 		if(mode == "train")
 			WarehouseSimulationDDPG(configs);
-	}
-	else{
+	}else if (algo == "ES"){
+		warehouse_simulate_ES(configs);
+	}else{
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(1);
 	}
@@ -89,8 +99,8 @@ Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		new_warehouse = new Warehouse_DDPG(configs);
-	else if(configs["mode"]["algo"].as<std::string>() == "DDPG_MERGED");
-		//new_warehouse = new Warehouse_DDPG_merged_step(configs);
+	//else if(configs["mode"]["algo"].as<std::string>() == "ES");
+		//new_warehouse = new Warehouse_ES_container(configs);
 	else{
 		std::cout << "ERROR: currently only configured for 'ddpg' and ''! exiting.\n";
 		exit(1);
