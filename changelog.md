@@ -168,3 +168,13 @@ trace if Eigen, Threadpool.cpp
 - Reduced ddpgAgent::REPLAY_BUFFER_SIZE to 1024*1024 (which results to sub 1 gigabyte of ram needed for one run)
 - Reward Method 2 is now likely broken 
 - Reward Method 1 Now runs Faster and provides a higher accuracy of the value
+
+## v 0.00028 o
+- Tried to have Q with more than 1 output(not working)
+- Coppied the NN parameters from another DDPG implementation
+- tested with these parameters and failed successfully 
+
+## v 0.00029 o (k)
+- Added full functionality for ES (not fully tested)
+
+
