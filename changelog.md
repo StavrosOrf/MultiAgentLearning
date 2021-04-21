@@ -177,4 +177,8 @@ trace if Eigen, Threadpool.cpp
 ## v 0.00029 o (k)
 - Added full functionality for ES (not fully tested)
 
+## v 0.00030k
+- implemented multithreading to ES
+- moved ES parameters from #define to config.yaml
+- minor code cleanup on ES
 

@@ -17,17 +17,16 @@ Warehouse_ES::~Warehouse_ES(void){
 	}
 }
 
-epoch_resultsES Warehouse_ES::SimulateEpochES(bool verbose, int epoch){
+epoch_resultsES Warehouse_ES::SimulateEpochES(const int epoch, bool verbose){
 	InitialiseNewEpoch();
-	std::normal_distribution<float> n_process(0,0.1);
-	std::default_random_engine n_generator(time(NULL));
+	std::normal_distribution<float> n_process(0,N_proc_std_dev);
+	const int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	std::default_random_engine n_generator(timestamp);
 	const float random_sample = n_process(n_generator);
 	
 	//for each agent add noise sample * std_dev
-	for (int i = 0; i < maTeam.size(); ++i)
-	{
+	for (int i = 0; i < maTeam.size(); i++)
 		maTeam[i]->updateNNWeights(STD_DEV * random_sample);
-	}
 
 	// each timestep
 	for (size_t t = 0; t < nSteps; t++){
@@ -35,12 +34,11 @@ epoch_resultsES Warehouse_ES::SimulateEpochES(bool verbose, int epoch){
 			std::cout <<"=== Epoch: "<<epoch<<" ==============================================================Step - "<<t<<std::endl;
 
 		//Select action	
-		std::vector<float> actions = QueryActorMATeam(get_edge_utilization());
+		const std::vector<float> actions = QueryActorMATeam(get_edge_utilization());
 
 		std::vector<float> final_costs = baseCosts;
-		for (size_t n = 0; n < N_EDGES; n++){
+		for (size_t n = 0; n < N_EDGES; n++)
 			final_costs[n] += actions[n] * max_base_travel_cost();
-		}
 
 		if (verbose){
 			printf("\nFinalCosts: ");
@@ -50,25 +48,24 @@ epoch_resultsES Warehouse_ES::SimulateEpochES(bool verbose, int epoch){
 		}
 	
 		if (verbose)
-		 	print_warehouse_state();
+			print_warehouse_state();
 		traverse_one_step(final_costs);
 	}
 
 	epoch_resultsES results;
 	// Log Perfomance Counters
-	size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
+	size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0;
 	for (size_t k = 0; k < whAGVs.size(); k++){
 		totalMove += whAGVs[k]->GetMoveTime();
 		totalEnter += whAGVs[k]->GetEnterTime();
 		totalWait += whAGVs[k]->GetWaitTime();
 		totalSuccess += whAGVs[k]->GetNumCompleted();
-		totalCommand += whAGVs[k]->GetNumCommanded();
 	}
 	if(verbose)
 		std::cout<<"Stats:\n Total Move: "<<totalMove<<"\n Total Enter: "<<totalEnter<<
-				"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
+			"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
 	results.update(totalSuccess, totalMove, totalEnter, totalWait, random_sample);
-	assert(totalMove+totalEnter+totalWait == whAGVs.size()*200);
+	assert(totalMove+totalEnter+totalWait == whAGVs.size()*nSteps);
 
 	return results;
 }
@@ -129,26 +126,28 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
 	} 
 }
 
+void Warehouse_ES::set_team_NNs(std::vector<esNN*> teamNNs){
+	for (int i = 0; i < maTeam.size(); i++)	
+		maTeam[i]->setNN(teamNNs[i]);
+}
+
+/************************************************************************************************
+**Note	:This is very Junky solution								*
+**Output:A random std::vector<esNN*> which contains the NNs of a multiagent team		*
+************************************************************************************************/
 std::vector<esNN*> Warehouse_ES::produce_random_team_NNs(){
 	std::vector<esNN*> team;
 
-	if(agent_type == agent_def::centralized)
+	if (agent_type == agent_def::centralized)
 		team.push_back((new ESAgent(N_EDGES*(1+incorporates_time), N_EDGES))->NN);
-	else if(agent_type == agent_def::link){			
-		for (size_t i = 0; i < whGraph->GetEdges().size(); i++){				
+	else if (agent_type == agent_def::link)
+		for (size_t i = 0; i < whGraph->GetEdges().size(); i++)
 			team.push_back((new ESAgent((1+incorporates_time), 1))->NN);
-		}
-	}
-		else if (agent_type == agent_def::intersection)
+	else if (agent_type == agent_def::intersection)
 		for (int v : whGraph->GetVertices())
 			team.push_back((new ESAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()))->NN);
-	
-	return team;
-}
 
-void Warehouse_ES::setTeamNNs(std::vector<esNN*> teamNNs){
-	for (int i = 0; i < maTeam.size(); i++)	
-		maTeam[i]->setNN(teamNNs[i]);
+	return team;
 }
 
 // void Warehouse_ES::initialiseNNWeights(std::vector<esNN> v){

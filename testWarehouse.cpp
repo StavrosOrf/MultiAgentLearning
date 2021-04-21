@@ -14,19 +14,20 @@
 #include "Domains/Warehouse.hpp"
 #include "Domains/Warehouse_DDPG.hpp"
 #include "Domains/Warehouse_ES_container.hpp"
-//#include "Domains/Warehouse_DDPG_merged_step.h"
 
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
 std::string config_file;
 
-void warehouse_simulate_ES(YAML::Node configs){
-	const int nEps = configs["ES"]["epochs"].as<int>();
-	//const int runs = configs["ES"]["runs"].as<int>();
+void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
+	const int runs = configs["ES"]["runs"].as<int>();
 	const bool verbose = configs["simulation"]["verbose"].as<bool>();
-	Warehouse_ES_container esc(configs);
-	esc.evolution_strategy(verbose);
-	std::cout << "please end up here, thank you" << std::endl;
+
+	for (int i = runs; i != 0; i--){
+		Warehouse_ES_container esc(configs);
+		uint G = esc.evolution_strategy(verbose, n_threads);
+		std::cout << "run: " << i << " Max G: " << G << std::endl;
+	}
 }
 
 void WarehouseSimulationDDPG(YAML::Node configs){
@@ -73,7 +74,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
 }
 
-void WarehouseSimulation(std::string config_file){
+void WarehouseSimulation(std::string config_file, size_t n_threads){
 	std::cout << "Reading configuration file: " << config_file << "\n";
 
 	YAML::Node configs = YAML::LoadFile(config_file);
@@ -85,7 +86,7 @@ void WarehouseSimulation(std::string config_file){
 		if(mode == "train")
 			WarehouseSimulationDDPG(configs);
 	}else if (algo == "ES"){
-		warehouse_simulate_ES(configs);
+		warehouse_simulate_ES(configs, n_threads);
 	}else{
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(1);
@@ -93,15 +94,15 @@ void WarehouseSimulation(std::string config_file){
 }
 
 /************************************************************************************************
- * *Input: A string named [agentType] which indicates the type of the Warehouse			*
- * *Output:A Warehouse of that type								*
- ************************************************************************************************/
+**Input: A string named [agentType] which indicates the type of the Warehouse			*
+**Output:A Warehouse of that type								*
+************************************************************************************************/
 Warehouse* create_warehouse(YAML::Node configs){
 	Warehouse* new_warehouse;
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		new_warehouse = new Warehouse_DDPG(configs);
-	//else if(configs["mode"]["algo"].as<std::string>() == "ES");
-		//new_warehouse = new Warehouse_ES_container(configs);
+	else if(configs["mode"]["algo"].as<std::string>() == "ES")
+		assert(0); //ES is not supposed to call this function
 	else{
 		std::cout << "ERROR: currently only configured for 'ddpg' and ''! exiting.\n";
 		exit(1);
@@ -117,8 +118,9 @@ Warehouse* create_warehouse(YAML::Node configs){
 **Output:Returns the string of the file result's folder file path				*
 *************************************************************************************************/
 std::string create_results_folder(YAML::Node configs){
+	const int64_t timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	std::string resFolder = configs["results"]["folder"].as<std::string>()
-		+ std::to_string(rand()) + '/';
+		+ std::to_string(timestamp) + '/';
 	char mkdir[10000];
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
 	system(mkdir);
@@ -141,7 +143,7 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-	int thrds = 2; // Default number of threads
+	int thrds = 1; // Default number of threads
 	for (int i = 1; i < argc; ++i){
 		std::string arg = argv[i];
 		//std::cout << "main"<<std::endl;
@@ -176,7 +178,7 @@ int main(int argc, char* argv[]){
 		}
 	}
 
-	WarehouseSimulation(config_file);
+	WarehouseSimulation(config_file, thrds);
 
 	return 0;
 }

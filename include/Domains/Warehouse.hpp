@@ -67,8 +67,8 @@ class Warehouse{
 		void DisableEpisodeReplayOutput()__attribute__ ((deprecated));
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual epoch_results SimulateEpoch(bool verbose,int epoch) {;}
-		virtual epoch_resultsES SimulateEpochES(bool verbose,int epoch) {;}
+		virtual epoch_results SimulateEpoch(bool verbose = false, int epoch = -1) = 0;
+		virtual epoch_resultsES SimulateEpochES(bool verbose = false, int epoch = -1){;}
 		void printAgvPaths();
 
 	protected:

@@ -8,23 +8,18 @@
 #include "Warehouse.hpp"
 #include "Warehouse_ES.hpp"
 #include "Agents/ESAgent.hpp" 
+#include "boost/asio.hpp"
 
-#define POP_SIZE 100
-
-// #define 
+#define LEARNING_RATE 0.01
 
 class Warehouse_ES_container {
 	public:
 		Warehouse_ES_container(YAML::Node configs);
 		~Warehouse_ES_container(void){}
 
-		void evolution_strategy(bool verbose=false);
-
+		uint evolution_strategy(size_t n_threads=1, bool verbose=false);
 	protected:
-
 		std::vector<Warehouse_ES*> population; 
-		int epoch = 10;
-
-
-
+		int epoch;
+		float learning_rate;
 };
