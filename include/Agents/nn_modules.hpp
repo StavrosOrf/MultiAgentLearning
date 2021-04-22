@@ -106,8 +106,7 @@ struct esNN : torch::nn::Module {
 	}
 
 	torch::Tensor forward(torch::Tensor x) {	
-		x = torch::sigmoid(fc1->forward(x));
-						
+		x = torch::sigmoid(fc1->forward(x));							
 		return x;
 	}
 

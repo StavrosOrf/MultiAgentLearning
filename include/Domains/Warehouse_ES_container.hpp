@@ -20,4 +20,5 @@ class Warehouse_ES_container {
 		std::vector<Warehouse_ES*> population; 
 		int epoch;
 		float learning_rate;
+		float N_proc_std_dev;
 };

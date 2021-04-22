@@ -19,14 +19,18 @@ Warehouse_ES::~Warehouse_ES(void){
 
 epoch_resultsES Warehouse_ES::SimulateEpochES(const int epoch, bool verbose){
 	InitialiseNewEpoch();
-	std::normal_distribution<float> n_process(0,N_proc_std_dev);
-	const int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	std::default_random_engine n_generator(timestamp);
-	const float random_sample = n_process(n_generator);
-	
+	// const int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();		
 	//for each agent add noise sample * std_dev
-	for (size_t i = 0; i < maTeam.size(); i++)
-		maTeam[i]->updateNNWeights(STD_DEV * random_sample);
+	std::vector<std::vector<torch::Tensor>> samples(maTeam.size());
+	for (size_t i = 0; i < maTeam.size(); i++){
+		for (size_t j = 0; j < maTeam[i]->NN->parameters().size(); j++ ){
+			torch::Tensor random_sample = torch::randn(maTeam[i]->NN->parameters()[j].sizes());			
+			torch::Tensor t = (maTeam[i]->NN->parameters()[j]).detach().clone();
+			maTeam[i]->NN->parameters()[j].set_data(t + N_proc_std_dev * random_sample);
+			samples[i].push_back(random_sample);		
+		}		
+		// maTeam[i]->updateNNWeights(STD_DEV * random_sample);
+	}
 
 	// each timestep
 	for (size_t t = 0; t < nSteps; t++){
@@ -64,7 +68,7 @@ epoch_resultsES Warehouse_ES::SimulateEpochES(const int epoch, bool verbose){
 	if(verbose)
 		std::cout<<"Stats:\n Total Move: "<<totalMove<<"\n Total Enter: "<<totalEnter<<
 			"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
-	results.update(totalSuccess, totalMove, totalEnter, totalWait, random_sample);
+	results.update(totalSuccess, totalMove, totalEnter, totalWait, samples);
 	assert(totalMove+totalEnter+totalWait == whAGVs.size()*nSteps);
 
 	return results;

@@ -182,3 +182,5 @@ trace if Eigen, Threadpool.cpp
 - moved ES parameters from #define to config.yaml
 - minor code cleanup on ES
 
+## v 0.00031 o (k) it works!?
+- Updated Noise addition(and tested centralized)

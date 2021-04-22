@@ -17,6 +17,7 @@
 #include "Planning/Graph.h"
 #include "Planning/Edge.h"
 #include "AGV.hpp"
+#include <torch/torch.h>
 
 #define N_EDGES whGraph->GetEdges().size()
 
@@ -43,13 +44,13 @@ struct epoch_resultsES{
 	uint totalMove = 0;
 	uint totalEnter = 0;
 	uint totalWait = 0;
-	float sample = 0; 
-	void update(uint tD, uint tM, uint tE, uint tW, float s){
+	std::vector<std::vector<torch::Tensor>> samples; 
+	void update(uint tD, uint tM, uint tE, uint tW, std::vector<std::vector<torch::Tensor>> s){
 		totalDeliveries += tD;
 		totalMove += tM;
 		totalEnter += tE;
 		totalWait += tW;
-		sample += s;
+		samples = s;
 	}
 };
 
