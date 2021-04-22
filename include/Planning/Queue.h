@@ -1,5 +1,4 @@
-#ifndef QUEUE_H_
-#define QUEUE_H_
+#pragma once
 
 #include <vector> // std::vector
 #include <queue> // std::priority_queue
@@ -14,24 +13,20 @@ struct CompareNode{
 };
 
 // Custom queue type to perform priority queue updates
-class Queue
-{
+class Queue{
 	public:
 		typedef std::priority_queue<Node *, std::vector<Node *>, CompareNode> QUEUE;
 		Queue(Node * source){
-			itsPQ = new QUEUE;
-			itsPQ->push(source);
+			itsPQ.push(source);
 		}
 
 		~Queue(){
-			while (!itsPQ->empty()){
-				Node * temp = itsPQ->top();
+			while (!itsPQ.empty()){
+				Node * temp = itsPQ.top();
 				delete temp;
 				temp = 0;
-				itsPQ->pop();
+				itsPQ.pop();
 			}
-			delete itsPQ;
-			itsPQ = 0;
 			for (size_t i = 0; i < closed.size(); i ++){
 				delete closed[i];
 				closed[i] = 0;
@@ -39,14 +34,11 @@ class Queue
 		}
 
 		std::vector<Node *> GetClosed() const {return closed;}
-		bool EmptyQueue() const {return itsPQ->empty();}
-		size_t SizeQueue() const {return itsPQ->size();}
+		bool EmptyQueue() const {return itsPQ.empty();}
+		size_t SizeQueue() const {return itsPQ.size();}
 		void UpdateQueue(Node * newNode);
 		Node * PopQueue();
-
 	private:
-		QUEUE * itsPQ;
+		QUEUE itsPQ;
 		std::vector<Node *> closed;
 };
-
-#endif //QUEUE_H_
