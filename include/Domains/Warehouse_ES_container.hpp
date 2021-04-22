@@ -12,7 +12,7 @@
 
 class Warehouse_ES_container {
 	public:
-		Warehouse_ES_container(YAML::Node configs);
+		Warehouse_ES_container(YAML::Node configs,std::ofstream*  eval_file);
 		~Warehouse_ES_container(void){}
 
 		uint evolution_strategy(size_t n_threads=1, bool verbose=false);
@@ -21,4 +21,6 @@ class Warehouse_ES_container {
 		int epoch;
 		float learning_rate;
 		float N_proc_std_dev;
+		std::ofstream* file;
+
 };

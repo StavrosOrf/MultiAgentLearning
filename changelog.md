@@ -184,3 +184,6 @@ trace if Eigen, Threadpool.cpp
 
 ## v 0.00031 o (k) it works!?
 - Updated Noise addition(and tested centralized)
+
+## v 0.00032 o
+- Added print to file functionality for ES algorrithm 

@@ -28,13 +28,14 @@ void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
 
 	std::ofstream eval_file(resFolder + warehouse_type + '_' + "ES" + '_' + agentType + ".csv");
 	for (int i = runs; i != 0; i--){
-		assert(eval_file.is_open());
-		eval_file << "run,G\n";
-		Warehouse_ES_container esc(configs);
+		assert(eval_file->is_open());
+		eval_file << "run,,Max_G\n";
+		Warehouse_ES_container esc(configs,&eval_file);
 		uint G = esc.evolution_strategy(n_threads, verbose);
-		eval_file << runs << ',' << G << std::endl;
+		eval_file << runs << ",," << G << std::endl;
 		std::cout << "run: " << i << " Max G: " << G << std::endl;
 	}
+	eval_file.close();
 }
 
 void WarehouseSimulationDDPG(YAML::Node configs){

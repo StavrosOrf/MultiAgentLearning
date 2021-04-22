@@ -100,17 +100,32 @@ struct CriticNN : torch::nn::Module {
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
+#define DEEP
+
 struct esNN : torch::nn::Module {
-	esNN (int numIn, int numOut, int numHid=0) {
-		fc1 = register_module("fc1",torch::nn::Linear(numIn,numOut));
+	esNN (int numIn, int numOut, int numHid=256) {
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));
+#ifdef DEEP	
+		fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
+		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
+#endif
 	}
 
 	torch::Tensor forward(torch::Tensor x) {	
-		x = torch::sigmoid(fc1->forward(x));							
+
+		x = torch::sigmoid(fc1->forward(x));
+#ifdef DEEP	
+		x = torch::sigmoid(fc2->forward(x));
+		x = torch::sigmoid(fc3->forward(x));
+#endif
+
 		return x;
 	}
 
 	torch::nn::Linear fc1{nullptr};		
+#ifdef DEEP	
+	torch::nn::Linear fc2{nullptr},fc3{nullptr};
+#endif
 };
 
 #endif // NN_MODULE_H

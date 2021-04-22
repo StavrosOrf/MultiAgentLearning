@@ -14,7 +14,7 @@ DDPG: #config options for 'DDPG' leanring algorihm
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   batch_size: 50 
 ES:
-  epochs: 2
+  epochs: 3
   runs: 1 # number of statistical runs
   population_size: 1000
   learning_rate: 0.001
@@ -22,7 +22,7 @@ ES:
 simulation:
   verbose: true
   steps: 200
-  agvs: origins_120.csv #Valid options: 70,90,120,200,400
+  agvs: origins_90.csv #Valid options: 70,90,120,200,400
   goals: goals.csv
 results:
   folder:     ../Results/
