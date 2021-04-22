@@ -7,7 +7,7 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream*
 	learning_rate = configs["ES"]["learning_rate"].as<float>();
 	const size_t population_size = configs["ES"]["population_size"].as<int>();
 	N_proc_std_dev = configs["DDPG"]["rand_proc_std_dev"].as<float>();
-	assert(N_proc_std_dev > 0 && !std::isInf(N_proc_std_dev));
+	assert(N_proc_std_dev > 0 && !std::isinf(N_proc_std_dev));
 	assert(population_size > 0 && epoch > 0);
 	file = eval_file;
 	*file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;

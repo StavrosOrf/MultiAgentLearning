@@ -28,7 +28,7 @@ void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
 
 	std::ofstream eval_file(resFolder + warehouse_type + '_' + "ES" + '_' + agentType + ".csv");
 	for (int i = runs; i != 0; i--){
-		assert(eval_file->is_open());
+		assert(eval_file.is_open());
 		eval_file << "run,,Max_G\n";
 		Warehouse_ES_container esc(configs,&eval_file);
 		uint G = esc.evolution_strategy(n_threads, verbose);
