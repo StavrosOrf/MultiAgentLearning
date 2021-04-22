@@ -220,7 +220,7 @@ void Warehouse::print_warehouse_state(){
 *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
 *	And the minimum remaining distance of AGVs on edge indexed by EdgeID+N_EDGES		*
 ************************************************************************************************/
-std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, true);}
+std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false);}
 std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool normalize){
 	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time)),0);
 	if (care_about_time)
@@ -245,7 +245,7 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool no
 		for(size_t i = 0; i < N_EDGES; i++)
 			assert((edge_utilization[i+N_EDGES]==0) == (edge_utilization[i]==0));
 
-	assert(!normalize);
+	assert(!normalize);//this should be called with the current implemenetions
 	if(normalize){//TODO update doc
 	 	for (size_t i = 0; i != N_EDGES; i++){
 	 		edge_utilization[i] /= max_base_travel_cost();
