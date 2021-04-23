@@ -108,17 +108,18 @@ std::vector<Edge*> Graph::get_outgoing_edges_of_a_vertex(vertex_t vertex){
 	return edges;
 }
 
-
-std::vector<const Edge *> Graph::GetEdges() const {
-	std::vector<const Edge*> edges;
-	edges.reserve(itsEdges.size());
-	for (size_t i = 0; i != itsEdges.size(); i++){
-		const Edge* e = & itsEdges[i];
+/*
+const std::vector<const Edge *> Graph::GetEdges() const {
+	std::vector<const edge*> edges;
+	edges.reserve(itsedges.size());
+	for (size_t i = 0; i != itsedges.size(); i++){
+		const edge* e = & itsedges[i];
 		edges.push_back(e);
 	}
 	edges.shrink_to_fit();
 	
-	for (size_t i = 0; i != itsEdges.size(); i++)
-		assert(itsEdges[i] == *edges[i]);
+	for (size_t i = 0; i != itsedges.size(); i++)
+		assert(itsedges[i] == *edges[i]);
 	return edges;
 }
+*/
