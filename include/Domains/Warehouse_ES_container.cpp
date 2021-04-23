@@ -16,20 +16,24 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream*
 		population.push_back(new Warehouse_ES(configs));
 		population[i]->InitialiseMATeam();
 	}
-
 }
 
-uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose){
+uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,size_t run){
 	//get initial random policy
 	std::vector<esNN*> team = population[0]->produce_random_team_NNs(); //TODO RENAME team?
 	std::vector<epoch_resultsES> results(population.size());
 	epoch_resultsES max_results;
+	std::clock_t start, startTotalRun = std::clock();
+	// typedef std::chrono::high_resolution_clock clockTotal;
+	startTotalRun = std::clock();
+
 	float avg_G;
 
 	uint max_deliveries_intra = 0;
 	for (int i = 0; i < epoch; i++){	
 		max_results.totalDeliveries = 0;
 		avg_G = 0;
+		start = std::clock();
 		
 #ifdef MULTITHREADED
 		boost::asio::thread_pool simulator_pool(n_threads);
@@ -90,15 +94,17 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose){
 			}
 		}
 		// std::cout<<(sum)<<"\n";
-
+		float d = (std::clock() - start)/((float) CLOCKS_PER_SEC );	
 		if(verbose)
-			std::cout << "- Epoch: "<<i<<" ====================== Avg G: "<<avg_G<<" ------ max G:"<<max_results.totalDeliveries<<std::endl;
-		
-					
+			std::printf("- Epoch: %3d - ( %6.2f sec) =================== Avg G: %6.2f ----- max G: %d \n",i,d,avg_G,max_results.totalDeliveries);
+			
+						
 		//Write results to file
 		*file << ","<<i<<","<<max_results.totalDeliveries<<","<<max_results.totalMove <<","<<max_results.totalEnter <<","<<max_results.totalWait <<","<<avg_G <<std::endl;
 	}
 
+	float duration = (int)((std::clock() - startTotalRun)/((float) CLOCKS_PER_SEC )*100 + 0.5);
+	std::cout<<"Total time elapsed for Run "<<run<<" ( "<<duration/100<<" sec) ----- MAX G: "<<max_deliveries_intra<<std::endl; 
 
 	return max_deliveries_intra;
 }
