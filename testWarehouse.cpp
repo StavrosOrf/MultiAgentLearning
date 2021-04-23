@@ -29,10 +29,10 @@ void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
 	std::ofstream eval_file(resFolder + warehouse_type + '_' + "ES" + '_' + agentType + ".csv");
 	for (int i = 0; i != runs; i++){
 		assert(eval_file.is_open());
-		eval_file << "run,,Max_G\n";
 		Warehouse_ES_container esc(configs,&eval_file);
 		uint G = esc.evolution_strategy(n_threads, verbose,i);
-		eval_file << runs << ",," << G << std::endl;		
+		eval_file << "run,,Max_G\n";
+		eval_file << i << ",," << G << std::endl;		
 	}
 	eval_file.close();
 }
@@ -130,7 +130,7 @@ std::string create_results_folder(YAML::Node configs){
 		+ std::to_string(timestamp) + '/';
 	char mkdir[10000];
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
-	system(mkdir);
+	int i = system(mkdir);
 	std::filesystem::copy_file(config_file, resFolder+config_file.substr(3));
 	return resFolder;
 }

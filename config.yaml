@@ -14,7 +14,7 @@ DDPG: #config options for 'DDPG' leanring algorihm
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   batch_size: 50 
 ES:
-  epochs: 500
+  epochs: 512
   runs: 2 # number of statistical runs
   population_size: 1000
   learning_rate: 0.001
