@@ -311,7 +311,7 @@ void Warehouse::transition_AGVs(bool verbose){
 			if (nextID >= s.size()){
 				std::cout << "AGV #" << curAGV << ", nextID: " << nextID << "\n";
 				std::cout << "	t2v: " << whAGVs[curAGV]->GetT2V() << "\n";
-				std::cout << "	itsQueue: " << (whAGVs[curAGV]->GetAGVPlanner()->GetQueue() != 0) << "\n";
+				//std::cout << "	itsQueue: " << (whAGVs[curAGV]->GetAGVPlanner()->GetQueue() != 0) << "\n";
 				assert(0);
 			}
 			if (s[nextID] < capacities[nextID]){ // check if next edge is full

@@ -5,7 +5,7 @@
 #include <float.h> // DBL_MAX
 #include "Edge.h"
 
-enum nodeType {SOURCE, OTHER};
+enum class nodeType {SOURCE, OTHER};
 
 // Node class to maintain path information up to a vertex
 // contains parent node, (mu, sigma) of cost-to-come
@@ -20,7 +20,7 @@ class Node
 		{
 			switch (n)
 			{
-				case SOURCE:
+				case nodeType::SOURCE:
 					itsCost = 0.0;
 					break;
 				default:

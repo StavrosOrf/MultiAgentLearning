@@ -2,7 +2,7 @@
 
 Node * Search::PathSearch(){
 	size_t sourceID = FindSourceID();
-	itsQueue = new Queue(new Node(itsGraph->GetVertices()[sourceID], SOURCE));
+	itsQueue = new Queue(new Node(itsGraph->GetVertices()[sourceID], nodeType::SOURCE));
 	bool pathFound = false;
 
 	while (!itsQueue->EmptyQueue()){

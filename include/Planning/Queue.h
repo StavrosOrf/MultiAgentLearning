@@ -38,6 +38,7 @@ class Queue{
 		size_t SizeQueue() const {return itsPQ.size();}
 		void UpdateQueue(Node * newNode);
 		Node * PopQueue();
+		void reset(){itsPQ = QUEUE(); closed.clear();}
 	private:
 		QUEUE itsPQ;
 		std::vector<Node *> closed;
