@@ -6,18 +6,18 @@
 **		case the edge is not a valid edge (is NULL or exists in a different graph)	*
 *************************************************************************************************/
 size_t Graph::GetEdgeID(const Edge * e){
-	for (size_t i = 0; i < numEdges; i++)
+	for (size_t i = 0; i < itsEdges.size(); i++)
 		if (e == &itsEdges[i])
 			return i;
 	//std::cout << "Error: edge not found in graph!\n";
-	return numEdges;
+	return itsEdges.size();
 }
 
 std::vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex in list of neighbours
 	std::vector<Edge *> neighbours;
 	vertex_t v = n->GetVertex();
 
-	for (size_t i = 0; i < numEdges; i++){
+	for (size_t i = 0; i < itsEdges.size(); i++){
 		vertex_t v1 = itsEdges[i].GetVertex1();
 		vertex_t v2 = itsEdges[i].GetVertex2();
 		if (v1 == v){
@@ -40,7 +40,7 @@ std::vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent ver
 }
 
 void Graph::GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vector<float> &costs){
-	numEdges = edges.size();
+	const size_t numEdges = edges.size();
 
 	for (size_t i = 0; i < numEdges; i++){
 		// Initial error checking
@@ -48,7 +48,7 @@ void Graph::GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vect
 		vertex_t v2 = edges[i][1];
 		bool v1Found = false;
 		bool v2Found = false;
-		for (size_t j = 0; j < numVertices; j++){
+		for (size_t j = 0; j < itsVertices.size(); j++){
 			if (v1 == itsVertices[j])
 				v1Found = true;
 			if (v2 == itsVertices[j])

@@ -2,8 +2,9 @@
 #define EDGE_H_
 
 #include <stddef.h>
+#include <cstdint>
 
-typedef int vertex_t;
+typedef int16_t vertex_t;
 
 // Edge class to contain mean and variance of cost along an edge
 class Edge

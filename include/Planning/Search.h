@@ -23,7 +23,7 @@ class Search{
 
 		Graph * GetGraph() const {return itsGraph;}
 		Queue * GetQueue() const {return itsQueue;}
-		void SetQueue(Queue * queue) {itsQueue = queue;}
+		//void SetQueue(Queue * queue) {itsQueue = queue;}
 		vertex_t GetSource() const {return itsSource;}
 		void SetSource(vertex_t s){itsSource = s;}
 		vertex_t GetGoal() const {return itsGoal;}

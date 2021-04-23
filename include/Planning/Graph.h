@@ -1,5 +1,4 @@
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#pragma once
 
 #include <iostream> //std::cout
 #include <vector> // std::vector
@@ -13,7 +12,6 @@
 class Graph{
 	public:
 		Graph(std::vector<vertex_t> &vertices, std::vector< std::vector<vertex_t> > &edges, std::vector<float> &costs): itsVertices(vertices){
-			numVertices = itsVertices.size();
 			GenerateEdges(edges, costs);
 		}
 
@@ -22,8 +20,8 @@ class Graph{
 
 		std::vector<vertex_t> GetVertices() const {return itsVertices;}
 		std::vector<const Edge *> GetEdges() const;
-		size_t GetNumVertices() const {return numVertices;}
-		size_t GetNumEdges() const {return numEdges;}
+		size_t GetNumVertices() const {return itsVertices.size();}
+		size_t GetNumEdges() const {return itsEdges.size();}
 		size_t GetEdgeID(const Edge *) __attribute__ ((pure));
 
 		std::vector<Edge*> get_outgoing_edges_of_a_vertex(vertex_t vertex);
@@ -37,10 +35,6 @@ class Graph{
 	private:
 		std::vector<vertex_t> itsVertices;
 		std::vector<Edge> itsEdges;
-		size_t numVertices;
-		size_t numEdges;
 
 		void GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vector<float> &costs);
 };
-
-#endif // GRAPH_H_
