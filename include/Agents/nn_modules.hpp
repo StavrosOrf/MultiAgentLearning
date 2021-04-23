@@ -100,7 +100,7 @@ struct CriticNN : torch::nn::Module {
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
-#define DEEP
+// #define DEEP
 
 struct esNN : torch::nn::Module {
 	esNN (int numIn, int numOut, int numHid=256) {
