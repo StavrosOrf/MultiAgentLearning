@@ -5,9 +5,9 @@
 **Output:Returns the ID of that edge as indexed by the graph, returns the number of edges in	*
 **		case the edge is not a valid edge (is NULL or exists in a different graph)	*
 *************************************************************************************************/
-size_t Graph::GetEdgeID(Edge * e){
+size_t Graph::GetEdgeID(const Edge * e){
 	for (size_t i = 0; i < numEdges; i++)
-		if (e == itsEdges[i])
+		if (e == &itsEdges[i])
 			return i;
 	//std::cout << "Error: edge not found in graph!\n";
 	return numEdges;
@@ -18,8 +18,8 @@ std::vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent ver
 	vertex_t v = n->GetVertex();
 
 	for (size_t i = 0; i < numEdges; i++){
-		vertex_t v1 = itsEdges[i]->GetVertex1();
-		vertex_t v2 = itsEdges[i]->GetVertex2();
+		vertex_t v1 = itsEdges[i].GetVertex1();
+		vertex_t v2 = itsEdges[i].GetVertex2();
 		if (v1 == v){
 			bool isNeighbour = true;
 			Node * n0 = n;
@@ -32,19 +32,17 @@ std::vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent ver
 				}
 			}
 			if (isNeighbour)
-				neighbours.push_back(itsEdges[i]);
+				neighbours.push_back(&itsEdges[i]);
 		}
 	}
 
 	return neighbours;
 }
 
-void Graph::GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vector<float> &costs)
-{
+void Graph::GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vector<float> &costs){
 	numEdges = edges.size();
 
-	for (size_t i = 0; i < numEdges; i++)
-	{
+	for (size_t i = 0; i < numEdges; i++){
 		// Initial error checking
 		vertex_t v1 = edges[i][0];
 		vertex_t v2 = edges[i][1];
@@ -63,25 +61,35 @@ void Graph::GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vect
 			exit(1);
 		}
 
-		Edge * e = new Edge(v1, v2, costs[i]);
-		itsEdges.push_back(e);
+		//Edge * e = new Edge(v1, v2, costs[i]);
+		itsEdges.push_back(Edge(v1, v2, costs[i]));
 	}
 }
 
 void Graph::reset_edge_costs(){
-	for(Edge* e : itsEdges)
-		e->SetCost(e->GetLength());
+	//TODO check
+	assert(0);
+	for(Edge e : itsEdges)
+		e.SetCost(e.GetLength());
 }
+
+void Graph::set_edge_cost(std::vector<float> new_costs){
+	assert(new_costs.size() == itsEdges.size());
+	for (size_t i = 0; i != itsEdges.size(); i++)
+		itsEdges[i].SetCost(new_costs[i]);
+}
+
 
 /************************************************************************************************
 **Input:An vertex_t indicating the [vertex] of the graph						*
 **Output:All the incomming edges to that [vertex]						*
 *************************************************************************************************/
 std::vector<Edge*> Graph::get_incoming_edges_of_a_vertex(vertex_t vertex){
+	assert(0);
 	std::vector<Edge*> edges;
-	for(Edge* e : itsEdges)
-		if (e->GetVertex2() == vertex)
-			edges.push_back(e);
+	for(Edge e : itsEdges)
+		if (e.GetVertex2() == vertex)
+			edges.push_back(&e);
 	edges.shrink_to_fit();
 	return edges;
 }
@@ -91,10 +99,26 @@ std::vector<Edge*> Graph::get_incoming_edges_of_a_vertex(vertex_t vertex){
 **Output:All the outgoing edges to that [vertex]						*
 *************************************************************************************************/
 std::vector<Edge*> Graph::get_outgoing_edges_of_a_vertex(vertex_t vertex){
+	assert(0);
 	std::vector<Edge*> edges;
-	for(Edge* e : itsEdges)
-		if (e->GetVertex1() == vertex)
-			edges.push_back(e);
+	for(Edge e : itsEdges)
+		if (e.GetVertex1() == vertex)
+			edges.push_back(&e);
 	edges.shrink_to_fit();
+	return edges;
+}
+
+
+std::vector<const Edge *> Graph::GetEdges() const {
+	std::vector<const Edge*> edges;
+	edges.reserve(itsEdges.size());
+	for (size_t i = 0; i != itsEdges.size(); i++){
+		const Edge* e = & itsEdges[i];
+		edges.push_back(e);
+	}
+	edges.shrink_to_fit();
+	
+	for (size_t i = 0; i != itsEdges.size(); i++)
+		assert(itsEdges[i] == *edges[i]);
 	return edges;
 }

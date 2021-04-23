@@ -1,6 +1,6 @@
 #include "Warehouse_ES_container.hpp"
 
-#define MULTITHREADED
+//#define MULTITHREADED
 
 Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream* eval_file){
 	epoch = configs["ES"]["epochs"].as<int>();
@@ -30,7 +30,7 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose){
 	for (int i = 0; i < epoch; i++){	
 		max_results.totalDeliveries = 0;
 		avg_G = 0;
-		
+
 #ifdef MULTITHREADED
 		boost::asio::thread_pool simulator_pool(n_threads);
 #endif

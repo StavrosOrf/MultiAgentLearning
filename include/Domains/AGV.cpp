@@ -67,7 +67,7 @@ void AGV::Traverse(){
 
 void AGV::EnterNewEdge(){
 	// update current edge, next vertex, etc.
-	curEdge = path.front();
+	curEdge = (Edge*) path.front();
 	path.pop_front();
 	nextVertex = curEdge->GetVertex2();
 	t2v = curEdge->GetLength();
@@ -89,7 +89,7 @@ void AGV::CompareCosts(std::vector<float> c){
 
 void AGV::PlanAGV(std::vector<float> c){
 	size_t nEdges = agvPlanner->GetGraph()->GetNumEdges();
-	std::vector<Edge *> edges = agvPlanner->GetGraph()->GetEdges();
+	std::vector<const Edge *> edges = agvPlanner->GetGraph()->GetEdges();
 
 	// Assuming agvPlanner is set up with correct start, goal
 	Node * bestPath = agvPlanner->PathSearch();
@@ -120,8 +120,10 @@ void AGV::PlanAGV(std::vector<float> c){
 }
 
 void AGV::DisplayPath(){
-	for (std::list<Edge *>::iterator it = path.begin(); it != path.end(); it++)
-		std::cout << "(" << (*it)->GetVertex1() << "," << (*it)->GetVertex2() << ") ";
+	assert(0);
+	//TODO rewrite
+	//for (std::list<Edge *>::iterator it = path.begin(); it != path.end(); it++)
+		//std::cout << "(" << (*it)->GetVertex1() << "," << (*it)->GetVertex2() << ") ";
 	// std::cout << "\n";
 }
 

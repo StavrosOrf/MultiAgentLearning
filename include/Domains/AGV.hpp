@@ -23,7 +23,7 @@ class AGV{
 		Edge * GetCurEdge(){return curEdge;}
 		size_t GetT2V(){return t2v;}
 		bool GetIsReplan(){return isReplan;}
-		Edge * GetNextEdge(){return path.front();}
+		const Edge * GetNextEdge(){return path.front();}
 
 		size_t GetMoveTime(){return tMove;}
 		size_t GetEnterTime(){return tEnter;}
@@ -63,7 +63,7 @@ class AGV{
 
 		Search * agvPlanner;		// planning routine
 		std::vector<float> costs;	// graph costs used to generate current plan
-		std::list<Edge *> path;		// current path as ordered list of edges
+		std::list<const Edge *> path;		// current path as ordered list of edges
 		void SetNewGoal();		// set new goal vertex
 };
 

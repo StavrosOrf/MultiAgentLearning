@@ -3,6 +3,7 @@
 
 #include <iostream> //std::cout
 #include <vector> // std::vector
+#include <cassert>
 #include <stddef.h>
 #include "Edge.h"
 #include "Node.h"
@@ -17,17 +18,13 @@ class Graph{
 		}
 
 		~Graph(){
-			for (unsigned i = 0; i < numEdges; i++){
-				delete itsEdges[i];
-				itsEdges[i] = 0;
-			}
 		}
 
 		std::vector<vertex_t> GetVertices() const {return itsVertices;}
-		std::vector<Edge *> GetEdges() const {return itsEdges;}
+		std::vector<const Edge *> GetEdges() const;
 		size_t GetNumVertices() const {return numVertices;}
 		size_t GetNumEdges() const {return numEdges;}
-		size_t GetEdgeID(Edge *) __attribute__ ((pure));
+		size_t GetEdgeID(const Edge *) __attribute__ ((pure));
 
 		std::vector<Edge*> get_outgoing_edges_of_a_vertex(vertex_t vertex);
 		std::vector<Edge*> get_incoming_edges_of_a_vertex(vertex_t vertex);
@@ -35,10 +32,11 @@ class Graph{
 		std::vector<Edge *> GetNeighbours(Node * n);
 
 		void reset_edge_costs();
+		void set_edge_cost(std::vector<float> new_costs);
 
 	private:
 		std::vector<vertex_t> itsVertices;
-		std::vector<Edge *> itsEdges;
+		std::vector<Edge> itsEdges;
 		size_t numVertices;
 		size_t numEdges;
 

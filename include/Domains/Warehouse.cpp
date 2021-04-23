@@ -185,8 +185,7 @@ void Warehouse::InitialiseNewEpoch(){
  **Method:Sets the Cost of the graph Edges to the values provides by [costs]			*
  *************************************************************************************************/
 void Warehouse::UpdateGraphCosts(std::vector<float> costs){
-	for (size_t i = 0; i < N_EDGES; i++)
-		whGraph->GetEdges()[i]->SetCost(costs[i]);
+	whGraph->set_edge_cost(costs);
 }
 
 /************************************************************************************************
@@ -357,7 +356,7 @@ void Warehouse::initialise_wh_agents(){
 		whAgents.push_back(new iAgent{0, eIDs});// only one centralised agent controlling all traffic
 	}else if(agent_type == agent_def::link){
 		std::vector<vertex_t> v = whGraph->GetVertices();
-		std::vector<Edge *> e = whGraph->GetEdges();
+		std::vector<const Edge *> e = whGraph->GetEdges();
 		for (size_t i = 0; i < e.size(); i++){
 			std::vector<size_t> vIDs;
 			vIDs.push_back(e[i]->GetVertex1());
