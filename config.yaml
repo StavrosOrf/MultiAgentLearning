@@ -7,22 +7,22 @@ mode:
 domain:
   folder: ../Domains/
   warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS', 'Min_SS'
-  agents: centralized #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
+  agents: link #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
 DDPG: #config options for 'DDPG' leanring algorihm
   epochs: 10 # set to 1 in test mode
   runs: 1 # number of statistical runs
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   batch_size: 50 
 ES:
-  epochs: 512
-  runs: 2 # number of statistical runs
+  epochs: 30
+  runs: 1 # number of statistical runs
   population_size: 1000
   learning_rate: 0.001
   rand_proc_std_dev: 1 #standard deviation of the random process, higher values encourage more exploration
 simulation:
   verbose: true
   steps: 200
-  agvs: origins_90.csv #Valid options: 70,90,120,200,400
+  agvs: origins_120.csv #Valid options: 70,90,120,200,400
   goals: goals.csv
 results:
   folder:     ../Results/
