@@ -13,26 +13,47 @@ size_t Graph::GetEdgeID(const Edge * e){
 	return itsEdges.size();
 }
 
-std::vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex in list of neighbours
+std::vector<Edge *> Graph::GetNeighbours(const Node * n){ // Do not include parent vertex in list of neighbours
 	std::vector<Edge *> neighbours;
 	neighbours.reserve(4);
 	vertex_t v = n->GetVertex();
 
-	for (size_t i = 0; i < itsEdges.size(); i++){
-		vertex_t v1 = itsEdges[i].GetVertex1();
-		vertex_t v2 = itsEdges[i].GetVertex2();
-		if (v1 == v){
-			bool isNeighbour = true;
-			Node * n0 = n;
+/*
+	for (Edge e : itsEdges){
+		vertex_t v1 = e.GetVertex1();
+		vertex_t v2 = e.GetVertex2();
+		if (v1 == v) [[unlikely]]{
+			bool isneighbour = true;
+			const Node * n0 = n;
 			while (n0->GetParent()){
 				n0 = n0->GetParent();
 				vertex_t v0 = n0->GetVertex();
 				if (v2 == v0){
-					isNeighbour = false;
+					isneighbour = false;
 					break;
 				}
 			}
-			if (isNeighbour)
+			if (isneighbour)
+				neighbours.push_back(&e);
+		}
+	}
+*/
+
+	for (size_t i = 0; i < itsEdges.size(); i++){
+		vertex_t v1 = itsEdges[i].GetVertex1();
+		vertex_t v2 = itsEdges[i].GetVertex2();
+		if (v1 == v) [[unlikely]] {
+			bool isneighbour = true;
+			const Node * n0 = n;
+			while (n0->GetParent()){
+				n0 = n0->GetParent();
+				vertex_t v0 = n0->GetVertex();
+				if (v2 == v0){
+					isneighbour = false;
+					break;
+				}
+			}
+			if (isneighbour)
 				neighbours.push_back(&itsEdges[i]);
 		}
 	}

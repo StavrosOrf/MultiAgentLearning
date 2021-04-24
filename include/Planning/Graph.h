@@ -33,7 +33,7 @@ class Graph{
 		std::vector<Edge*> get_outgoing_edges_of_a_vertex(vertex_t vertex);
 		std::vector<Edge*> get_incoming_edges_of_a_vertex(vertex_t vertex);
 
-		std::vector<Edge *> GetNeighbours(Node * n);
+		std::vector<Edge *> GetNeighbours(const Node * n);
 
 		void reset_edge_costs();
 		void set_edge_cost(std::vector<float> new_costs);

@@ -24,8 +24,8 @@ class Edge
 			return lhs.GetVertex1() == rhs.GetVertex1() && lhs.GetVertex2() == rhs.GetVertex2();
 		}
 	private:
-		vertex_t itsVertex1;
-		vertex_t itsVertex2;
+		vertex_t itsVertex1; //parent (or source) vertex
+		vertex_t itsVertex2; //child (or destination) vertex
 		float itsCost;
 		size_t itsLength;
 };
