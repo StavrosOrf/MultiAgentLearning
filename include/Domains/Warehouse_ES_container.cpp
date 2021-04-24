@@ -21,6 +21,12 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream*
 uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,size_t run){
 	//get initial random policy
 	std::vector<esNN*> team = population[0]->produce_random_team_NNs(); //TODO RENAME team?
+	std::vector<esNN*> best_team_policy = population[0]->produce_random_team_NNs();
+
+	int best_epoch = 0;
+
+	// load_best_team_policy(team);
+
 	std::vector<epoch_resultsES> results(population.size());
 	epoch_resultsES max_results;
 	// typedef std::chrono::high_resolution_clock clockTotal;
@@ -29,7 +35,7 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 	float avg_G;
 
 	uint max_deliveries_intra = 0;
-	for (int i = 0; i < epoch; i++){	
+	for (int e = 0; e < epoch; e++){	
 		// max_results.totalDeliveries = 0;
 		avg_G = 0;
 		auto startEpochh = std::chrono::high_resolution_clock::now();
@@ -38,7 +44,7 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 #endif
 		for (size_t j = 0; j < population.size(); j++){
 #ifdef MULTITHREADED
-			boost::asio::post(simulator_pool, [i, j, team, &results, this](){
+			boost::asio::post(simulator_pool, [e, j, team, &results, this](){
 #endif
 				population[j]->set_team_NNs(team);
 				results[j] = population[j]->SimulateEpochES();	
@@ -59,8 +65,16 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 			}
 		}
 		avg_G = avg_G/population.size();
-		max_deliveries_intra = std::max<uint>(max_results.totalDeliveries, max_deliveries_intra);
+		//if we have a better NN team save it as best TODO
 
+		if(max_deliveries_intra < max_results.totalDeliveries){
+			max_deliveries_intra = max_results.totalDeliveries;
+			best_team_policy = team;
+			best_epoch = e;
+			std::cout<<"New best team model G: "<<max_deliveries_intra <<"\n";
+
+		}
+		
 
 		/*Initialize Sum Tensor
 		*sum's outer vector represents each Agent's NN
@@ -94,13 +108,19 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 		auto finishEpochh = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsed = finishEpochh - startEpochh;
 	
+<<<<<<< HEAD
 		//if(verbose)
 		std::printf("- Epoch: %3d - ( %6.2f sec) =================== Avg G: %6.2f ----- max G: %d \n",i,elapsed.count(),avg_G,max_results.totalDeliveries);
+=======
+		if(verbose)
+			std::printf("- Epoch: %3d - ( %6.2f sec) =================== Avg G: %6.2f ----- max G: %d \n",e,elapsed.count(),avg_G,max_results.totalDeliveries);
+>>>>>>> 92c087aa2fda68528a73585aca2de89d37a51479
 			
 						
 		//Write results to file
-		*file << ","<<i<<","<<max_results.totalDeliveries<<","<<max_results.totalMove <<","<<max_results.totalEnter <<","<<max_results.totalWait <<","<<avg_G <<std::endl;
+		*file << ","<<e<<","<<max_results.totalDeliveries<<","<<max_results.totalMove <<","<<max_results.totalEnter <<","<<max_results.totalWait <<","<<avg_G <<std::endl;
 	}
+	save_best_team_policy(best_team_policy,best_epoch,max_deliveries_intra);
 
 	auto endRun = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> elapsedT = endRun - startRun;
@@ -108,3 +128,46 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 
 	return max_deliveries_intra;
 }
+<<<<<<< HEAD
+=======
+
+
+//Not sure if necessary yet
+std::vector<esNN*> Warehouse_ES_container::copy_best_team_policy(std::vector<esNN*> teamNNs){
+
+	return teamNNs;
+}
+
+// Save a set of team NNs
+void Warehouse_ES_container::save_best_team_policy(std::vector<esNN*> teamNNs,int epoch,int G){
+	std::string filename;
+	auto net = std::make_shared<esNN>(1,1);
+	for (size_t i = 0; i < teamNNs.size(); i++){
+		filename = "best.epoch" + std::to_string(epoch) + "."+ std::to_string(teamNNs.size()) + "from" + std::to_string(i + 1) + ".G." + std::to_string(G) +".pt";
+
+		for (size_t j = 0; j < teamNNs[i]->parameters().size(); j++ ){
+			net->parameters()[j].set_data(teamNNs[i]->parameters()[j].detach().clone())  ;
+			// std::cout<<torch::sum(net->parameters()[j])<<"\n";
+		}
+		
+		torch::save(net,filename);	
+	}
+}
+
+
+// Load a set of team NNs
+void Warehouse_ES_container::load_best_team_policy(std::vector<esNN*> teamNNs){
+	std::string filename = "best.epoch102.1from1.G.655.pt";
+
+
+
+	auto net = std::make_shared<esNN>(1,1);
+	for (size_t i = 0; i < teamNNs.size(); i++){		
+		torch::load(net,filename);		
+		for (size_t j = 0; j < teamNNs[i]->parameters().size(); j++ ){
+			teamNNs[i]->parameters()[j].set_data(net->parameters()[j].detach().clone())  ;
+			// std::cout<<torch::sum(teamNNs[i]->parameters()[j])<<"\n";
+		}	
+	}
+}
+>>>>>>> 92c087aa2fda68528a73585aca2de89d37a51479

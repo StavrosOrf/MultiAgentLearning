@@ -186,4 +186,6 @@ trace if Eigen, Threadpool.cpp
 - Updated Noise addition(and tested centralized)
 
 ## v 0.00032 o
-- Added print to file functionality for ES algorrithm 
+- Added print to file functionality for ES algorrithm
+- Added the option to save - load team NNs
+- Discovered major memory leak Issues!!! 
