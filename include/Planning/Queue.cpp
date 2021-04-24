@@ -2,7 +2,6 @@
 
 void Queue::UpdateQueue(Node * newNode){
 	itsPQ.push(newNode);
-	static uint max_l = 0;
 }
 
 Node * Queue::PopQueue(){

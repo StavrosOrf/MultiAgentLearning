@@ -32,6 +32,7 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 	for (int i = 0; i < epoch; i++){	
 		// max_results.totalDeliveries = 0;
 		avg_G = 0;
+		auto startEpochh = std::chrono::high_resolution_clock::now();
 #ifdef MULTITHREADED
 		boost::asio::thread_pool simulator_pool(n_threads);
 #endif
@@ -91,7 +92,7 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 			}
 		}
 		auto finishEpochh = std::chrono::high_resolution_clock::now();
-		std::chrono::duration<double> elapsed = finishEpochh - startRun;
+		std::chrono::duration<double> elapsed = finishEpochh - startEpochh;
 	
 		//if(verbose)
 		std::printf("- Epoch: %3d - ( %6.2f sec) =================== Avg G: %6.2f ----- max G: %d \n",i,elapsed.count(),avg_G,max_results.totalDeliveries);

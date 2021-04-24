@@ -15,6 +15,7 @@ size_t Graph::GetEdgeID(const Edge * e){
 
 std::vector<Edge *> Graph::GetNeighbours(Node * n){ // Do not include parent vertex in list of neighbours
 	std::vector<Edge *> neighbours;
+	neighbours.reserve(4);
 	vertex_t v = n->GetVertex();
 
 	for (size_t i = 0; i < itsEdges.size(); i++){

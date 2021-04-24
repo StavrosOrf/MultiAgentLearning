@@ -2,7 +2,10 @@
 
 Node * Search::PathSearch(){
 	size_t sourceID = FindSourceID();
-	itsQueue = new Queue(new Node(itsGraph->GetVertices()[sourceID], nodeType::SOURCE));
+	//assert(!itsQueue);
+	assert(itsQueue->EmptyQueue());
+	//itsQueue = new Queue(new Node(itsGraph->GetVertices()[sourceID], nodeType::SOURCE));
+	itsQueue->UpdateQueue(new Node(itsGraph->GetVertices()[sourceID], nodeType::SOURCE));
 	bool pathFound = false;
 
 	while (!itsQueue->EmptyQueue()){
@@ -44,11 +47,12 @@ Node * Search::PathSearch(){
 	}
 }
 
+//TODO improve performance by reseting existing queue
 void Search::ResetSearch(){
-	if (itsQueue){
-		delete itsQueue;
-		itsQueue = 0;
-	}
+	assert(itsQueue);
+	itsQueue->reset();
+	//kdelete itsQueue;
+	//kitsQueue = new Queue();
 }
 
 size_t Search::FindSourceID(){

@@ -3,6 +3,7 @@
 #include <vector> // std::vector
 #include <queue> // std::priority_queue
 #include "Node.h"
+#include <boost/heap/priority_queue.hpp>
 
 struct CompareNode{
 	bool operator() (const Node * n1, const Node * n2) const{
@@ -16,9 +17,11 @@ struct CompareNode{
 class Queue{
 	public:
 		typedef std::priority_queue<Node *, std::vector<Node *>, CompareNode> QUEUE;
+		//typedef boost::heap::priority_queue<Node *> QUEUE;
 		Queue(Node * source){
 			itsPQ.push(source);
 		}
+		Queue(){}
 
 		~Queue(){
 			while (!itsPQ.empty()){
@@ -38,7 +41,10 @@ class Queue{
 		size_t SizeQueue() const {return itsPQ.size();}
 		void UpdateQueue(Node * newNode);
 		Node * PopQueue();
-		void reset(){itsPQ = QUEUE(); closed.clear();}
+		void reset(){
+			itsPQ = QUEUE(); 
+			closed.clear(); 
+			assert(itsPQ.empty() && closed.empty());}
 	private:
 		QUEUE itsPQ;
 		std::vector<Node *> closed;

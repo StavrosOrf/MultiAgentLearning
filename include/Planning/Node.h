@@ -46,6 +46,10 @@ class Node
 
 		void DisplayPath();
 		Node * ReverseList(Node * itsChild);
+		bool operator<(Node&& other) noexcept
+		{
+			return this->itsCost < other.itsCost;
+		}
 
 	private:
 		vertex_t itsVertex;

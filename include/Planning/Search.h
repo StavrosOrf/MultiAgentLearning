@@ -1,5 +1,4 @@
-#ifndef SEARCH_H_
-#define SEARCH_H_
+#pragma once
 
 #include <vector> // std::vector, std::cout
 #include <math.h> // pow, abs, sqrt
@@ -14,7 +13,10 @@
 // Dijkstra's path search class to store and search a graph
 class Search{
 	public:
-		Search(Graph * graph, vertex_t source, vertex_t goal):itsGraph(graph), itsQueue(0), itsSource(source), itsGoal(goal){}
+		Search(Graph * graph, vertex_t source, vertex_t goal):itsGraph(graph), itsQueue(0), itsSource(source), itsGoal(goal){
+			itsQueue = new Queue();	
+		}
+
 
 		~Search(){
 			delete itsQueue;
@@ -39,5 +41,3 @@ class Search{
 
 		size_t FindSourceID();
 };
-
-#endif // SEARCH_H_

@@ -136,4 +136,3 @@ void AGV::SetNewGoal(){
 	goal = newGoal;
 	agvPlanner->SetGoal(goal); // set new goal vertex
 }
-
