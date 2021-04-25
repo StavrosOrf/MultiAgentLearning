@@ -67,9 +67,8 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 		for (epoch_resultsES r : results){
 			avg_G += r.totalDeliveries;			
 			max_results.totalDeliveries = std::max<uint>(max_results.totalDeliveries, r.totalDeliveries);
-			if(max_results.totalDeliveries < r.totalDeliveries){
+			if(max_results.totalDeliveries < r.totalDeliveries)
 				max_results = r;				
-			}
 		}
 		avg_G = avg_G/population.size();
 		//if we have a better NN team save it as best TODO
@@ -90,27 +89,22 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 		for (size_t i = 0; i < team.size(); i++){
 			// std::vector<torch::Tensor>> temp(team[i][i]->NN->parameters().size());
 			sum[i].resize(team[i]->parameters().size());
-			for (size_t j = 0; j < team[i]->parameters().size(); j++ ){
+			for (size_t j = 0; j < team[i]->parameters().size(); j++ )
 				sum[i][j] = torch::zeros(team[i]->parameters()[j].sizes());				
-			}
 		}
 
-		for (epoch_resultsES r : results){
-			for (size_t i = 0; i < team.size(); i++){
-				for (size_t j = 0; j < team[i]->parameters().size(); j++ ){
+		for (epoch_resultsES r : results)
+			for (size_t i = 0; i < team.size(); i++)
+				for (size_t j = 0; j < team[i]->parameters().size(); j++ )
 					sum[i][j] += (float)r.totalDeliveries * r.samples[i][j];					
-				}
-			}
-		}
 
-		for (size_t i = 0; i < team.size(); i++){
+		for (size_t i = 0; i < team.size(); i++)
 			for (size_t j = 0; j < team[i]->parameters().size(); j++ ){
 				float delta = 1/ (((float)population.size()) * (float)N_proc_std_dev);
 				sum[i][j] = learning_rate * sum[i][j] * delta ;
 				// std::cout<<torch::sum(sum[i][j])<<"\n";
 				team[i]->parameters()[j].set_data(team[i]->parameters()[j].detach().clone() + sum[i][j])  ;
 			}
-		}
 		auto finishEpochh = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsed = finishEpochh - startEpochh;
 	
@@ -128,6 +122,10 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 	std::cout<<"Total time elapsed for Run "<<run<<" ( "<<elapsedT.count()<<" sec) ----- MAX G: "<<max_deliveries_intra<<std::endl; 
 	
 	for (esNN* nn : team){
+		delete nn;
+		nn = NULL;
+	}
+	for (esNN* nn : best_team_policy){
 		delete nn;
 		nn = NULL;
 	}
