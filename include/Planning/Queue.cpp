@@ -7,7 +7,7 @@ void Queue::UpdateQueue(Node * newNode){
 Node * Queue::PopQueue(){
 	closed.push_back(itsPQ.top());
 	itsPQ.pop();
-	assert(closed.back() == closed[closed.size()-back]);
+	assert(closed.back() == closed[closed.size()-1]);
 	return closed[closed.size()-1];
 }
 
