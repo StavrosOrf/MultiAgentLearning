@@ -7,8 +7,7 @@
 typedef int16_t vertex_t;
 
 // Edge class to contain mean and variance of cost along an edge
-class Edge
-{
+class Edge{
 	public:
 		Edge(vertex_t v1, vertex_t v2, float cost):
 			itsVertex1(v1), itsVertex2(v2), itsCost(cost), itsLength((size_t)cost) {}
