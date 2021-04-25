@@ -26,7 +26,7 @@ class Warehouse_ES_container {
 		}
 
 		uint evolution_strategy(size_t n_threads=1, bool verbose=false, size_t run=0);
-		std::vector<esNN*> copy_best_team_policy(std::vector<esNN*> teamNNs);
+		void copy_best_team_policy(std::vector<esNN*> sourceNNs,std::vector<esNN*> targetNNs);
 		void save_best_team_policy(std::vector<esNN*> teamNNs,int epoch,int G);
 		void load_best_team_policy(std::vector<esNN*> teamNNs);
 	protected:

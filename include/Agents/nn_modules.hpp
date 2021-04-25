@@ -82,7 +82,7 @@ struct CriticNN : torch::nn::Module {
 
 	torch::Tensor forward(torch::Tensor x) {	
 		// auto m = torch::min(x);
-		// auto s = torch::max(x);		
+		// auto s = torch::max(x);		numIn
 		// if(torch::is_nonzero(torch::sum(x)))
 		// 	x = (x-m)/(s-m);		
 
@@ -100,12 +100,17 @@ struct CriticNN : torch::nn::Module {
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
-#define DEEP
+// #define DEEP
 
 struct esNN : torch::nn::Module {
-	esNN (int numIn, int numOut, int numHid=256) {
-		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));
-#ifdef DEEP	
+	esNN (int numIn, int numOut, int numHid=64) {
+
+#ifndef	DEEP	
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numOut));
+#endif
+
+#ifdef DEEP
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));	
 		fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
 		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
 #endif

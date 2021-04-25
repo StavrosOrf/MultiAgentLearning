@@ -1,6 +1,6 @@
 #include "Warehouse_ES_container.hpp"
 
-//#define MULTITHREADED
+#define MULTITHREADED
 
 Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream* eval_file){
 	epoch = configs["ES"]["epochs"].as<int>();
@@ -20,10 +20,17 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream*
 
 uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,size_t run){
 	//get initial random policy
-	std::vector<esNN*> team = population[0]->produce_random_team_NNs(); //TODO RENAME team?
-	std::vector<esNN*> best_team_policy = team;
+	std::vector<esNN*> team = population[0]->produce_random_team_NNs(); 
+	std::vector<esNN*> best_team_policy = population[0]->produce_random_team_NNs(); //Allocating a new memory space for this
 
 	int best_epoch = 0;
+	torch::Device device = torch::kCPU;
+	if(torch::cuda::is_available()) {
+		std::cout<<"Cuda is available!"<<"\n";
+		device = torch::kCUDA;
+	}else{
+		std::cout<<"No Cuda is available!"<<"\n";
+	}
 
 	// load_best_team_policy(team);
 
@@ -69,13 +76,12 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 
 		if(max_deliveries_intra < max_results.totalDeliveries){
 			max_deliveries_intra = max_results.totalDeliveries;
-			best_team_policy = team;
+			copy_best_team_policy(team,best_team_policy);			
 			best_epoch = e;
 			std::cout<<"New best team model G: "<<max_deliveries_intra <<"\n";
 
 		}
 		
-
 		/*Initialize Sum Tensor
 		*sum's outer vector represents each Agent's NN
 		* and the inner vector represents each NN's layers' parameters */
@@ -125,19 +131,18 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 		delete nn;
 		nn = NULL;
 	}
-	//for (esNN* nn : best_team_policy)
-		//if (nn)
-			//delete nn;
-		
 
 	return max_deliveries_intra;
 }
 
 
-//Not sure if necessary yet
-std::vector<esNN*> Warehouse_ES_container::copy_best_team_policy(std::vector<esNN*> teamNNs){
+//copy a vector of NNs to another vector of NNs
+void Warehouse_ES_container::copy_best_team_policy(std::vector<esNN*> sourceNNs,std::vector<esNN*> targetNNs){
 
-	return teamNNs;
+	for (size_t i = 0; i < targetNNs.size(); i++)
+		for (size_t j = 0; j < targetNNs[i]->parameters().size(); j++ )
+			targetNNs[i]->parameters()[j].set_data(sourceNNs[i]->parameters()[j].detach().clone());
+
 }
 
 // Save a set of team NNs
@@ -145,7 +150,7 @@ void Warehouse_ES_container::save_best_team_policy(std::vector<esNN*> teamNNs,in
 	std::string filename;
 	auto net = std::make_shared<esNN>(1,1);
 	for (size_t i = 0; i < teamNNs.size(); i++){
-		filename = "best.epoch" + std::to_string(epoch) + "."+ std::to_string(teamNNs.size()) + "from" + std::to_string(i + 1) + ".G." + std::to_string(G) +".pt";
+		filename = "best.epoch" + std::to_string(epoch) + "."+ std::to_string(i + 1) + "from" + std::to_string(teamNNs.size()) + ".G." + std::to_string(G) +".pt";
 
 		for (size_t j = 0; j < teamNNs[i]->parameters().size(); j++ ){
 			net->parameters()[j].set_data(teamNNs[i]->parameters()[j].detach().clone())  ;

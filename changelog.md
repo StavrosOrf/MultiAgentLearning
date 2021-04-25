@@ -195,3 +195,8 @@ trace if Eigen, Threadpool.cpp
 - Gotten rid of useless state
 - Reduced heap allocations on Search's queue
 - Added Caching of Edge's references
+
+## v 0.00033 o
+- fixed copy best team_policy
+- experimented with different NNs / fixed typos / Reduction of the hidden node number lead to better memory performance(256->64 nodes)
+- 

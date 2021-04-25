@@ -30,7 +30,7 @@ void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
 	for (int i = 0; i != runs; i++){
 		assert(eval_file.is_open());
 
-		*file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
+		eval_file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
 		Warehouse_ES_container esc(configs,&eval_file);
 		uint G = esc.evolution_strategy(n_threads, verbose,i);
 	}
