@@ -19,11 +19,11 @@ int main(){
 
 	// Read in data from files
 	char v_str[] = "v_test.txt";
-	cout << "Reading vertices from file: ";
+	std::cout << "Reading vertices from file: ";
 	ifstream verticesFile(v_str);
-	cout << v_str << "...";
+	std::cout << v_str << "...";
 	if (!verticesFile.is_open()){
-		cout << "\nFile: " << v_str << " not found, exiting.\n";
+		std::cout << "\nFile: " << v_str << " not found, exiting.\n";
 		return 1;
 	}
 	vector<int> vertices;
@@ -32,14 +32,14 @@ int main(){
 	{
 		vertices.push_back(atoi(line.c_str()));
 	}
-	cout << "complete.\n";
+	std::cout << "complete.\n";
 
 	char e_str[] = "e_test.txt";
-	cout << "Reading edges from file: ";
+	std::cout << "Reading edges from file: ";
 	ifstream edgesFile(e_str);
-	cout << e_str << "...";
+	std::cout << e_str << "...";
 	if (!edgesFile.is_open()){
-		cout << "\nFile: " << e_str << " not found, exiting.\n";
+		std::cout << "\nFile: " << e_str << " not found, exiting.\n";
 		return 1;
 	}
 	vector< vector<int> > edges;
@@ -59,7 +59,7 @@ int main(){
 		costs.push_back(ec[2]);
 		edges.push_back(e);
 	}
-	cout << "complete.\n";
+	std::cout << "complete.\n";
 
 	Graph * testGraph = new Graph(vertices, edges, costs);
 	Search * testSearch = new Search(testGraph, 8, 3);

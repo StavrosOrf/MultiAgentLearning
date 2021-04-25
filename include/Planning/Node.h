@@ -38,7 +38,6 @@ class Node
 		~Node(){};
 
 		Node * GetParent() const {return itsParent;}
-		void SetParent(Node * parent) {itsParent = parent;}
 		float GetCost() const {return itsCost;}
 		void SetCost(float cost) {itsCost = cost;}
 		vertex_t GetVertex() const {return itsVertex;}
@@ -46,12 +45,12 @@ class Node
 
 		void DisplayPath();
 		Node * ReverseList(Node * itsChild);
-		bool operator<(Node&& other) noexcept
-		{
+		bool operator<(Node&& other) noexcept{
 			return this->itsCost < other.itsCost;
 		}
 
 	private:
+		void SetParent(Node * parent) {itsParent = parent;}
 		vertex_t itsVertex;
 		Node * itsParent;
 		float itsCost;

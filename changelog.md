@@ -189,3 +189,9 @@ trace if Eigen, Threadpool.cpp
 - Added print to file functionality for ES algorrithm
 - Added the option to save - load team NNs
 - Discovered major memory leak Issues!!! 
+
+## v 0.00032 k perfomance imporvements
+- Improved memory layout of graph
+- Gotten rid of useless state
+- Reduced heap allocations on Search's queue
+- Added Caching of Edge's references

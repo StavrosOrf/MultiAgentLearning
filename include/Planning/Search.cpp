@@ -32,14 +32,18 @@ Node * Search::PathSearch(){
 	if (!pathFound){
 		std::cout << "No path found from source to goal. Exiting.\n";
 		exit(1);
-	}
-	else{
+	}else{
 		Node * bestPath = 0;
+		//assert(itsQueue->EmptyQueue());
+		//itsQueue->delete_queue();
 
 		for (size_t i = 0; i < itsQueue->GetClosed().size(); i++)
 			if (itsGoal == itsQueue->GetClosed()[i]->GetVertex()){
 				bestPath = itsQueue->GetClosed()[i];
 				break;
+			} else {
+				//delete itsQueue->GetClosed()[i];
+				//itsQueue->GetClosed()[i] = NULL;
 			}
 
 		assert(bestPath != NULL);
@@ -47,12 +51,12 @@ Node * Search::PathSearch(){
 	}
 }
 
-//TODO improve performance by reseting existing queue
+//TODO(Kallinteris) improve performance by reseting existing queue
 void Search::ResetSearch(){
 	assert(itsQueue);
 	itsQueue->reset();
-	//kdelete itsQueue;
-	//kitsQueue = new Queue();
+	//delete itsQueue;
+	//itsQueue = new Queue();
 }
 
 size_t Search::FindSourceID(){
@@ -63,10 +67,15 @@ size_t Search::FindSourceID(){
 	exit(1);
 }
 
+//returns the lenght of the optimal path
 float Search::PathSearchLenght(){
 	float total = 0;
-	for (Node *n = PathSearch(); n != NULL; n = n->GetParent())
+	for (Node *n = PathSearch(); n != NULL;){
 		total += n->GetCost();
+		Node* t = n;
+		n = n->GetParent();
+		delete t;
+	}
 	return total;
 }
 

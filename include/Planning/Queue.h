@@ -33,14 +33,28 @@ class Queue{
 				itsPQ.pop();
 			}
 			for (size_t i = 0; i < closed.size(); i ++){
-				delete closed[i];
-				closed[i] = 0;
+				if (closed[i]){
+					delete closed[i];
+					closed[i] = 0;
+				}
 			}
 		}
 
 		std::vector<Node *> GetClosed() const {return closed;}
 		bool EmptyQueue() const {return itsPQ.empty();}
 		size_t SizeQueue() const {return itsPQ.size();}
+		/*
+		void delete_queue() {
+			while(!itsPQ.empty()){
+				assert(itsPQ.top());
+				Node * temp = itsPQ.top();
+				delete temp;
+				temp = 0;
+				itsPQ.pop();
+			}
+
+		}
+		*/
 		void UpdateQueue(Node * newNode);
 		Node * PopQueue();
 		void reset(){

@@ -18,7 +18,12 @@
 class Warehouse_ES_container {
 	public:
 		Warehouse_ES_container(YAML::Node configs,std::ofstream*  eval_file);
-		~Warehouse_ES_container(void){}
+		~Warehouse_ES_container(void){
+			for (Warehouse_ES* w : population){
+				delete w;
+				w = 0;
+			}
+		}
 
 		uint evolution_strategy(size_t n_threads=1, bool verbose=false, size_t run=0);
 		std::vector<esNN*> copy_best_team_policy(std::vector<esNN*> teamNNs);

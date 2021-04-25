@@ -97,8 +97,10 @@ void AGV::PlanAGV(std::vector<float> c){
 
 	path.clear();
 	while (bestPath->GetParent()){
+		//Node * old_node = bestPath;
 		Node * curNode = bestPath->GetParent();
 		vertex_t v1 = curNode->GetVertex();
+		//delete old_node;
 
 		bool edgeFound = false;
 		for (size_t i = 0; i < nEdges; i++)

@@ -108,13 +108,8 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 		auto finishEpochh = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double> elapsed = finishEpochh - startEpochh;
 	
-<<<<<<< HEAD
-		//if(verbose)
-		std::printf("- Epoch: %3d - ( %6.2f sec) =================== Avg G: %6.2f ----- max G: %d \n",i,elapsed.count(),avg_G,max_results.totalDeliveries);
-=======
 		if(verbose)
 			std::printf("- Epoch: %3d - ( %6.2f sec) =================== Avg G: %6.2f ----- max G: %d \n",e,elapsed.count(),avg_G,max_results.totalDeliveries);
->>>>>>> 92c087aa2fda68528a73585aca2de89d37a51479
 			
 						
 		//Write results to file
@@ -125,11 +120,16 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 	auto endRun = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> elapsedT = endRun - startRun;
 	std::cout<<"Total time elapsed for Run "<<run<<" ( "<<elapsedT.count()<<" sec) ----- MAX G: "<<max_deliveries_intra<<std::endl; 
+	
+	for (esNN* nn : team)
+		delete nn;
+	for (esNN* nn : best_team_policy)
+		if (nn)
+			delete nn;
+		
 
 	return max_deliveries_intra;
 }
-<<<<<<< HEAD
-=======
 
 
 //Not sure if necessary yet
@@ -170,4 +170,3 @@ void Warehouse_ES_container::load_best_team_policy(std::vector<esNN*> teamNNs){
 		}	
 	}
 }
->>>>>>> 92c087aa2fda68528a73585aca2de89d37a51479
