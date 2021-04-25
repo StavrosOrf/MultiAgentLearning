@@ -1,5 +1,4 @@
-#ifndef NN_MODULE_H
-#define NN_MODULE_H
+#pragma once
 
 #include <torch/csrc/autograd/generated/variable_factories.h>
 #include <torch/serialize/input-archive.h>
@@ -103,8 +102,7 @@ struct CriticNN : torch::nn::Module {
 // #define DEEP
 
 struct esNN : torch::nn::Module {
-	esNN (int numIn, int numOut, int numHid=64) {
-
+	esNN (int numIn, int numOut, [[maybe_unused]] int numHid=64) {
 #ifndef	DEEP	
 		fc1 = register_module("fc1",torch::nn::Linear(numIn,numOut));
 #endif
@@ -132,5 +130,3 @@ struct esNN : torch::nn::Module {
 	torch::nn::Linear fc2{nullptr},fc3{nullptr};
 #endif
 };
-
-#endif // NN_MODULE_H

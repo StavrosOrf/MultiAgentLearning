@@ -1,5 +1,4 @@
-#ifndef WAREHOUSE_H_
-#define WAREHOUSE_H_
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -68,8 +67,6 @@ class Warehouse{
 		void DisableEpisodeReplayOutput()__attribute__ ((deprecated));
 
 		void LoadPolicies(YAML::Node) __attribute__ ((deprecated));
-		virtual epoch_results SimulateEpoch(bool verbose = false, int epoch = -1) = 0;
-		virtual epoch_resultsES SimulateEpochES(bool verbose = false, int epoch = -1){;}
 		void printAgvPaths();
 
 	protected:
@@ -113,4 +110,3 @@ class Warehouse{
 
 		agent_def agent_type;
 };
-#endif // WAREHOUSE_H_

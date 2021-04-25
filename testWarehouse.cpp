@@ -56,12 +56,13 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
 		startTotalRun = std::clock();
-		Warehouse * trainDomain = create_warehouse(configs);
+		Warehouse_DDPG * trainDomain = new Warehouse_DDPG(configs);
+		trainDomain->InitialiseMATeam();
 
 		std::cout << "Starting Run: " << run << std::endl;
 		for (int n = 0; n < nEps; n++){
 			start = std::clock();
-			epoch_results t = trainDomain->SimulateEpoch(verbose,n);//simulate
+			epoch_results t = trainDomain->simulate_epoch_DDPG(verbose,n);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			if (t.totalDeliveries > max_G){
 				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4u\e[0m, tMove=%6u, tEnter=%6u, tWait=%6u\n",
@@ -104,7 +105,8 @@ void WarehouseSimulation(std::string config_file, size_t n_threads){
 **Input: A string named [agentType] which indicates the type of the Warehouse			*
 **Output:A Warehouse of that type								*
 ************************************************************************************************/
-Warehouse* create_warehouse(YAML::Node configs){
+[[deprecated("Create your warehouse inside the class")]]
+Warehouse* create_warehouse(YAML::Node configs) {
 	Warehouse* new_warehouse;
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		new_warehouse = new Warehouse_DDPG(configs);
@@ -130,7 +132,7 @@ std::string create_results_folder(YAML::Node configs){
 		+ std::to_string(timestamp) + '/';
 	char mkdir[10000];
 	sprintf(mkdir,"mkdir -p %s",(resFolder).c_str());
-	int i = system(mkdir);
+	system(mkdir);
 	std::filesystem::copy_file(config_file, resFolder+config_file.substr(3));
 	return resFolder;
 }

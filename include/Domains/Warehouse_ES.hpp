@@ -18,7 +18,6 @@ class Warehouse_ES : public Warehouse {
 		}
 		~Warehouse_ES(void);
 
-		epoch_results SimulateEpoch(bool verbose, int epoch){}
 		epoch_resultsES SimulateEpochES (const int epoch = 1, bool verbose = false);
 
 		void InitialiseMATeam(); // create agents for each vertex in graph

@@ -27,7 +27,7 @@ Warehouse_DDPG::~Warehouse_DDPG(void){
 	DDPGAgent::clear_replar_buffer();
 }
 
-epoch_results Warehouse_DDPG::SimulateEpoch(bool verbose, int epoch){
+epoch_results Warehouse_DDPG::simulate_epoch_DDPG(bool verbose, int epoch){
 	InitialiseNewEpoch();
 	std::normal_distribution<float> n_process(1, N_proc_std_dev);
 	std::default_random_engine n_generator(time(NULL));
