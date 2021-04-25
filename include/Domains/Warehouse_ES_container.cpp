@@ -123,9 +123,9 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 	
 	for (esNN* nn : team)
 		delete nn;
-	for (esNN* nn : best_team_policy)
-		if (nn)
-			delete nn;
+	//for (esNN* nn : best_team_policy)
+		//if (nn)
+			//delete nn;
 		
 
 	return max_deliveries_intra;
