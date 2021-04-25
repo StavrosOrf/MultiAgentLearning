@@ -47,6 +47,7 @@ class Queue{
 		Node * PopQueue();
 		void reset(){
 			delete_queue();
+			delete_closed();
 			itsPQ = QUEUE(); 
 			//itsPQ.clear();
 			closed.clear(); 
