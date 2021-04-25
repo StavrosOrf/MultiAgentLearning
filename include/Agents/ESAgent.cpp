@@ -23,7 +23,7 @@ void ESAgent::updateNNWeights(float scalar){
 }
 
 
-void ESAgent::setNN(esNN* nn){
+void ESAgent::setNN(const esNN* nn){
 	for (size_t i = 0; i < nn->parameters().size(); i++ )
 		NN->parameters()[i].set_data(nn->parameters()[i].detach().clone());
 }

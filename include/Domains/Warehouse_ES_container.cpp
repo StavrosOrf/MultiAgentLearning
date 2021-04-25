@@ -21,7 +21,7 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream*
 uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,size_t run){
 	//get initial random policy
 	std::vector<esNN*> team = population[0]->produce_random_team_NNs(); //TODO RENAME team?
-	std::vector<esNN*> best_team_policy = population[0]->produce_random_team_NNs();
+	std::vector<esNN*> best_team_policy = team;
 
 	int best_epoch = 0;
 
@@ -121,8 +121,10 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 	std::chrono::duration<double> elapsedT = endRun - startRun;
 	std::cout<<"Total time elapsed for Run "<<run<<" ( "<<elapsedT.count()<<" sec) ----- MAX G: "<<max_deliveries_intra<<std::endl; 
 	
-	for (esNN* nn : team)
+	for (esNN* nn : team){
 		delete nn;
+		nn = NULL;
+	}
 	//for (esNN* nn : best_team_policy)
 		//if (nn)
 			//delete nn;

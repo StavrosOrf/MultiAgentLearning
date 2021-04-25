@@ -45,6 +45,9 @@ Run the project configured by `config.yaml` using six threads:
 ```
 cmake -DCMAKE_BUILD_TYPE=Debug .. && make && gdb --args ./testWarehouse -c ../config.yaml
 ```
+```
+cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make && valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all ./testWarehouse -c ../config.yaml
+```
 ## Profiling
 With Perf (Recommended if you are not made out RAM)
 ```

@@ -21,7 +21,7 @@ class ESAgent{
 		~ESAgent();
 
 		void updateNNWeights(float scalar);
-		void setNN(esNN* nn);
+		void setNN(const esNN* nn);
 		std::vector<float> evaluateNN(const std::vector<float>& s);
 		esNN* NN;
 	protected:
