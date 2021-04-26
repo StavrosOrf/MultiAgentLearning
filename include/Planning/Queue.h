@@ -8,8 +8,8 @@
 // Custom queue type to perform priority queue updates
 class Queue{
 	public:
-		//typedef std::priority_queue<Node *, std::vector<Node *>, > QUEUE;
-		typedef boost::heap::priority_queue<Node *> QUEUE;
+		typedef std::priority_queue<Node *, std::vector<Node *>> QUEUE;
+		//typedef boost::heap::priority_queue<Node *> QUEUE;
 		Queue(Node * source){
 			itsPQ.push(source);
 			//closed.reserve(100);

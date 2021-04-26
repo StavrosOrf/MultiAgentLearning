@@ -32,8 +32,8 @@ void Queue::delete_closed() {
 void Queue::reset(){
 	delete_queue();
 	delete_closed();
-	//itsPQ = QUEUE(); 
-	itsPQ.clear();
+	itsPQ = QUEUE(); 
+	//itsPQ.clear();
 	closed.clear(); 
 	assert(itsPQ.empty() && closed.empty());
 }
