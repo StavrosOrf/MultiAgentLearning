@@ -1,16 +1,14 @@
 #include "Warehouse_ES_container.hpp"
 
-#define MULTITHREADED
+//#define MULTITHREADED
 
-Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream* eval_file){
+Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs){
 	epoch = configs["ES"]["epochs"].as<int>();
 	learning_rate = configs["ES"]["learning_rate"].as<float>();
 	const size_t population_size = configs["ES"]["population_size"].as<int>();
 	N_proc_std_dev = configs["DDPG"]["rand_proc_std_dev"].as<float>();
 	assert(N_proc_std_dev > 0 && !std::isinf(N_proc_std_dev));
 	assert(population_size > 0 && epoch > 0);
-	file = eval_file;
-	*file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
 
 	for(size_t i = 0 ; i < population_size; i++){
 		population.push_back(new Warehouse_ES(configs));
@@ -18,7 +16,7 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs,std::ofstream*
 	}
 }
 
-uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,size_t run){
+uint Warehouse_ES_container::evolution_strategy(const size_t n_threads, bool verbose,size_t run , std::ofstream &file){
 	//get initial random policy
 	std::vector<esNN*> team = population[0]->produce_random_team_NNs(); 
 	std::vector<esNN*> best_team_policy = population[0]->produce_random_team_NNs(); //Allocating a new memory space for this
@@ -50,13 +48,14 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 		boost::asio::thread_pool simulator_pool(n_threads);
 #endif
 		for (size_t j = 0; j < population.size(); j++){
-#ifdef MULTITHREADED
-			boost::asio::post(simulator_pool, [e, j, team, &results, this](){
-#endif
+			auto train_task = [j, team, &results, this](){
 				population[j]->set_team_NNs(team);
 				results[j] = population[j]->SimulateEpochES();	
+			};
 #ifdef MULTITHREADED
-			});
+			boost::asio::post(simulator_pool, train_task);
+#else
+			train_task();
 #endif
 		}
 #ifdef MULTITHREADED
@@ -113,7 +112,7 @@ uint Warehouse_ES_container::evolution_strategy(size_t n_threads, bool verbose,s
 			
 						
 		//Write results to file
-		*file << ","<<e<<","<<max_results.totalDeliveries<<","<<max_results.totalMove <<","<<max_results.totalEnter <<","<<max_results.totalWait <<","<<avg_G <<std::endl;
+		file << ","<<e<<","<<max_results.totalDeliveries<<","<<max_results.totalMove <<","<<max_results.totalEnter <<","<<max_results.totalWait <<","<<avg_G <<std::endl;
 	}
 	save_best_team_policy(best_team_policy,best_epoch,max_deliveries_intra);
 

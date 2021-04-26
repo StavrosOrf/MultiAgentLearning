@@ -464,7 +464,7 @@ float Warehouse::value_of_current_state(){
 	
 	{//Assert that all AGVs have the same possible 2 goals 
 		assert(whAGVs[0]->get_possible_goals().size() == 2);
-		for (AGV* a : whAGVs)
+		for (AGV*  a [[maybe_unused]] : whAGVs)
 			assert(a->get_possible_goals() == whAGVs[0]->get_possible_goals());
 	}
 

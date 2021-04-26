@@ -15,7 +15,7 @@ class Warehouse_ES : public Warehouse {
 	public:
 		Warehouse_ES(YAML::Node configs) : Warehouse(configs){
 			N_proc_std_dev = configs["DDPG"]["rand_proc_std_dev"].as<float>();
-		}
+			}
 		~Warehouse_ES(void);
 
 		epoch_resultsES SimulateEpochES (const int epoch = 1, bool verbose = false);
