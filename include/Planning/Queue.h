@@ -16,8 +16,8 @@ struct CompareNode{
 // Custom queue type to perform priority queue updates
 class Queue{
 	public:
-		typedef std::priority_queue<Node *, std::vector<Node *>, CompareNode> QUEUE;
-		//typedef boost::heap::priority_queue<Node *> QUEUE;
+		//typedef std::priority_queue<Node *, std::vector<Node *>, CompareNode> QUEUE;
+		typedef boost::heap::priority_queue<Node *, boost::heap::compare<CompareNode>> QUEUE;
 		Queue(Node * source){
 			itsPQ.push(source);
 			//closed.reserve(100);

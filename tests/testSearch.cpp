@@ -18,7 +18,7 @@ int main(){
 	std::cout << "Initialising graph...\n";
 
 	// Read in data from files
-	char v_str[] = "v_test.txt";
+	char v_str[] = "../Domains/Small_SS/vertices.csv";
 	std::cout << "Reading vertices from file: ";
 	ifstream verticesFile(v_str);
 	std::cout << v_str << "...";
@@ -26,15 +26,14 @@ int main(){
 		std::cout << "\nFile: " << v_str << " not found, exiting.\n";
 		return 1;
 	}
-	vector<int> vertices;
+	vector<vertex_t> vertices;
 	string line;
-	while (getline(verticesFile,line))
-	{
+	while (getline(verticesFile,line)){
 		vertices.push_back(atoi(line.c_str()));
 	}
 	std::cout << "complete.\n";
 
-	char e_str[] = "e_test.txt";
+	char e_str[] = "../Domains/Small_SS/edges.csv";
 	std::cout << "Reading edges from file: ";
 	ifstream edgesFile(e_str);
 	std::cout << e_str << "...";
@@ -42,18 +41,16 @@ int main(){
 		std::cout << "\nFile: " << e_str << " not found, exiting.\n";
 		return 1;
 	}
-	vector< vector<int> > edges;
+	vector< vector<vertex_t> > edges;
 	vector<float> costs;
-	while (getline(edgesFile,line))
-	{
+	while (getline(edgesFile,line)){
 		stringstream lineStream(line);
 		string cell;
 		vector<float> ec;
-		while (getline(lineStream,cell,','))
-		{
+		while (getline(lineStream,cell,',')){
 			ec.push_back(atof(cell.c_str()));
 		}
-		vector<int> e;
+		vector<vertex_t> e;
 		e.push_back((int)ec[0]);
 		e.push_back((int)ec[1]);
 		costs.push_back(ec[2]);
@@ -62,12 +59,12 @@ int main(){
 	std::cout << "complete.\n";
 
 	Graph * testGraph = new Graph(vertices, edges, costs);
-	Search * testSearch = new Search(testGraph, 8, 3);
+	Search * testSearch = new Search(testGraph, 0, 10);
 	Node * bestPath = testSearch->PathSearch();
 	Node * pathSG = bestPath->ReverseList(0);
 	pathSG->DisplayPath();
 
-	vector<Edge *> graphEdges = testGraph->GetEdges();
+	vector<const Edge *> graphEdges = testGraph->GetEdges();
 	bool bOut = false;
 	if (graphEdges[0] == graphEdges[1])
 		bOut = true;
