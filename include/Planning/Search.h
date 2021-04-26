@@ -39,5 +39,5 @@ class Search{
 		vertex_t itsSource;
 		vertex_t itsGoal;
 
-		size_t FindSourceID();
+		size_t FindSourceID(); [[deprecated("Serves no purpose")]]
 };

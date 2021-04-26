@@ -1,8 +1,8 @@
 #include "Search.h"
 
 Node * Search::PathSearch(){
-	size_t sourceID = FindSourceID();
-	//assert(!itsQueue);
+	size_t sourceID = itsSource;
+	assert(itsQueue);
 	assert(itsQueue->EmptyQueue());
 	//itsQueue = new Queue(new Node(itsGraph->GetVertices()[sourceID], nodeType::SOURCE));
 	itsQueue->UpdateQueue(new Node(itsGraph->GetVertices()[sourceID], nodeType::SOURCE));
