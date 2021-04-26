@@ -1,6 +1,6 @@
 #include "Warehouse_ES_container.hpp"
 
-//#define MULTITHREADED
+#define MULTITHREADED
 
 Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs){
 	epoch = configs["ES"]["epochs"].as<int>();
