@@ -1,7 +1,5 @@
 #include "Warehouse_ES_container.hpp"
 
-#define MULTITHREADED
-
 Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs){
 	epoch = configs["ES"]["epochs"].as<int>();
 	learning_rate = configs["ES"]["learning_rate"].as<float>();
@@ -44,23 +42,24 @@ uint Warehouse_ES_container::evolution_strategy(const size_t n_threads, bool ver
 		// max_results.totalDeliveries = 0;
 		avg_G = 0;
 		auto startEpochh = std::chrono::high_resolution_clock::now();
-#ifdef MULTITHREADED
-		boost::asio::thread_pool simulator_pool(n_threads);
-#endif
-		for (size_t j = 0; j < population.size(); j++){
-			auto train_task = [j, team, &results, this](){
+
+		if (n_threads == 1)
+			for (size_t j = 0; j < population.size(); j++){
 				population[j]->set_team_NNs(team);
 				results[j] = population[j]->SimulateEpochES();	
-			};
-#ifdef MULTITHREADED
-			boost::asio::post(simulator_pool, train_task);
-#else
-			train_task();
-#endif
+			}
+		else if (n_threads > 1){
+			boost::asio::thread_pool simulator_pool(n_threads);
+			for (size_t j = 0; j < population.size(); j++){
+				auto train_task = [j, team, &results, this](){
+					population[j]->set_team_NNs(team);
+					results[j] = population[j]->SimulateEpochES();	
+				};
+				boost::asio::post(simulator_pool, train_task);
+			}
+			simulator_pool.join();
 		}
-#ifdef MULTITHREADED
-		simulator_pool.join();
-#endif
+
 		max_results = results[0];
 		//Calculate statistics for every epoch
 		for (epoch_resultsES r : results){
