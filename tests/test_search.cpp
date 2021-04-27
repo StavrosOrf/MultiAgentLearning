@@ -74,6 +74,8 @@ int main(){
 		bOut = true;
 	std::cout << "graphEdges[0] == graphEdges[0]: " << bOut << "\n";
 
+	testSearch->ResetSearch();
+	std::cout << "path length  = " << testSearch->PathSearchLenght() << std::endl;
 	delete testGraph;
 	testGraph = 0;
 	delete testSearch;

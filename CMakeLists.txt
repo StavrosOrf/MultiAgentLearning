@@ -46,13 +46,13 @@ set( LIBS_TO_LINK
                   ${TORCH_LIBRARIES}
                   ${CMAKE_THREAD_LIBS_INIT})# -llapack
 
-#add_executable(testSearch testSearch.cpp)
-#target_link_libraries(testSearch ${LIBS_TO_LINK})
+#add_executable(test_search ./tests/test_search.cpp)
+#target_link_libraries(test_search ${LIBS_TO_LINK})
 
-#add_executable(test_torch test_torch.cpp)
+#add_executable(test_torch ./tests/test_torch.cpp)
 #target_link_libraries(test_torch ${LIBS_TO_LINK})
 
-#add_executable(test_random test_random.cpp)
+#add_executable(test_random ./tests/test_random.cpp)
 #target_link_libraries(test_random ${LIBS_TO_LINK})
 
 add_executable(testWarehouse testWarehouse.cpp)

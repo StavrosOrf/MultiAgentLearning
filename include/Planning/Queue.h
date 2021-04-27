@@ -40,4 +40,9 @@ class Queue{
 		std::vector<Node *> closed;
 		void delete_queue();
 		void delete_closed();
+		
+		//Instead of allocating new nodes all over the heap
+		//we instead allocate them all together achiving
+		//data locallity and zero cost deletion and zero cost new
+		std::vector<Node> node_pool; //TODO actually implement it if we need it
 };

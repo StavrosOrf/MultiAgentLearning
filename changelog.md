@@ -190,7 +190,7 @@ trace if Eigen, Threadpool.cpp
 - Added the option to save - load team NNs
 - Discovered major memory leak Issues!!! 
 
-## v 0.00032 k perfomance imporvements
+## v 0.00032k perfomance imporvements
 - Improved memory layout of graph
 - Gotten rid of useless state
 - Reduced heap allocations on Search's queue
@@ -200,3 +200,12 @@ trace if Eigen, Threadpool.cpp
 - fixed copy best team_policy
 - experimented with different NNs / fixed typos / Reduction of the hidden node number lead to better memory performance(256->64 nodes)
 - 
+
+## v 0.00034k
+- minor code cleanup
+- Queue Heap management optimaizations
+- Eliminitated all mem leaks
+- Other Minor Perfomance Optimaizations
+- Removed MUTLITHREADING Macro from Warehouse_ES_container.cpp
+- fixed bug in PathSearchLengh()
+- fixed test_search.cpp

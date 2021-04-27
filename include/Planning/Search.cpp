@@ -69,13 +69,6 @@ size_t Search::FindSourceID(){
 
 //returns the lenght of the optimal path
 float Search::PathSearchLenght(){
-	float total = 0;
-	for (Node *n = PathSearch(); n != NULL;){
-		total += n->GetCost();
-		Node* t = n;
-		n = n->GetParent();
-		delete t;
-	}
-	return total;
+	return PathSearch()->GetCost();
 }
 
