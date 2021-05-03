@@ -34,7 +34,6 @@ void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
 		Warehouse_ES_container esc(configs);
 		uint G = esc.evolution_strategy(n_threads, verbose, i, eval_file);
 	}
-	eval_file.close();
 }
 
 void WarehouseSimulationDDPG(YAML::Node configs){

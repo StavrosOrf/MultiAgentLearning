@@ -34,7 +34,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(CMAKE_CXX_FLAGS "-g3")
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 add_subdirectory(include)
-add_subdirectory(tests)
 
 #link_directories(libraries)
 

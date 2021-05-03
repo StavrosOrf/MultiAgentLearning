@@ -1,6 +1,6 @@
 #include "Warehouse_DDPG.hpp"
 
-#define REWARD_METHOD 3
+#define REWARD_METHOD 1
 
 #define REWARD_METHOD_3_BUFFER_SIZE 30
 //REWARD_METHOD OPTIONS
