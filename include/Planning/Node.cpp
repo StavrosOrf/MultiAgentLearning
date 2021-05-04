@@ -1,7 +1,6 @@
 #include "Node.h"
 
-void Node::DisplayPath()
-{
+void Node::DisplayPath() {
 	std::cout << "Vertex: " << itsVertex << "\n";
 	std::cout << "	cost-to-come: " << itsCost << "\n";
 
