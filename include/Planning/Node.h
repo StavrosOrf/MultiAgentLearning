@@ -31,7 +31,7 @@ class Node{
 		}
 
 		~Node(){};
-		Node(const Node &) = delete;
+		//Node(const Node &) = delete;
 
 		Node * GetParent() const {return itsParent;}
 		float GetCost() const {return itsCost;}

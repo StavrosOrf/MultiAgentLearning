@@ -8,6 +8,7 @@ Warehouse_ES_container::Warehouse_ES_container(YAML::Node configs){
 	assert(N_proc_std_dev > 0 && !std::isinf(N_proc_std_dev));
 	assert(population_size > 0 && epoch > 0);
 
+	population.reserve(population_size);
 	for(size_t i = 0 ; i < population_size; i++){
 		population.push_back(new Warehouse_ES(configs));
 		population[i]->InitialiseMATeam();
