@@ -76,19 +76,21 @@ epoch_results Warehouse_DDPG::simulate_epoch_DDPG(bool verbose, int epoch){
 
 		std::vector<float> final_costs = baseCosts;
 		for (size_t n = 0; n < N_EDGES; n++){ // Add Random Noise from process N
-			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*max_base_travel_cost();			
-			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*baseCosts[n];			
-			// actions[n] = actions[n]*max_base_travel_cost()*n_process(n_generator);
+			actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*max_base_travel_cost();			
+			//actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*baseCosts[n];			
+			//actions[n] = actions[n]*max_base_travel_cost()*n_process(n_generator);
 
 			//I believe that with this style of "randomness" we better explore the action space
+			/*
 			if(n_process(n_generator) > (1.1 + 0.0005 * epoch))
 				actions[n] = 0;
 			else
 				actions[n] = max_base_travel_cost()*actions[n]; //4th ?
+			*/
 
-			// final_costs[n] = actions[n];
+			final_costs[n] += actions[n];
 		}
-		final_costs = actions;
+		//final_costs += actions;
 		//Final costs must be >= 0 //Just a theory
 		// float min = *min_element(final_costs.begin(),final_costs.end());
 		// if( min < 0 )
