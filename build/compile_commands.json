@@ -1,0 +1,67 @@
+[
+{
+  "directory": "/home/st/MultiAgentLearning/build",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/testWarehouse.dir/testWarehouse.cpp.o -c /home/st/MultiAgentLearning/testWarehouse.cpp",
+  "file": "/home/st/MultiAgentLearning/testWarehouse.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Agents",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/Agents.dir/DDPGAgent.cpp.o -c /home/st/MultiAgentLearning/include/Agents/DDPGAgent.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Agents/DDPGAgent.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Agents",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/Agents.dir/ESAgent.cpp.o -c /home/st/MultiAgentLearning/include/Agents/ESAgent.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Agents/ESAgent.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Domains",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/Domains.dir/Warehouse.cpp.o -c /home/st/MultiAgentLearning/include/Domains/Warehouse.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Domains/Warehouse.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Domains",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/Domains.dir/AGV.cpp.o -c /home/st/MultiAgentLearning/include/Domains/AGV.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Domains/AGV.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Domains",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/Domains.dir/Warehouse_DDPG.cpp.o -c /home/st/MultiAgentLearning/include/Domains/Warehouse_DDPG.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Domains/Warehouse_DDPG.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Domains",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/Domains.dir/Warehouse_ES.cpp.o -c /home/st/MultiAgentLearning/include/Domains/Warehouse_ES.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Domains/Warehouse_ES.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Domains",
+  "command": "/usr/bin/c++  -DAT_PARALLEL_OPENMP=1 -D_THP_CORE -I/home/st/MultiAgentLearning/include -isystem /home/st/MultiAgentLearning/libtorch/include -isystem /home/st/MultiAgentLearning/libtorch/include/torch/csrc/api/include  -Wall -Wextra -O2 -g -DNDEBUG   -D_GLIBCXX_USE_CXX11_ABI=1 -std=gnu++2a -o CMakeFiles/Domains.dir/Warehouse_ES_container.cpp.o -c /home/st/MultiAgentLearning/include/Domains/Warehouse_ES_container.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Domains/Warehouse_ES_container.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Planning",
+  "command": "/usr/bin/c++   -I/home/st/MultiAgentLearning/include  -Wall -Wextra -O2 -g -DNDEBUG   -std=gnu++2a -o CMakeFiles/Planning.dir/Search.cpp.o -c /home/st/MultiAgentLearning/include/Planning/Search.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Planning/Search.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Planning",
+  "command": "/usr/bin/c++   -I/home/st/MultiAgentLearning/include  -Wall -Wextra -O2 -g -DNDEBUG   -std=gnu++2a -o CMakeFiles/Planning.dir/Graph.cpp.o -c /home/st/MultiAgentLearning/include/Planning/Graph.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Planning/Graph.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Planning",
+  "command": "/usr/bin/c++   -I/home/st/MultiAgentLearning/include  -Wall -Wextra -O2 -g -DNDEBUG   -std=gnu++2a -o CMakeFiles/Planning.dir/Queue.cpp.o -c /home/st/MultiAgentLearning/include/Planning/Queue.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Planning/Queue.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Planning",
+  "command": "/usr/bin/c++   -I/home/st/MultiAgentLearning/include  -Wall -Wextra -O2 -g -DNDEBUG   -std=gnu++2a -o CMakeFiles/Planning.dir/Node.cpp.o -c /home/st/MultiAgentLearning/include/Planning/Node.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Planning/Node.cpp"
+},
+{
+  "directory": "/home/st/MultiAgentLearning/build/include/Planning",
+  "command": "/usr/bin/c++   -I/home/st/MultiAgentLearning/include  -Wall -Wextra -O2 -g -DNDEBUG   -std=gnu++2a -o CMakeFiles/Planning.dir/Edge.cpp.o -c /home/st/MultiAgentLearning/include/Planning/Edge.cpp",
+  "file": "/home/st/MultiAgentLearning/include/Planning/Edge.cpp"
+}
+]

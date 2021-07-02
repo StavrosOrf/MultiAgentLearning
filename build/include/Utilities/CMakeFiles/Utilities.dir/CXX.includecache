@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/st/MultiAgentLearning/include/Utilities/Utilities.cpp
+Utilities.h
+/home/st/MultiAgentLearning/include/Utilities/Utilities.h
+
+/home/st/MultiAgentLearning/include/Utilities/Utilities.h
+vector
+-
+math.h
+-
+stdlib.h
+-
+
