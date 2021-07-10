@@ -114,13 +114,26 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
 
  		return actions;
  	}else if (agent_type == agent_def::intersection){
- 		std::vector<float> actions(N_EDGES);
 
-		for (size_t i = 0; i < maTeam.size(); i++)
-			for (int j = 0; whAgents[i]->eIDs.size(); j++)
-				actions[whAgents[i]->eIDs[j]] =
-					maTeam[i]->evaluateNN(states)[j];
+ 		// TODO IF INCORPORATES TIME IT NEEDS to change
+ 		std::vector<float> actions(N_EDGES); 		
+ 		// std::cout<<"i"<<std::endl;
+		for (size_t i = 0; i < maTeam.size(); i++){			
+			std::vector<float> state_i;
+			// state_i.reserve(whAgents[i]->eIDs.size());
 
+			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)							
+				state_i.push_back(states[whAgents[i]->eIDs[j]]);			
+			
+			if(incorporates_time)
+				for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)								
+					state_i.push_back(states[whAgents[i]->eIDs[j] + states.size()/2]);			
+						
+			std::vector<float> actions_i = maTeam[i]->evaluateNN(state_i);			
+			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)
+				actions[whAgents[i]->eIDs[j]] = actions_i[j];	
+			
+			}
 		return actions;
 	}
 	else{
