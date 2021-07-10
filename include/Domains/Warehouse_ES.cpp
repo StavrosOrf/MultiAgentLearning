@@ -115,12 +115,14 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
  		return actions;
  	}else if (agent_type == agent_def::intersection){
 
- 		// TODO IF INCORPORATES TIME IT NEEDS to change
- 		std::vector<float> actions(N_EDGES); 		
+		std::vector<float> actions(N_EDGES); 		
  		// std::cout<<"i"<<std::endl;
-		for (size_t i = 0; i < maTeam.size(); i++){			
+		for (size_t i = 0; i < maTeam.size(); i++){
 			std::vector<float> state_i;
-			// state_i.reserve(whAgents[i]->eIDs.size());
+			if(incorporates_time)
+				state_i.reserve(whAgents[i]->eIDs.size()*2);
+			else
+				state_i.reserve(whAgents[i]->eIDs.size());			
 
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)							
 				state_i.push_back(states[whAgents[i]->eIDs[j]]);			
