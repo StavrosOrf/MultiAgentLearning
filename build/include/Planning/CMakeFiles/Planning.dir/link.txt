@@ -1,0 +1,2 @@
+/usr/bin/ar qc libPlanning.a  CMakeFiles/Planning.dir/Search.cpp.o CMakeFiles/Planning.dir/Graph.cpp.o CMakeFiles/Planning.dir/Queue.cpp.o CMakeFiles/Planning.dir/Node.cpp.o CMakeFiles/Planning.dir/Edge.cpp.o
+/usr/bin/ranlib libPlanning.a

@@ -99,7 +99,7 @@ struct CriticNN : torch::nn::Module {
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
-// #define DEEP
+#define DEEP
 
 struct esNN : torch::nn::Module {
 	esNN (int numIn, int numOut, [[maybe_unused]] int numHid=64) {
@@ -109,7 +109,7 @@ struct esNN : torch::nn::Module {
 
 #ifdef DEEP
 		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));	
-		fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
+		// fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
 		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
 #endif
 	}
@@ -118,7 +118,7 @@ struct esNN : torch::nn::Module {
 
 		x = torch::sigmoid(fc1->forward(x));
 #ifdef DEEP	
-		x = torch::sigmoid(fc2->forward(x));
+		// x = torch::sigmoid(fc2->forward(x));
 		x = torch::sigmoid(fc3->forward(x));
 #endif
 
@@ -127,6 +127,7 @@ struct esNN : torch::nn::Module {
 
 	torch::nn::Linear fc1{nullptr};		
 #ifdef DEEP	
-	torch::nn::Linear fc2{nullptr},fc3{nullptr};
+	// torch::nn::Linear fc2{nullptr};
+	torch::nn::Linear fc3{nullptr};
 #endif
 };

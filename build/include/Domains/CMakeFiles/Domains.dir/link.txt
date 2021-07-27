@@ -1,0 +1,2 @@
+/usr/bin/ar qc libDomains.a  CMakeFiles/Domains.dir/Warehouse.cpp.o CMakeFiles/Domains.dir/AGV.cpp.o CMakeFiles/Domains.dir/Warehouse_DDPG.cpp.o CMakeFiles/Domains.dir/Warehouse_ES.cpp.o CMakeFiles/Domains.dir/Warehouse_ES_container.cpp.o
+/usr/bin/ranlib libDomains.a
