@@ -209,3 +209,8 @@ trace if Eigen, Threadpool.cpp
 - Removed MUTLITHREADING Macro from Warehouse_ES_container.cpp
 - fixed bug in PathSearchLengh()
 - fixed test_search.cpp
+
+## V 1
+- Cleanup: Removed Deprated files: matlab plot and simulator
+- added plot scripts
+- updated Readme.md

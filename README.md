@@ -1,6 +1,9 @@
 # multiagent_learning
 
-Top level project files for multiagent learning.
+This project Implements (MA)DDPG and ES on a warehouse domain using multiple
+agent definitions with each learning algorithm, for purpose of comparing it to
+[CCEA](https://github.com/JenJenChung/multiagent_learning).
+
 
 ## Installation ##
 

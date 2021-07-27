@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -g  -shared -Wl,-soname,libLearning.so -o libLearning.so CMakeFiles/Learning.dir/dummy.cpp.o 
