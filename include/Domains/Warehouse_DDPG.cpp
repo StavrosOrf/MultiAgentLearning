@@ -108,7 +108,7 @@ epoch_results Warehouse_DDPG::simulate_epoch_DDPG(bool verbose, int epoch){
 			printf("\n");
 		}
 
-		float routable_agvs = 0;//total number of agvs that could be routed in the graph
+		float routable_agvs = 0;//total number of agvs that could be routed in the graph,  Used for reward 2
 		for (size_t v = 0; v != whGraph->GetNumVertices(); v++)
 			routable_agvs += std::min<float>(get_vertex_remaining_outgoing_capacity(v), get_vertex_utilization()[v]);
 

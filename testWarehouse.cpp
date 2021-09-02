@@ -14,17 +14,55 @@
 #include "Domains/Warehouse.hpp"
 #include "Domains/Warehouse_DDPG.hpp"
 #include "Domains/Warehouse_ES_container.hpp"
+// #include "Domains/Warehouse_COMA.hpp"
 
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
 std::string config_file;
 
 void warehouse_simulate_COMA(YAML::Node configs, [[maybe_unused]] size_t n_threads){
-	const int runs = configs["ES"]["runs"].as<int>();
-	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
-	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
-	const std::string agentType = configs["domain"]["agents"].as<std::string>();
-	const std::string resFolder = create_results_folder(configs);
+	// const int nEps = configs["COMA"]["epochs"].as<int>();
+	// const int runs = configs["COMA"]["runs"].as<int>();
+	// [[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
+	// const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
+	// const std::string agentType = configs["domain"]["agents"].as<std::string>();
+	// const std::string resFolder = create_results_folder(configs);
+
+	// std::clock_t start, startTotalRun, startTotalExperiment = std::clock();
+
+	// double duration;
+	// uint max_G = 0; //Maximum Total Deliveries
+
+	// std::ofstream eval_file(resFolder + warehouse_type + '_' + "COMA" + '_' + agentType + ".csv");
+	// for (int run = 0; run != runs; run++){
+	// 	assert(eval_file.is_open());
+	// 	eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
+	// 	startTotalRun = std::clock();
+	// 	Warehouse_COMA * trainDomain = new Warehouse_COMA(configs);
+	// 	trainDomain->InitialiseMATeam();
+
+	// 	std::cout << "Starting Run: " << run << std::endl;
+	// 	for (int e = 0; e < nEps; e++){
+	// 		start = std::clock();
+	// 		epoch_results t = trainDomain->simulate_epoch_COMA(verbose,e);//simulate
+	// 		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	// 		if (t.totalDeliveries > max_G){
+	// 			std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4u\e[0m, tMove=%6u, tEnter=%6u, tWait=%6u\n",
+	// 				e,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
+	// 			max_G = t.totalDeliveries;
+	// 		}
+	// 		else
+	// 			std::printf("Epoch %3d (%5.1f sec): G=%4u, tMove=%6u, tEnter=%6u, tWait=%6u\n",
+	// 				e,duration,t.totalDeliveries,t.totalMove,t.totalEnter,t.totalWait);
+	// 		eval_file<<run<<','<<e<<','<<t.totalDeliveries<<','<<t.totalMove<<','<<t.totalEnter<<','<<t.totalWait << std::endl;
+	// 	}
+	// 	duration = ( std::clock() - startTotalRun ) / ((double) CLOCKS_PER_SEC );
+	// 	std::cout<<"Total time elapsed for Run "<<run<<" ( "<<duration<<" sec)"<<std::endl; 
+		
+	// }
+	// eval_file.close();
+	// duration = ( std::clock() - startTotalExperiment ) / ((double) CLOCKS_PER_SEC );
+	// std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
 
 }
 
@@ -87,7 +125,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		eval_file.close();
 	}
 	duration = ( std::clock() - startTotalExperiment ) / ((double) CLOCKS_PER_SEC );
-		std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
+	std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
 }
 
 void WarehouseSimulation(std::string config_file, size_t n_threads){
@@ -103,7 +141,7 @@ void WarehouseSimulation(std::string config_file, size_t n_threads){
 	}else if (algo == "ES"){
 		warehouse_simulate_ES(configs, n_threads);
 	}else if (algo == "COMA"){
-		//TODO
+		warehouse_simulate_COMA(configs, n_threads);
 	}else{
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(1);

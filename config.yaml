@@ -1,5 +1,5 @@
 mode:
-  algo: ES #Valid Options: 'DDPG', 'ES', COMA
+  algo: COMA #Valid Options: 'DDPG', 'ES', COMA
 domain:
   folder: ../Domains/
   warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS', 'Min_SS'
@@ -15,6 +15,11 @@ ES:
   population_size: 1000
   learning_rate: 0.001
   rand_proc_std_dev: 1 #standard deviation of the random process, higher values encourage more exploration
+COMA:
+  epochs: 5
+  runs: 2 # number of statistical runs
+  rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
+  batch_size: 50   
 simulation:
   verbose: true
   steps: 200

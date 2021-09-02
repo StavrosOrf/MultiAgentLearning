@@ -1,6 +1,5 @@
 #include "DDPGAgent.hpp"
 
-
 DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state_space,size_t global_action_space){
 	//Create NNs
 	const int hiddensize = 256;

@@ -8,31 +8,26 @@ COMAAgent::COMAAgent(size_t state_space, size_t action_space){
 
 	muNN = new ActorNN(state_space, action_space, hiddensize);
 
-
-	for (size_t i = 0; i < muNN->parameters().size(); i++ )
-		assert(torch::sum(muNN->parameters()[i] == mutNN->parameters()[i]).item<float>() == muNN->parameters()[i].numel());
-
-	COMAAgent::replay_buffer.reserve(REPLAY_BUFFER_SIZE);
-
+	COMAAgent::replay_buffer.reserve(COMA_consts::replay_buffer_size);
 
 	//optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
 	//optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
 }
 
 COMAAgent::~COMAAgent(){
-	delete(qNN);
-	delete(qtNN);
+	// delete(qNN);
+	// delete(qtNN);
 	delete(muNN);
 	// delete(mutNN);
-	qNN = qtNN = NULL;
+	// qNN = qtNN = NULL;
 	muNN = NULL;
 }
 
-COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_space){
+void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_space){
 	const int hiddensize = 256;
 
-	qNN = new CriticNN(global_state_space+global_action_space, 1, hiddensize);
-	qtNN = new CriticNN(global_state_space+global_action_space, 1, hiddensize);
+	COMAAgent::qNN = new CriticNN(global_state_space+global_action_space, 1, hiddensize);
+	CriticNN* qtNN = new CriticNN(global_state_space+global_action_space, 1, hiddensize);
 
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN->parameters().size(); i++)
@@ -41,7 +36,6 @@ COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_space
 	//assert that copy was successfull
 	for (size_t i = 0; i < qNN->parameters().size(); i++ )
 		assert(torch::sum(qNN->parameters()[i] == qtNN->parameters()[i]).item<float>() == qNN->parameters()[i].numel());
-
 }
 
 /************************************************************************************************
@@ -57,7 +51,8 @@ std::vector<float> COMAAgent::EvaluateActorNN_DDPG(const std::vector<float>& s){
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
-std::vector<float> COMAAgent::EvaluateCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
+/*
+static std::vector<float> COMAAgent::EvaluateCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -77,7 +72,8 @@ std::vector<float> COMAAgent::EvaluateCriticNN_DDPG(const std::vector<float>& s,
 // 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 // 	return to_return;
 // }
-std::vector<float> COMAAgent::EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
+
+static std::vector<float> COMAAgent::EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -89,6 +85,8 @@ std::vector<float> COMAAgent::EvaluateTargetCriticNN_DDPG(const std::vector<floa
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
+*/
+
 
 /************************************************************************************************
  * *Input:	a experience_replay [r]									*
@@ -97,10 +95,10 @@ std::vector<float> COMAAgent::EvaluateTargetCriticNN_DDPG(const std::vector<floa
 void COMAAgent::addToReplayBuffer(experience_replay r){
 	assert(r.next_state.size() == r.current_state.size());
 
-	if (COMAAgent::replay_buffer.size() < REPLAY_BUFFER_SIZE)
+	if (COMAAgent::replay_buffer.size() < COMA_consts::replay_buffer_size)
 		COMAAgent::replay_buffer.push_back(r);
 	else
-		COMAAgent::replay_buffer[rand()%REPLAY_BUFFER_SIZE] = r;
+		COMAAgent::replay_buffer[rand()%COMA_consts::replay_buffer_size] = r;
 }
 /************************************************************************************************
 **Input:[size] of batch to return								*
