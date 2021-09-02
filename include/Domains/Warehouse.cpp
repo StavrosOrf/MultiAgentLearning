@@ -13,9 +13,11 @@ Warehouse::Warehouse(YAML::Node configs){
 		algo = algo_type::ddpg;
 	else if(configs["mode"]["algo"].as<std::string>() == "ES")
 		algo = algo_type::evolutionary_strategies;
+	else if(configs["mode"]["algo"].as<std::string>() == "COMA")
+		algo = algo_type::coma;
 	else{
-		std::cout << "ERROR: Currently only configured for 'DDPG' and ''! Exiting.\n";
-		exit(1);
+		std::cout << "ERROR: Currently only configured for 'DDPG' and 'ES' and 'COMA'! Exiting.\n";
+		exit(EXIT_FAILURE);
 	}
 	std::string agentType = configs["domain"]["agents"].as<std::string>();
 
@@ -27,7 +29,7 @@ Warehouse::Warehouse(YAML::Node configs){
 		agent_type = agent_def::intersection;
 	else{
 		std::cout<<"Error in agent definition"<<std::endl;
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 	incorporates_time = agentType.ends_with("_t");
 

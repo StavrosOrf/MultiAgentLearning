@@ -21,13 +21,6 @@ uint Warehouse_ES_container::evolution_strategy(const size_t n_threads, bool ver
 	std::vector<esNN*> best_team_policy = population[0]->produce_random_team_NNs(); //Allocating a new memory space for this
 
 	int best_epoch = 0;
-	torch::Device device = torch::kCPU;
-	if(torch::cuda::is_available()) {
-		std::cout<<"Cuda is available!"<<"\n";
-		device = torch::kCUDA;
-	}else{
-		std::cout<<"No Cuda is available!"<<"\n";
-	}
 
 	// load_best_team_policy(team);
 

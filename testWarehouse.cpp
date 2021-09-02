@@ -19,9 +19,18 @@ Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
 std::string config_file;
 
-void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
+void warehouse_simulate_COMA(YAML::Node configs, [[maybe_unused]] size_t n_threads){
 	const int runs = configs["ES"]["runs"].as<int>();
-	const bool verbose = configs["simulation"]["verbose"].as<bool>();
+	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
+	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
+	const std::string agentType = configs["domain"]["agents"].as<std::string>();
+	const std::string resFolder = create_results_folder(configs);
+
+}
+
+void warehouse_simulate_ES(YAML::Node configs, [[maybe_unused]] size_t n_threads){
+	const int runs = configs["ES"]["runs"].as<int>();
+	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
 	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
 	const std::string agentType = configs["domain"]["agents"].as<std::string>();
 	const std::string resFolder = create_results_folder(configs);
@@ -30,9 +39,9 @@ void warehouse_simulate_ES(YAML::Node configs, size_t n_threads){
 	for (int i = 0; i != runs; i++){
 		assert(eval_file.is_open());
 
-		eval_file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
+		eval_file <<",Epouint G = esc.evolution_strategy(n_threads, verbose, i, eval_file);ch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
 		Warehouse_ES_container esc(configs);
-		uint G = esc.evolution_strategy(n_threads, verbose, i, eval_file);
+		[[maybe_unused]] uint G = esc.evolution_strategy(n_threads, verbose, i, eval_file);
 	}
 }
 
@@ -87,13 +96,14 @@ void WarehouseSimulation(std::string config_file, size_t n_threads){
 	YAML::Node configs = YAML::LoadFile(config_file);
 
 	std::string algo = configs["mode"]["algo"].as<std::string>();
-	std::string mode = configs["mode"]["type"].as<std::string>();
+	//std::string mode = configs["mode"]["type"].as<std::string>();
 
 	if (algo == "DDPG") {
-		if(mode == "train")
-			WarehouseSimulationDDPG(configs);
+		WarehouseSimulationDDPG(configs);
 	}else if (algo == "ES"){
 		warehouse_simulate_ES(configs, n_threads);
+	}else if (algo == "COMA"){
+		//TODO
 	}else{
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(1);
@@ -185,6 +195,13 @@ int main(int argc, char* argv[]){
 			return 1;
 		}
 	}
+
+	//torch::Device device = torch::kCPU;
+	if(torch::cuda::is_available()) {
+		std::cout<<"Cuda is available!"<<"\n";
+		//device = torch::kCUDA;
+	}else
+		std::cout<<"No Cuda is available!"<<"\n";
 
 	WarehouseSimulation(config_file, thrds);
 

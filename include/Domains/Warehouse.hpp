@@ -21,9 +21,16 @@
 #define N_EDGES whGraph->GetEdges().size()
 
 
-enum class algo_type{ddpg, evolutionary_strategies};
+enum class algo_type{ddpg, evolutionary_strategies, coma};
 
 enum class agent_def{centralized, link, intersection};
+
+struct experience_replay{
+	std::vector<float> current_state;
+	std::vector<float> next_state;
+	std::vector<float> action;
+	float reward;
+};
 
 struct epoch_results{
 	uint totalDeliveries = 0;

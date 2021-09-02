@@ -1,5 +1,5 @@
 mode:
-  algo: ES #Valid Options: 'DDPG', 'ES'
+  algo: ES #Valid Options: 'DDPG', 'ES', COMA
 domain:
   folder: ../Domains/
   warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS', 'Min_SS'
