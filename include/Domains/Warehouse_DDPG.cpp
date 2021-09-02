@@ -245,7 +245,7 @@ epoch_results Warehouse_DDPG::simulate_epoch_DDPG(bool verbose, int epoch){
 
 void Warehouse_DDPG::InitialiseMATeam(){
 	assert(whAgents.size());//this must be called after whAgents have been initialized
-	if (algo == algo_type::ddpg){
+	if (algo == algo_type::ddpg)
 		assert(ddpg_maTeam.empty());
 		if(agent_type == agent_def::centralized)
 			ddpg_maTeam.push_back(new DDPGAgent(N_EDGES*(1+incorporates_time), N_EDGES,N_EDGES*(1+incorporates_time), N_EDGES));
@@ -257,7 +257,6 @@ void Warehouse_DDPG::InitialiseMATeam(){
  		else if (agent_type == agent_def::intersection)
 			for (int v : whGraph->GetVertices())
 				ddpg_maTeam.push_back(new DDPGAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size(), (1+incorporates_time)*N_EDGES, N_EDGES));
-	}
 	else{
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
 		exit(EXIT_FAILURE);

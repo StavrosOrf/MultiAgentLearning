@@ -9,6 +9,7 @@
 #include "Warehouse.hpp"
 #include "Planning/Search.h"
 #include "Agents/DDPGAgent.hpp"
+#include "Agents/experience_replay.hpp"
 
 class Warehouse_DDPG : public Warehouse {
 	public:

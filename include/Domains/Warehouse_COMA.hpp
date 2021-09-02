@@ -7,6 +7,8 @@
 #include <string>
 #include "Warehouse.hpp"
 #include "Planning/Search.h"
+#include "Agents/experience_replay.hpp"
+#include "Agents/COMAAgent.hpp"
 
 class Warehouse_COMA : public Warehouse {
 	public:
@@ -23,5 +25,5 @@ class Warehouse_COMA : public Warehouse {
 		std::vector<float> QueryActorMATeam(std::vector<float> states) __attribute__ ((pure));
 		std::vector<float> QueryTargetActorMATeam(std::vector<float> states) __attribute__ ((pure));
 		float N_proc_std_dev;
-		//std::vector<DDPGAgent *> ddpg_maTeam;
+		std::vector<COMAAgent *> maTeam;
 };

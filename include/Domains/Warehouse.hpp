@@ -25,13 +25,6 @@ enum class algo_type{ddpg, evolutionary_strategies, coma};
 
 enum class agent_def{centralized, link, intersection};
 
-struct experience_replay{
-	std::vector<float> current_state;
-	std::vector<float> next_state;
-	std::vector<float> action;
-	float reward;
-};
-
 struct epoch_results{
 	uint totalDeliveries = 0;
 	uint totalMove = 0;
