@@ -16,6 +16,7 @@ AGV::AGV(vertex_t initV, std::vector<vertex_t> goalVs, Graph * graph){
 	agvPlanner = new Search(graph, origin, goal);
 	SetNewGoal();
 	ncDel++;
+	curEdge = nullptr;
 }
 
 AGV::~AGV(){

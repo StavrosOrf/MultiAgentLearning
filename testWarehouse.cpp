@@ -102,13 +102,13 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
 		startTotalRun = std::clock();
-		Warehouse_DDPG * trainDomain = new Warehouse_DDPG(configs);
-		trainDomain->InitialiseMATeam();
+		Warehouse_DDPG trainDomain = Warehouse_DDPG(configs);
+		trainDomain.InitialiseMATeam();
 
 		std::cout << "Starting Run: " << run << std::endl;
 		for (int n = 0; n < nEps; n++){
 			start = std::clock();
-			epoch_results t = trainDomain->simulate_epoch_DDPG(verbose,n);//simulate
+			epoch_results t = trainDomain.simulate_epoch_DDPG(verbose,n);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			if (t.totalDeliveries > max_G){
 				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4u\e[0m, tMove=%6u, tEnter=%6u, tWait=%6u\n",
@@ -137,7 +137,8 @@ void WarehouseSimulation(std::string config_file, size_t n_threads){
 	//std::string mode = configs["mode"]["type"].as<std::string>();
 
 	if (algo == "DDPG") {
-		WarehouseSimulationDDPG(configs);
+		std::cout << "(MA)DDPG has been deprecated)" << std::endl;
+		//WarehouseSimulationDDPG(configs);
 	}else if (algo == "ES"){
 		warehouse_simulate_ES(configs, n_threads);
 	}else if (algo == "COMA"){
@@ -146,27 +147,6 @@ void WarehouseSimulation(std::string config_file, size_t n_threads){
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(1);
 	}
-}
-
-/************************************************************************************************
-**Input: A string named [agentType] which indicates the type of the Warehouse			*
-**Output:A Warehouse of that type								*
-************************************************************************************************/
-[[deprecated("Create your warehouse inside the class")]]
-Warehouse* create_warehouse(YAML::Node configs) {
-	Warehouse* new_warehouse;
-	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
-		new_warehouse = new Warehouse_DDPG(configs);
-	else if(configs["mode"]["algo"].as<std::string>() == "ES")
-		assert(0); //ES is not supposed to call this function
-	else{
-		std::cout << "ERROR: currently only configured for 'ddpg' and ''! exiting.\n";
-		exit(1);
-	}
-
-	new_warehouse->InitialiseMATeam();
-
-	return new_warehouse;
 }
 
 /************************************************************************************************

@@ -1,41 +1,30 @@
 #include "COMAAgent.hpp"
 
+const int hiddensize = 256;
 
-COMAAgent::COMAAgent(size_t state_space, size_t action_space){
-	//Create NNs
-	const int hiddensize = 256;
+COMAAgent::COMAAgent(size_t state_space, size_t action_space)
+	: muNN(state_space, action_space, hiddensize){
 
-
-	muNN = new ActorNN(state_space, action_space, hiddensize);
-
-	COMAAgent::replay_buffer.reserve(COMA_consts::replay_buffer_size);
-
+	//TODO
 	//optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
 	//optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
 }
 
-COMAAgent::~COMAAgent(){
-	// delete(qNN);
-	// delete(qtNN);
-	delete(muNN);
-	// delete(mutNN);
-	// qNN = qtNN = NULL;
-	muNN = NULL;
-}
+COMAAgent::~COMAAgent(){}
 
 void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_space){
 	const int hiddensize = 256;
 
-	COMAAgent::qNN = new CriticNN(global_state_space+global_action_space, 1, hiddensize);
-	CriticNN* qtNN = new CriticNN(global_state_space+global_action_space, 1, hiddensize);
+	COMAAgent::qNN = CriticNN(global_state_space+global_action_space, 1, hiddensize);
+	COMAAgent::qtNN = CriticNN(global_state_space+global_action_space, 1, hiddensize);
 
 	//copy {Q', Mu'} <- {Q, Mu}
-	for (size_t i = 0; i < qNN->parameters().size(); i++)
-		qtNN->parameters()[i].set_data(qNN->parameters()[i].detach().clone());
+	for (size_t i = 0; i < qNN.parameters().size(); i++)
+		qtNN.parameters()[i].set_data(qNN.parameters()[i].detach().clone());
 
 	//assert that copy was successfull
-	for (size_t i = 0; i < qNN->parameters().size(); i++ )
-		assert(torch::sum(qNN->parameters()[i] == qtNN->parameters()[i]).item<float>() == qNN->parameters()[i].numel());
+	for (size_t i = 0; i < qNN.parameters().size(); i++ )
+		assert(torch::sum(qNN.parameters()[i] == qtNN.parameters()[i]).item<float>() == qNN.parameters()[i].numel());
 }
 
 /************************************************************************************************
@@ -47,8 +36,8 @@ std::vector<float> COMAAgent::EvaluateActorNN_DDPG(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(std::move(s)).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
-	torch::Tensor t1 = muNN->forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	torch::Tensor t1 = muNN.forward(t);
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 /*
@@ -88,44 +77,6 @@ static std::vector<float> COMAAgent::EvaluateTargetCriticNN_DDPG(const std::vect
 */
 
 
-/************************************************************************************************
- * *Input:	a experience_replay [r]									*
- * *Method:Adds [r] to the [replay_buffer], if [replay_buffer] is full it evicts a tuple	*
- * ************************************************************************************************/
-void COMAAgent::addToReplayBuffer(experience_replay r){
-	assert(r.next_state.size() == r.current_state.size());
-
-	if (COMAAgent::replay_buffer.size() < COMA_consts::replay_buffer_size)
-		COMAAgent::replay_buffer.push_back(r);
-	else
-		COMAAgent::replay_buffer[rand()%COMA_consts::replay_buffer_size] = r;
-}
-/************************************************************************************************
-**Input:[size] of batch to return								*
-**Method:Selects a non-inclusive (with unique items) minibanch from the experience_replay buffer*
-**Output:Returns a non-inclusive miniBatch of [size]						*
-*************************************************************************************************/
-std::vector<experience_replay> COMAAgent::getReplayBufferBatch(size_t size){
-	assert(replay_buffer.size()+1 >= size);
-	std::vector<experience_replay> to_return;
-	to_return.reserve(size);
-
-	//generate a list of rand indexes (non inclusive)
-	std::vector<int> rand_list;
-	rand_list.reserve(size);
-	for (size_t i = 0; i != size; i++){
-		int r = rand()%COMAAgent::replay_buffer.size();
-		while (std::find(rand_list.begin(), rand_list.end(),r)!=rand_list.end())
-			r = rand()%COMAAgent::replay_buffer.size();
-		rand_list.push_back(r);
-	}
-
-	for (int i : rand_list)
-		to_return.push_back(COMAAgent::replay_buffer[i]);
-
-	assert(to_return.size() == size);
-	return to_return;
-}
 
 /************************************************************************************************
  * *Method:updates the network parameters (aka network transition weights) of target networks	*
@@ -254,8 +205,8 @@ std::vector<experience_replay> COMAAgent::getReplayBufferBatch(size_t size){
 **Method:Print Various Metrics about the agent's neural Networks				*
 *************************************************************************************************/
 void COMAAgent::printAboutNN(){
-	for (size_t i = 0; i < muNN->parameters().size(); i++ ){
-		torch::Tensor t = muNN->parameters()[i].detach().clone();
+	for (size_t i = 0; i < muNN.parameters().size(); i++ ){
+		torch::Tensor t = muNN.parameters()[i].detach().clone();
 		// torch::Tensor tt = mutNN->parameters()[i].detach().clone();
 
 		std::cout<<" MuNN "<<i<<": "<< torch::sum(t).item<float>();

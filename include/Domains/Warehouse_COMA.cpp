@@ -11,11 +11,7 @@ Warehouse_COMA::~Warehouse_COMA(void){
 		delete whAgents[i];
 		whAgents[i] = 0;
 	}
-	for (size_t i = 0; i != maTeam.size(); i++){
-		delete maTeam[i];
-		maTeam[i] = NULL;
-	}
-	// DDPGAgent::clear_replar_buffer();
+	COMAAgent::ERB.clear();
 }
 
 
@@ -55,8 +51,6 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 		std::vector<float> final_costs = baseCosts;
 		for (size_t n = 0; n < N_EDGES; n++){ // Add Random Noise from process N
 			// actions[n] = QueryActorMATeam(cur_state)[n]*max_base_travel_cost() + n_process(n_generator)*max_base_travel_cost();			
-
-
 			final_costs[n] += actions[n];
 		}
 
@@ -64,7 +58,6 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 			// printf("CostsAdd: ");
 			// for (size_t n = 0; n < final_costs.size(); n++)
 			// 	printf(" %.1f",final_costs[n]-baseCosts[n] + min);
-			// printf("\n");
 			printf("\nFinalCosts: ");
 			for (size_t n = 0; n < final_costs.size(); n++)
 				printf(" %.1f",final_costs[n]);
@@ -109,7 +102,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 // REWARD_METHOD == 2
 		float total_AGVs_that_entered_an_edge_this_step = 0;
 		for(AGV* a : whAGVs)
-			total_AGVs_that_entered_an_edge_this_step += a->entered_edge_this_step();
+			total_AGVs_that_entered_an_edge_this_step += (float) (a->entered_edge_this_step());
 		reward = total_AGVs_that_entered_an_edge_this_step - routable_agvs;
 
 
@@ -121,7 +114,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 			std::cout<<"Reward: "<<reward<<std::endl;
 		assert(!std::isnan(reward) && !std::isinf(reward));
 		// if (routable_agvs != 0)
-		COMAAgent::addToReplayBuffer({temp_state,cur_state,actions,reward});
+		COMAAgent::ERB.add_random({temp_state,cur_state,actions,reward});
 		// else if(verbose)
 	
 		// if(DDPGAgent::get_replay_buffer_size() > DDPGAgent::get_batch_size() * 2 && t%TRAINING_STEP == 0){
@@ -188,13 +181,11 @@ void Warehouse_COMA::InitialiseMATeam(){
 
 	COMAAgent::init_critic_NNs(N_EDGES*(1+incorporates_time), N_EDGES);
 	assert(maTeam.empty());
-	if(agent_type == agent_def::centralized)
+	if (agent_type == agent_def::centralized)
 		maTeam.push_back(new COMAAgent(N_EDGES*(1+incorporates_time), N_EDGES));
-	else if(agent_type == agent_def::link){			
-		for (size_t i = 0; i < whGraph->GetEdges().size(); i++){				
+	else if (agent_type == agent_def::link)
+		for (size_t i = 0; i < whGraph->GetEdges().size(); i++)
 			maTeam.push_back(new COMAAgent((1+incorporates_time), 1));
-		}
-	}
 	else if (agent_type == agent_def::intersection)
 		for (int v : whGraph->GetVertices())
 			maTeam.push_back(new COMAAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()));

@@ -210,7 +210,23 @@ trace if Eigen, Threadpool.cpp
 - fixed bug in PathSearchLengh()
 - fixed test_search.cpp
 
-## V 1
+## v 1
 - Cleanup: Removed Deprated files: matlab plot and simulator
 - added plot scripts
 - updated Readme.md
+
+## non-versioned patched ko
+- minor cleanup and typo fixes
+
+## v 1.00001k
+- Added Skeleton for handling agent_type::COMA
+
+## v 1.00002o
+- Added foundation for implementing agent_type::COMA 
+- Minor cleanup
+
+## v 1.00003k
+- Added class experience_replay_buffer
+- Marked agent_type::DDPG as deprecated
+- removed testWarehouse::create_warehouse
+- converted many pointless pointer to stakk objects (pun intented)

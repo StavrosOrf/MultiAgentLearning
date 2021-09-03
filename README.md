@@ -4,6 +4,10 @@ This project Implements (MA)DDPG and ES on a warehouse domain using multiple
 agent definitions with each learning algorithm, for purpose of comparing it to
 [CCEA](https://github.com/JenJenChung/multiagent_learning).
 
+This purpose implements the following algorithms on the warehouse domain/framework
+ - ES
+ - (MA)DDPG [deprecated]
+
 
 ## Installation ##
 
@@ -27,7 +31,8 @@ wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-de
 unzip libtorch-cxx11-abi-shared-with-deps-latest+cpu.zip
 rm libtorch-cxx11-abi-shared-with-deps-latest+cpu.zip
 ```
-Note: you can download and install LibTorch with different computer platform (e.g. CUDA on https://pytorch.org/)
+Note: you can download and install LibTorch with different computer platform (e.g. CUDA/RocM) on https://pytorch.org/, be sure to instal the c++11+ ABI version
+
 
 
 Build the code:

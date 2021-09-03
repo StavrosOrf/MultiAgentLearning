@@ -13,7 +13,7 @@
 class Warehouse_COMA : public Warehouse {
 	public:
 		Warehouse_COMA(YAML::Node configs) : Warehouse(configs), N_proc_std_dev(0){
-			N_proc_std_dev = configs["DDPG"]["rand_proc_std_dev"].as<float>();
+			N_proc_std_dev = configs["COMA"]["rand_proc_std_dev"].as<float>();
 			//DDPGAgent::set_batch_size(configs["DDPG"]["batch_size"].as<uint>());
 		}
 		~Warehouse_COMA(void);
@@ -25,5 +25,5 @@ class Warehouse_COMA : public Warehouse {
 		std::vector<float> QueryActorMATeam(std::vector<float> states) __attribute__ ((pure));
 		std::vector<float> QueryTargetActorMATeam(std::vector<float> states) __attribute__ ((pure));
 		float N_proc_std_dev;
-		std::vector<COMAAgent *> maTeam;
+		std::vector<COMAAgent*> maTeam;
 };

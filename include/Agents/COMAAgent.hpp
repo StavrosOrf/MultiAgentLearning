@@ -14,9 +14,10 @@
 #include <cstdio>
 #include "nn_modules.hpp"
 #include "Agents/experience_replay.hpp"
+#include "Agents/experience_replay_buffer.hpp"
 
 namespace COMA_consts{ 
-	const size_t replay_buffer_size = 200*100; //1024*1024
+	const static size_t replay_buffer_size = 200*100; //1024*1024
 	const float gamma = 0.99;
 	const float tau = 0.01;
 }
@@ -31,9 +32,6 @@ class COMAAgent{
 		// std::vector<float> EvaluateTargetActorNN_DDPG(const std::vector<float>& s);
 		static std::vector<float> EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a);
 
-		static std::vector<experience_replay> getReplayBufferBatch(size_t size = batch_size);
-		static void addToReplayBuffer(experience_replay r);
-		static size_t get_replay_buffer_size(){return replay_buffer.size();}
 		static void init_critic_NNs(size_t global_state_space, size_t global_action_space);
 
 		// void updateTargetWeights();
@@ -45,11 +43,11 @@ class COMAAgent{
 
 		static void set_batch_size(size_t i){batch_size = i;}
 		static size_t get_batch_size() {return batch_size;}
-		static void clear_replar_buffer(){replay_buffer.clear();}
+
+		inline static experience_replay_buffer ERB = experience_replay_buffer(200*100);
 	protected:
-		inline static CriticNN *qNN, *qtNN; //TODO thread local
-		ActorNN* muNN;//, *mutNN;
-		inline static std::vector<experience_replay> replay_buffer;
+		inline static CriticNN qNN = CriticNN(0,0,0), qtNN = CriticNN(0,0,0); //TODO thread local
+		ActorNN muNN;
 		inline static size_t batch_size;		
 
 		Net temp = Net(1, 1, 1*2);
