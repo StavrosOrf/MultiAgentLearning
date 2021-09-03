@@ -230,3 +230,6 @@ trace if Eigen, Threadpool.cpp
 - Marked agent_type::DDPG as deprecated
 - removed testWarehouse::create_warehouse
 - converted many pointless pointer to stakk objects (pun intented)
+
+## v 1.00004k
+- More work on agent_type::coma (first half done?)

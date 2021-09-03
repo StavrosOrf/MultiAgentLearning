@@ -19,6 +19,44 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 	InitialiseNewEpoch();
 	std::normal_distribution<float> n_process(1, N_proc_std_dev);
 	std::default_random_engine n_generator(time(NULL));
+
+	COMAAgent::ERB.clear();
+
+	assert(COMAAgent::get_batch_size());
+	for (size_t e = 0; e != COMAAgent::get_batch_size(); e++){
+		std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
+		for (size_t t = 0; t < nSteps; t++){
+			std::vector<float> actions = query_actor_MATeam(cur_state);
+			
+			traverse_one_step(actions);
+			 
+			// Log Perfomance Counters
+			size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
+			for (size_t k = 0; k < whAGVs.size(); k++){
+				totalMove += whAGVs[k]->GetMoveTime();
+				totalEnter += whAGVs[k]->GetEnterTime();
+				totalWait += whAGVs[k]->GetWaitTime();
+				totalSuccess += whAGVs[k]->GetNumCompleted();
+				totalCommand += whAGVs[k]->GetNumCommanded();
+			}
+			if(verbose)
+				std::cout<<"Stats:\n Total Move: "<<totalMove<<"\n Total Enter: "<<totalEnter<<
+					"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
+
+			float reward = totalMove + totalEnter;
+
+			const std::vector<float> old_state = cur_state;
+			const std::vector<float> next_state = get_edge_utilization();
+			
+			COMAAgent::ERB.add_random({old_state, next_state, actions, reward});
+		}
+
+	}
+
+
+
+	
+	/*
 	epoch_results results;
 	float reward;
 
@@ -115,6 +153,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 		assert(!std::isnan(reward) && !std::isinf(reward));
 		// if (routable_agvs != 0)
 		COMAAgent::ERB.add_random({temp_state,cur_state,actions,reward});
+		*/
 		// else if(verbose)
 	
 		// if(DDPGAgent::get_replay_buffer_size() > DDPGAgent::get_batch_size() * 2 && t%TRAINING_STEP == 0){
@@ -166,8 +205,8 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 		// }else
 		// 	if(verbose)
 		// 		std::cout << "Not enough Replays yet for updating NNs!"<<std::endl;
-	}	
-	return results;
+	//}	
+	//return results;
 }
 
 
@@ -191,4 +230,40 @@ void Warehouse_COMA::InitialiseMATeam(){
 			maTeam.push_back(new COMAAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()));
 
 	assert(!maTeam.empty());
+}
+
+std::vector<float> Warehouse_COMA::query_actor_MATeam(std::vector<float> states){
+ 	assert(states.size() == N_EDGES*(1 + incorporates_time));
+ 	if(agent_type == agent_def::centralized){
+		assert(0);
+ 		return maTeam[0]->evaluate_actorNN(states);
+	}
+ 	else if (agent_type == agent_def::link){
+ 		std::vector<float> actions;
+ 		actions.reserve(N_EDGES);
+
+ 		for (size_t i = 0; i < maTeam.size(); i++)
+ 			if(incorporates_time)
+ 				actions.push_back(maTeam[i]->evaluate_actorNN({states[i], states[i+N_EDGES]})[0]);
+ 			else{
+ 				float t = (maTeam[i]->evaluate_actorNN({states[i]}))[0];
+ 				actions.push_back(t);
+ 			}
+ 		return actions;
+ 	}
+	 else if (agent_type == agent_def::intersection){//TODO WITH TIME
+ 		std::vector<float> actions;
+ 		actions.reserve(N_EDGES);
+
+		for (size_t i = 0; i < maTeam.size(); i++)
+			for (int j = 0; whAgents[i]->eIDs.size(); j++)
+				actions[whAgents[i]->eIDs[j]] =
+					maTeam[i]->evaluate_actorNN(states)[j];
+		return actions;
+	}
+	else{
+		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
+		exit(EXIT_FAILURE);
+		return {0};
+	} 
 }

@@ -107,7 +107,6 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
  				actions.push_back(maTeam[i]->evaluateNN({states[i], states[i+N_EDGES]})[0]);
  			else{
  				float t = (maTeam[i]->evaluateNN({states[i]}))[0];
- 				
  				actions.push_back(t);
  			}
 		assert(actions.size() == N_EDGES);

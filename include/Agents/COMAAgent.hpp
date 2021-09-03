@@ -20,6 +20,8 @@ namespace COMA_consts{
 	const static size_t replay_buffer_size = 200*100; //1024*1024
 	const float gamma = 0.99;
 	const float tau = 0.01;
+	const float learning_rate_actor = 0;
+	const float learning_rate_crtitic = 0;
 }
 
 class COMAAgent{
@@ -28,7 +30,7 @@ class COMAAgent{
 		~COMAAgent();
 
 		static std::vector<float> EvaluateCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a);
-		std::vector<float> EvaluateActorNN_DDPG(const std::vector<float>& s);
+		std::vector<float> evaluate_actorNN(const std::vector<float>& s);
 		// std::vector<float> EvaluateTargetActorNN_DDPG(const std::vector<float>& s);
 		static std::vector<float> EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a);
 
@@ -48,7 +50,7 @@ class COMAAgent{
 	protected:
 		inline static CriticNN qNN = CriticNN(0,0,0), qtNN = CriticNN(0,0,0); //TODO thread local
 		ActorNN muNN;
-		inline static size_t batch_size;		
+		inline static size_t batch_size = 0;		
 
 		Net temp = Net(1, 1, 1*2);
 

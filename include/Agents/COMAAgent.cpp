@@ -32,7 +32,7 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
  * *Method:Does a foward pass of the associated NN						*
  * *Output:Returns a vector of the final nodes of the NN					*
  * ************************************************************************************************/
-std::vector<float> COMAAgent::EvaluateActorNN_DDPG(const std::vector<float>& s){
+std::vector<float> COMAAgent::evaluate_actorNN(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(std::move(s)).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
