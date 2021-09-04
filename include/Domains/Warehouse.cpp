@@ -358,7 +358,7 @@ void Warehouse::initialise_wh_agents(){
 			eIDs.push_back(j);
 		whAgents.push_back(new iAgent{0, eIDs});// only one centralised agent controlling all traffic
 	}else if(agent_type == agent_def::link){
-		std::vector<vertex_t> v = whGraph->GetVertices();
+		//std::vector<vertex_t> v = whGraph->GetVertices();
 		std::vector<const Edge *> e = whGraph->GetEdges();
 		for (size_t i = 0; i < e.size(); i++){
 			std::vector<size_t> vIDs;

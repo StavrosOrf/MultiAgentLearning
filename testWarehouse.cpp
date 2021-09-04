@@ -12,7 +12,9 @@
 #include <unistd.h>
 
 #include "Domains/Warehouse.hpp"
+#ifdef ENABLE_DDPG
 #include "Domains/Warehouse_DDPG.hpp"
+#endif
 #include "Domains/Warehouse_ES_container.hpp"
 // #include "Domains/Warehouse_COMA.hpp"
 
@@ -84,6 +86,9 @@ void warehouse_simulate_ES(YAML::Node configs, [[maybe_unused]] size_t n_threads
 }
 
 void WarehouseSimulationDDPG(YAML::Node configs){
+	#ifndef ENABLE_DDPG
+		assert(0);
+	#else
 	srand(time(NULL)); // increment random seed
 	const int nEps = configs["DDPG"]["epochs"].as<int>();
 	const int runs = configs["DDPG"]["runs"].as<int>();
@@ -126,6 +131,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	}
 	duration = ( std::clock() - startTotalExperiment ) / ((double) CLOCKS_PER_SEC );
 	std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
+	#endif
 }
 
 void WarehouseSimulation(std::string config_file, size_t n_threads){
@@ -145,7 +151,7 @@ void WarehouseSimulation(std::string config_file, size_t n_threads){
 		warehouse_simulate_COMA(configs, n_threads);
 	}else{
 		std::cout << "Error: unknown algo! Exiting.\n";
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 }
 

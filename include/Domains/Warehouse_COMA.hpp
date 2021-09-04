@@ -18,7 +18,7 @@ class Warehouse_COMA : public Warehouse {
 		}
 		~Warehouse_COMA(void);
 
-		virtual epoch_results simulate_epoch_COMA (bool verbose, int epoch = 1);
+		virtual epoch_results simulate_epoch_COMA (bool verbose);
 
 		void InitialiseMATeam(); // create agents for each vertex in graph
 	protected:

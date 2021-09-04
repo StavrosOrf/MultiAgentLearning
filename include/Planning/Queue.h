@@ -22,7 +22,7 @@ class Queue{
 			itsPQ.push(source);
 			//closed.reserve(100);
 		}
-		Queue(){}
+		Queue() = default;
 
 		~Queue(){
 			delete_queue();

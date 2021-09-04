@@ -15,45 +15,60 @@ Warehouse_COMA::~Warehouse_COMA(void){
 }
 
 
-epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
+epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	InitialiseNewEpoch();
-	std::normal_distribution<float> n_process(1, N_proc_std_dev);
-	std::default_random_engine n_generator(time(NULL));
-
-	COMAAgent::ERB.clear();
-
+	epoch_results results;
+	//std::normal_distribution<float> n_process(1, N_proc_std_dev);
+	//std::default_random_engine n_generator(time(NULL));
 	assert(COMAAgent::get_batch_size());
-	for (size_t e = 0; e != COMAAgent::get_batch_size(); e++){
-		std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
-		for (size_t t = 0; t < nSteps; t++){
-			std::vector<float> actions = query_actor_MATeam(cur_state);
-			
-			traverse_one_step(actions);
-			 
-			// Log Perfomance Counters
-			size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
-			for (size_t k = 0; k < whAGVs.size(); k++){
-				totalMove += whAGVs[k]->GetMoveTime();
-				totalEnter += whAGVs[k]->GetEnterTime();
-				totalWait += whAGVs[k]->GetWaitTime();
-				totalSuccess += whAGVs[k]->GetNumCompleted();
-				totalCommand += whAGVs[k]->GetNumCommanded();
-			}
-			if(verbose)
-				std::cout<<"Stats:\n Total Move: "<<totalMove<<"\n Total Enter: "<<totalEnter<<
-					"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
 
-			float reward = totalMove + totalEnter;
+	//COMAAgent::ERB.clear();
 
-			const std::vector<float> old_state = cur_state;
-			const std::vector<float> next_state = get_edge_utilization();
-			
-			COMAAgent::ERB.add_random({old_state, next_state, actions, reward});
+	///SIMULATE step
+	//for (size_t e = 0; e != COMAAgent::get_batch_size(); e++){
+	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
+	std::vector<experience_replay> replay;
+	replay.reserve(nSteps);
+
+	for (size_t t = 0; t < nSteps; t++){
+		std::vector<float> actions = query_actor_MATeam(cur_state);
+		
+		traverse_one_step(actions);
+		 
+		// Log Perfomance Counters
+		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
+		for (size_t k = 0; k < whAGVs.size(); k++){
+			totalMove += whAGVs[k]->GetMoveTime();
+			totalEnter += whAGVs[k]->GetEnterTime();
+			totalWait += whAGVs[k]->GetWaitTime();
+			totalSuccess += whAGVs[k]->GetNumCompleted();
+			totalCommand += whAGVs[k]->GetNumCommanded();
 		}
+		if(verbose)
+			std::cout<<"Stats:\n Total Move+Ender: "<<totalMove+totalEnter<<
+				"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
+		results.update((float) totalSuccess, (float) totalMove, (float) totalEnter, (float) totalWait);
 
+		float reward = totalMove + totalEnter;
+
+		const std::vector<float> next_state = get_edge_utilization();
+
+		replay.push_back({cur_state, next_state, actions, reward});
+		//COMAAgent::ERB.add_random({cur_state, next_state, actions, reward});
 	}
 
+	///TRAIN step
+	//for 
+	{//train Q
 
+	}
+	{//train Mu
+		
+	}
+	
+	return results;
+
+	//}
 
 	
 	/*
@@ -175,7 +190,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose, int epoch){
 		// 			// std::cout <<"n_target_actor: "<<n_target_actor.size()<<std::endl;
 		// 			assert(N_EDGES && n_target_actor.size() == N_EDGES);
 		// 			float y = b.reward + GAMMA *
-		// 				ddpg_maTeam[n]->EvaluateTargetCriticNN_DDPG(b.next_state,n_target_actor)[0];
+		// 				ddpg_input_criticmaTeam[n]->EvaluateTargetCriticNN_DDPG(b.next_state,n_target_actor)[0];
 		// 			//Generate Qvals and Qprime for Q backprop
 		// 			float q = ddpg_maTeam[n]->EvaluateCriticNN_DDPG(b.current_state,b.action)[0];
 		// 			Qvals.push_back(q);
@@ -256,7 +271,7 @@ std::vector<float> Warehouse_COMA::query_actor_MATeam(std::vector<float> states)
  		actions.reserve(N_EDGES);
 
 		for (size_t i = 0; i < maTeam.size(); i++)
-			for (int j = 0; whAgents[i]->eIDs.size(); j++)
+			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)
 				actions[whAgents[i]->eIDs[j]] =
 					maTeam[i]->evaluate_actorNN(states)[j];
 		return actions;

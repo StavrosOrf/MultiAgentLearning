@@ -3,14 +3,11 @@
 const int hiddensize = 256;
 
 COMAAgent::COMAAgent(size_t state_space, size_t action_space)
-	: muNN(state_space, action_space, hiddensize){
+	: muNN(state_space, action_space, hiddensize),
+	optimizerMuNN(muNN.parameters(),0.01),
+	optimizerQNN(qNN.parameters(),0.01) {}
 
-	//TODO
-	//optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
-	//optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
-}
-
-COMAAgent::~COMAAgent(){}
+COMAAgent::~COMAAgent() = default;
 
 void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_space){
 	const int hiddensize = 256;
@@ -28,10 +25,10 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
 }
 
 /************************************************************************************************
- * *Input:a vector [s] of the input state and a vector [a] of input actions			*
- * *Method:Does a foward pass of the associated NN						*
- * *Output:Returns a vector of the final nodes of the NN					*
- * ************************************************************************************************/
+**Input:a vector [s] of the input state and a vector [a] of input actions			*
+**Method:Does a foward pass of the associated NN						*
+**Output:Returns a vector of the final nodes of the NN						*
+*************************************************************************************************/
 std::vector<float> COMAAgent::evaluate_actorNN(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(std::move(s)).unsqueeze(0);
 	t = t.to(torch::kFloat32);

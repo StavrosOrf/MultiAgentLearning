@@ -44,7 +44,7 @@ struct epoch_resultsES{
 	uint totalEnter = 0;
 	uint totalWait = 0;
 	std::vector<std::vector<torch::Tensor>> samples; 
-	void update(uint tD, uint tM, uint tE, uint tW, std::vector<std::vector<torch::Tensor>> s){
+	void update(uint tD, uint tM, uint tE, uint tW, const std::vector<std::vector<torch::Tensor>> &s){
 		totalDeliveries += tD;
 		totalMove += tM;
 		totalEnter += tE;

@@ -1,6 +1,7 @@
 #include "AGV.hpp"
 
-AGV::AGV(vertex_t initV, std::vector<vertex_t> goalVs, Graph * graph){
+AGV::AGV(vertex_t initV, std::vector<vertex_t> goalVs, Graph * graph):
+	agvGoals(goalVs){
 	nextVertex = -1;
 	t2v = 0;
 	origin = initV;
@@ -11,7 +12,7 @@ AGV::AGV(vertex_t initV, std::vector<vertex_t> goalVs, Graph * graph){
 	tEnter = 0;
 	tWait = 0;
 	just_entered_edge = false;
-	agvGoals = goalVs;
+	//agvGoals = goalVs;
 	isReplan = true;
 	agvPlanner = new Search(graph, origin, goal);
 	SetNewGoal();
@@ -75,7 +76,7 @@ void AGV::EnterNewEdge(){
 	isReplan = false;
 }
 
-void AGV::CompareCosts(std::vector<float> c){
+void AGV::CompareCosts(const std::vector<float> &c){
 	if (t2v == 0 && !isReplan) // compare if waiting to change edges and flag is not already set
 		// Compare current graph costs to prior costs used to generate existing plan
 		for (size_t i = 0; i < c.size(); i++)
@@ -88,7 +89,7 @@ void AGV::CompareCosts(std::vector<float> c){
 			}
 }
 
-void AGV::PlanAGV(std::vector<float> c){
+void AGV::PlanAGV(const std::vector<float> &c){
 	size_t nEdges = agvPlanner->GetGraph()->GetNumEdges();
 	std::vector<const Edge *> edges = agvPlanner->GetGraph()->GetEdges();
 

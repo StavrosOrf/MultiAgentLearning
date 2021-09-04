@@ -16,8 +16,8 @@ class AGV{
 		void ResetAGV();
 		void Traverse();
 		void EnterNewEdge();
-		void CompareCosts(std::vector<float>);
-		void PlanAGV(std::vector<float>);
+		void CompareCosts(const std::vector<float>&);
+		void PlanAGV(const std::vector<float>&);
 		vertex_t GetNextVertex(){return nextVertex;}
 		vertex_t get_cur_vertex(){assert(t2v==0); return nextVertex;}
 		Edge * GetCurEdge(){return curEdge;}

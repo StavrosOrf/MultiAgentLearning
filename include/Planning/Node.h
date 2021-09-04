@@ -29,7 +29,7 @@ class Node{
 			itsCost = itsParent->GetCost() + edge->GetCost();
 		}
 
-		~Node(){};
+		~Node() = default;
 		//Node(const Node &) = delete;
 
 		Node * GetParent() const {return itsParent;}

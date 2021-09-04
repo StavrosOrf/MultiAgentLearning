@@ -11,7 +11,7 @@ class Edge{
 	public:
 		Edge(vertex_t v1, vertex_t v2, float cost):
 			itsVertex1(v1), itsVertex2(v2), itsCost(cost), itsLength((size_t)cost) {}
-		~Edge(){}
+		~Edge() = default;
 
 		vertex_t GetVertex1() const {return itsVertex1;}
 		vertex_t GetVertex2() const {return itsVertex2;}

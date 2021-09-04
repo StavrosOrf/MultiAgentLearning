@@ -21,8 +21,7 @@ class Graph{
 			}
 		}
 
-		~Graph(){
-		}
+		~Graph() = default;
 
 		std::vector<vertex_t> GetVertices() const {return itsVertices;}
 		const std::vector<const Edge *> GetEdges() const __attribute__ ((const)){return itsEdges_ref;} 
@@ -36,7 +35,7 @@ class Graph{
 		std::vector<Edge *> GetNeighbours(const Node * n);
 
 		void reset_edge_costs();
-		void set_edge_cost(std::vector<float> new_costs);
+		void set_edge_cost(const std::vector<float>& new_costs);
 
 	private:
 		std::vector<vertex_t> itsVertices;

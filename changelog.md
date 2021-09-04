@@ -233,3 +233,6 @@ trace if Eigen, Threadpool.cpp
 
 ## v 1.00004k
 - More work on agent_type::coma (first half done?)
+
+## v 1.00005k
+- Disabled agent_type::DDPG (-DENABLE_DDPG to re-enable) 

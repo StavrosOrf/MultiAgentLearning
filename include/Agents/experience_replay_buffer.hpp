@@ -50,7 +50,7 @@ class experience_replay_buffer{
  		**Input: A experience_replay [r]								*
  		**Method:Adds [r] to the [replay_buffer], if [replay_buffer] is full it evicts a random tuple	*
  		*************************************************************************************************/
-		void add_random(experience_replay r){
+		void add_random(const experience_replay &r){
 			assert(r.next_state.size() == r.current_state.size());
 		
 			if (replay_buffer.size() < buffer_capacity)

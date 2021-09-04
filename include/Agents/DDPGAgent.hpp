@@ -16,7 +16,7 @@
 #include "nn_modules.hpp"
 #include "Agents/experience_replay.hpp"
 
-#define REPLAY_BUFFER_SIZE 200*100 //1024*1024
+#define REPLAY_BUFFER_SIZE (200*100) //1024*1024
 #define GAMMA 0.99
 #define TAU 0.01
 #define TRAINING_STEP 10

@@ -68,7 +68,7 @@ epoch_resultsES Warehouse_ES::SimulateEpochES(const int epoch, bool verbose){
 	if(verbose)
 		std::cout<<"Stats:\n Total Move: "<<totalMove<<"\n Total Enter: "<<totalEnter<<
 			"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
-	results.update(totalSuccess, totalMove, totalEnter, totalWait, samples);
+	results.update((float) totalSuccess, (float) totalMove, (float) totalEnter, (float) totalWait, samples);
 	assert(totalMove+totalEnter+totalWait == whAGVs.size()*nSteps);
 
 	return results;

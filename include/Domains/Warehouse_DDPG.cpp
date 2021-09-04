@@ -301,12 +301,13 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
  		return actions;
  	}else if (agent_type == agent_def::intersection){
  		std::vector<float> actions(N_EDGES);
-
+		assert(0 && "intersection not implemented");
+		 /*
 		for (size_t i = 0; i < ddpg_maTeam.size(); i++)
 			for (int j = 0; whAgents[i]->eIDs.size(); j++)
 				actions[whAgents[i]->eIDs[j]] =
 					ddpg_maTeam[i]->EvaluateActorNN_DDPG(states)[j];
-
+		*/
 		return actions;
 	}
 	else{
@@ -335,12 +336,14 @@ std::vector<float> Warehouse_DDPG::QueryTargetActorMATeam(std::vector<float> sta
  	}else if (agent_type == agent_def::intersection){
  		std::vector<float> actions;
  		actions.reserve(N_EDGES);
-
+	        assert(0 && "intersection not implemented");
+		/*
 		for (size_t i = 0; i < ddpg_maTeam.size(); i++)
 			for (int j = 0; whAgents[i]->eIDs.size(); j++)
 				actions[whAgents[i]->eIDs[j]] =
 					ddpg_maTeam[i]->EvaluateTargetActorNN_DDPG(states)[j];
-		return actions;
+		*/
+	        return actions;
 	}
 	else{
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;

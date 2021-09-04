@@ -26,8 +26,11 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state
 	DDPGAgent::replay_buffer.reserve(REPLAY_BUFFER_SIZE);
 
 
-	//optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
-	//optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
+	
+	#ifdef ENABLE_DDPG
+	optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
+	optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
+	#endif
 }
 
 DDPGAgent::~DDPGAgent(){

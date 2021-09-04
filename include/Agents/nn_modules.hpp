@@ -20,7 +20,7 @@ struct Net : torch::nn::Module {
 		parameters()[hid_count].set_data((parameters()[hid_count]-0.5)/numHid*2);
 		h_c = hid_count;
 	}
-	torch::Tensor forward(const torch::Tensor input) {
+	torch::Tensor forward(const torch::Tensor &input) {
 		assert(torch::sum(first == parameters()[0]).item<float>() == first.numel());
 		torch::Tensor output_layer,h;
 		// const torch::Tensor r_input = (input-0.5)*2;

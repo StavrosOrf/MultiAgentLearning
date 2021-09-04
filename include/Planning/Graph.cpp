@@ -95,7 +95,7 @@ void Graph::reset_edge_costs(){
 		e.SetCost(e.GetLength());
 }
 
-void Graph::set_edge_cost(std::vector<float> new_costs){
+void Graph::set_edge_cost(const std::vector<float>& new_costs){
 	assert(new_costs.size() == itsEdges.size());
 	for (size_t i = 0; i != itsEdges.size(); i++)
 		itsEdges[i].SetCost(new_costs[i]);
