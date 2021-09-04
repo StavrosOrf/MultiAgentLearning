@@ -16,8 +16,8 @@ Warehouse_COMA::~Warehouse_COMA(void){
 
 
 epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
-	InitialiseNewEpoch();
-	epoch_results results;
+	
+	epoch_results results; // TODO fix
 	//std::normal_distribution<float> n_process(1, N_proc_std_dev);
 	//std::default_random_engine n_generator(time(NULL));
 	assert(COMAAgent::get_batch_size());
@@ -25,37 +25,49 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	//COMAAgent::ERB.clear();
 
 	///SIMULATE step
-	//for (size_t e = 0; e != COMAAgent::get_batch_size(); e++){
-	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
-	std::vector<experience_replay> replay;
+	
+	
+	std::vector<experience_replay> replay; //empty buffer
 	replay.reserve(nSteps);
 
-	for (size_t t = 0; t < nSteps; t++){
-		std::vector<float> actions = query_actor_MATeam(cur_state);
-		
-		traverse_one_step(actions);
-		 
-		// Log Perfomance Counters
-		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
-		for (size_t k = 0; k < whAGVs.size(); k++){
-			totalMove += whAGVs[k]->GetMoveTime();
-			totalEnter += whAGVs[k]->GetEnterTime();
-			totalWait += whAGVs[k]->GetWaitTime();
-			totalSuccess += whAGVs[k]->GetNumCompleted();
-			totalCommand += whAGVs[k]->GetNumCommanded();
+	for (size_t e = 0; e != COMAAgent::get_batch_size(); e++){
+		InitialiseNewEpoch();
+
+		for (size_t t = 0; t < nSteps; t++){
+			std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
+			std::vector<float> actions = query_actor_MATeam(cur_state);
+			
+			traverse_one_step(actions);
+			 
+			// Log Perfomance Counters
+			size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
+			for (size_t k = 0; k < whAGVs.size(); k++){
+				totalMove += whAGVs[k]->GetMoveTime();
+				totalEnter += whAGVs[k]->GetEnterTime();
+				totalWait += whAGVs[k]->GetWaitTime();
+				totalSuccess += whAGVs[k]->GetNumCompleted();
+				totalCommand += whAGVs[k]->GetNumCommanded();
+			}
+			if(verbose)
+				std::cout<<"Stats:\n Total Move+Ender: "<<totalMove+totalEnter<<
+					"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
+			results.update((float) totalSuccess, (float) totalMove, (float) totalEnter, (float) totalWait);
+
+			float reward = totalMove + totalEnter;
+
+			const std::vector<float> next_state = get_edge_utilization();
+
+			replay.push_back({cur_state, next_state, actions, reward});
+			//COMAAgent::ERB.add_random({cur_state, next_state, actions, reward});
 		}
-		if(verbose)
-			std::cout<<"Stats:\n Total Move+Ender: "<<totalMove+totalEnter<<
-				"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
-		results.update((float) totalSuccess, (float) totalMove, (float) totalEnter, (float) totalWait);
-
-		float reward = totalMove + totalEnter;
-
-		const std::vector<float> next_state = get_edge_utilization();
-
-		replay.push_back({cur_state, next_state, actions, reward});
-		//COMAAgent::ERB.add_random({cur_state, next_state, actions, reward});
 	}
+
+	std::vector<float> targets;
+	for (int i = 0; i < count; ++i){
+		targets.push_back(COMAAgent::EvaluateTargetCriticNN_DDPG());
+	}
+	
+
 
 	///TRAIN step
 	//for 

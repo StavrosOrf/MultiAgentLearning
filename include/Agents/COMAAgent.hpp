@@ -30,9 +30,9 @@ class COMAAgent{
 		COMAAgent(size_t state_space, size_t action_space);
 		~COMAAgent();
 
-		static std::vector<float> EvaluateCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a);
-		std::vector<float> evaluate_actorNN(const std::vector<float>& s);
-		static std::vector<float> EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a);
+		static std::vector<float> evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		std::vector<float> evaluate_actor_NN(const std::vector<float>& s);
+		static std::vector<float> evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
 
 		static void init_critic_NNs(size_t global_state_space, size_t global_action_space);
 
