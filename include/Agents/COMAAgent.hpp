@@ -45,10 +45,9 @@ class COMAAgent{
 
 		static void set_batch_size(size_t i){batch_size = i;}
 		static size_t get_batch_size() {return batch_size;}
-
-		inline static experience_replay_buffer ERB = experience_replay_buffer(200*100);
+		
 	protected:
-		inline static CriticNN qNN = CriticNN(0,0,0), qtNN = CriticNN(0,0,0); //TODO thread local
+		inline static CriticNN qNN = CriticNN(1,1,1), qtNN = CriticNN(1,1,1); //TODO thread local
 		ActorNN muNN;
 		inline static size_t batch_size = 0;		
 

@@ -14,7 +14,8 @@ class Warehouse_COMA : public Warehouse {
 	public:
 		Warehouse_COMA(YAML::Node configs) : Warehouse(configs), N_proc_std_dev(0){
 			N_proc_std_dev = configs["COMA"]["rand_proc_std_dev"].as<float>();
-			//DDPGAgent::set_batch_size(configs["DDPG"]["batch_size"].as<uint>());
+
+			COMAAgent::set_batch_size(configs["COMA"]["batch_size"].as<uint>());
 		}
 		~Warehouse_COMA(void);
 

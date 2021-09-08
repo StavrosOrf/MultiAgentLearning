@@ -10,8 +10,7 @@ Warehouse_COMA::~Warehouse_COMA(void){
 	for (size_t i = 0; i < whAgents.size(); i++){
 		delete whAgents[i];
 		whAgents[i] = 0;
-	}
-	COMAAgent::ERB.clear();
+	}	
 }
 
 
@@ -20,15 +19,14 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	epoch_results results; // TODO fix
 	//std::normal_distribution<float> n_process(1, N_proc_std_dev);
 	//std::default_random_engine n_generator(time(NULL));
-	assert(COMAAgent::get_batch_size());
-
+	assert(COMAAgent::get_batch_size());	
 	//COMAAgent::ERB.clear();
 
 	///SIMULATE step
 	
 	
 	std::vector<experience_replay> replay; //empty buffer
-	replay.reserve(nSteps);
+	replay.reserve(nSteps*COMAAgent::get_batch_size());
 
 	for (size_t e = 0; e != COMAAgent::get_batch_size(); e++){
 		InitialiseNewEpoch();
@@ -62,9 +60,35 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 		}
 	}
 
-	std::vector<float> targets;
-	for (int i = 0; i < count; ++i){
-		targets.push_back(COMAAgent::EvaluateTargetCriticNN_DDPG());
+	// std::vector<float [][]> targets;
+	float targets[COMAAgent::get_batch_size()][nSteps][maTeam.size()];
+	// Critic's Input: For every agent prepare this as batch_size x nSteps x (State,Action)
+	float q_input[COMAAgent::get_batch_size()][nSteps];
+
+	std::vector<float> q_input_states;
+	q_input_states.reserve(COMAAgent::get_batch_size()*nSteps); 
+	std::vector<float> q_input_actions;
+	q_input_actions.reserve(COMAAgent::get_batch_size()*nSteps);
+
+	// float temp[COMAAgent::get_batch_size()][nSteps];
+	std::vector<float> temp;
+
+	for (int i = 0; i < maTeam.size(); ++i){
+		for (int b = 0; b < COMAAgent::get_batch_size(); ++b){
+			for (int t = 0; t < nSteps; ++t){
+				// q_input[b][t][0] = replay[b*nSteps + t].action[i];
+				q_input_actions[b*nSteps + t] = replay[b*nSteps + t].action[i];
+				// q_input[b][t][1] = replay[b*nSteps + t].current_state[i];		
+				q_input_states[b*nSteps + t]= replay[b*nSteps + t].current_state[i];				
+			}
+		}
+
+		temp = COMAAgent::evaluate_target_critic_NN(q_input_states,q_input_actions);
+		for (int b = 0; b < COMAAgent::get_batch_size(); ++b){
+			for (int t = 0; t < nSteps; ++t){
+				targets[b][t][i] = temp[b*nSteps + t]; //Targets y_t for each agent
+			}
+		}
 	}
 	
 
@@ -263,7 +287,7 @@ std::vector<float> Warehouse_COMA::query_actor_MATeam(std::vector<float> states)
  	assert(states.size() == N_EDGES*(1 + incorporates_time));
  	if(agent_type == agent_def::centralized){
 		assert(0);
- 		return maTeam[0]->evaluate_actorNN(states);
+ 		return maTeam[0]->evaluate_actor_NN(states);
 	}
  	else if (agent_type == agent_def::link){
  		std::vector<float> actions;
@@ -271,9 +295,9 @@ std::vector<float> Warehouse_COMA::query_actor_MATeam(std::vector<float> states)
 
  		for (size_t i = 0; i < maTeam.size(); i++)
  			if(incorporates_time)
- 				actions.push_back(maTeam[i]->evaluate_actorNN({states[i], states[i+N_EDGES]})[0]);
+ 				actions.push_back(maTeam[i]->evaluate_actor_NN({states[i], states[i+N_EDGES]})[0]);
  			else{
- 				float t = (maTeam[i]->evaluate_actorNN({states[i]}))[0];
+ 				float t = (maTeam[i]->evaluate_actor_NN({states[i]}))[0];
  				actions.push_back(t);
  			}
  		return actions;
@@ -285,7 +309,7 @@ std::vector<float> Warehouse_COMA::query_actor_MATeam(std::vector<float> states)
 		for (size_t i = 0; i < maTeam.size(); i++)
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)
 				actions[whAgents[i]->eIDs[j]] =
-					maTeam[i]->evaluate_actorNN(states)[j];
+					maTeam[i]->evaluate_actor_NN(states)[j];
 		return actions;
 	}
 	else{
