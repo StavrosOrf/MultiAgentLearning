@@ -104,7 +104,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
 
  		for (size_t i = 0; i < maTeam.size(); i++)
  			if(incorporates_time)
- 				actions.push_back(maTeam[i]->evaluateNN({&states[i], &states[i+N_EDGES]})[0]);
+ 				actions.push_back(maTeam[i]->evaluateNN({states[i], states[i+N_EDGES]})[0]);
  			else{
  				float t = (maTeam[i]->evaluateNN({states[i]}))[0];
  				actions.push_back(t);
