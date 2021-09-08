@@ -29,7 +29,7 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
 **Method:Does a foward pass of the associated NN						*
 **Output:Returns a vector of the final nodes of the NN						*
 *************************************************************************************************/
-std::vector<float> COMAAgent::evaluate_actorNN(const std::vector<float>& s){
+std::vector<float> COMAAgent::evaluate_actor_NN(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(std::move(s)).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
@@ -37,8 +37,8 @@ std::vector<float> COMAAgent::evaluate_actorNN(const std::vector<float>& s){
 	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
-/*
-static std::vector<float> COMAAgent::EvaluateCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
+
+static std::vector<float> COMAAgent::evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -46,7 +46,7 @@ static std::vector<float> COMAAgent::EvaluateCriticNN_DDPG(const std::vector<flo
 	torch::Tensor t = torch::tensor(input).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
-	torch::Tensor t1 = qNN->forward(t);
+	torch::Tensor t1 = qNN.forward(t);
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
@@ -59,7 +59,7 @@ static std::vector<float> COMAAgent::EvaluateCriticNN_DDPG(const std::vector<flo
 // 	return to_return;
 // }
 
-static std::vector<float> COMAAgent::EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
+static std::vector<float> COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -67,11 +67,11 @@ static std::vector<float> COMAAgent::EvaluateTargetCriticNN_DDPG(const std::vect
 	torch::Tensor t = torch::tensor(input).unsqueeze(0);
 	t = t.to(torch::kFloat32);
 
-	torch::Tensor t1 = qtNN->forward(t);
+	torch::Tensor t1 = qtNN.forward(t);
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
-*/
+
 
 
 
