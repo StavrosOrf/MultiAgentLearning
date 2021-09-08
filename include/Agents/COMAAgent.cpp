@@ -34,11 +34,11 @@ std::vector<float> COMAAgent::evaluate_actor_NN(const std::vector<float>& s){
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = muNN.forward(t);
-	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
+	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
 
-static std::vector<float> COMAAgent::evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
+std::vector<float> COMAAgent::evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
@@ -59,7 +59,8 @@ static std::vector<float> COMAAgent::evaluate_critic_NN(const std::vector<float>
 // 	return to_return;
 // }
 
-static std::vector<float> COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
+// static std::vector<float> COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
+std::vector<float> COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
