@@ -49,7 +49,7 @@ Warehouse::~Warehouse(void){
 	}
 }
 
-void Warehouse::InitialiseGraph(std::string v_str, std::string e_str, std::string c_str, YAML::Node configs, bool verbose){
+void Warehouse::InitialiseGraph(const std::string &v_str, const std::string &e_str, const std::string &c_str, const YAML::Node &configs, bool verbose){
 	std::vector<vertex_t> vertices;
 	std::vector<std::vector<vertex_t>> edges;
 	std::vector< float > costs;
@@ -186,7 +186,7 @@ void Warehouse::InitialiseNewEpoch(){
  **Input:a vector of [costs]									*
  **Method:Sets the Cost of the graph Edges to the values provides by [costs]			*
  *************************************************************************************************/
-void Warehouse::UpdateGraphCosts(std::vector<float> costs){
+void Warehouse::UpdateGraphCosts(const std::vector<float> &costs){
 	whGraph->set_edge_cost(costs);
 }
 
@@ -270,7 +270,7 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool no
 **Input:[cost_add] a vector containing aditional planing costs indexed by EdgedIDs		*
 **Method:Replans the AGVs using Methos of the {Graph} class					*
 *************************************************************************************************/
-void Warehouse::replan_AGVs(std::vector<float> cost_add){
+void Warehouse::replan_AGVs(const std::vector<float> &cost_add){
 	// Replan AGVs as necessary
 	for (size_t k = 0; k < whAGVs.size(); k++){
 		whAGVs[k]->CompareCosts(cost_add); // set replanning flags
@@ -341,7 +341,7 @@ void Warehouse::transition_AGVs(bool verbose){
  * *Input:A vector containing the [final_costs] of the edges					*
  * *Method:Executes all the required steps to plan and traverse the AGVs on the warehouse	*
  * ************************************************************************************************/
-void Warehouse::traverse_one_step(std::vector<float> final_costs){
+void Warehouse::traverse_one_step(const std::vector<float>& final_costs){
 	UpdateGraphCosts(final_costs);
 	replan_AGVs(final_costs);
 	transition_AGVs();

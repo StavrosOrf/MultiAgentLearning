@@ -70,9 +70,9 @@ class Warehouse{
 		void printAgvPaths();
 
 	protected:
-		void replan_AGVs(const std::vector<float> final_cost);
+		void replan_AGVs(const std::vector<float> &final_cost);
 		void transition_AGVs(bool verbose = false);
-		void traverse_one_step(const std::vector<float> final_cost);
+		void traverse_one_step(const std::vector<float> &final_cost);
 		void GetJointState(std::vector<size_t> &s);//__attribute__((deprecated))
 		void print_warehouse_state();
 		std::vector<float> get_edge_utilization() __attribute__ ((pure));
@@ -99,11 +99,11 @@ class Warehouse{
 		Graph * whGraph; // vertex and edge definitions, access to change edge costs at each step
 		std::vector<AGV *> whAGVs; // manage AGV A* search and movement through graph
 
-		inline void InitialiseGraph(std::string, std::string, std::string, YAML::Node, bool verbose = false); // read in configuration files and construct Graph
+		inline void InitialiseGraph(const std::string&, const std::string&, const std::string&, const YAML::Node&, bool verbose = false); // read in configuration files and construct Graph
 		inline void InitialiseAGVs(YAML::Node, bool verbose = false); // create AGVs to move in graph
 		void InitialiseNewEpoch(); // reset simulation for each episode/epoch
 
-		void UpdateGraphCosts(std::vector<float>);
+		void UpdateGraphCosts(const std::vector<float> &);
 
 		bool incorporates_time; //True means that the domain incorpated time to it's state
 		//as described in github.io/anthropomorphic/Papers/Chung2018multiagent.pdf

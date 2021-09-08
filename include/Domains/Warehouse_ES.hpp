@@ -21,10 +21,10 @@ class Warehouse_ES : public Warehouse {
 		epoch_resultsES SimulateEpochES (const int epoch = 1, bool verbose = false);
 
 		void InitialiseMATeam(); // create agents for each vertex in graph
-		std::vector<float> QueryActorMATeam(std::vector<float> states);
+		std::vector<float> QueryActorMATeam(const std::vector<float> &states);
 		void initialiseNNWeights(std::vector<esNN> v);
 
-		void set_team_NNs(std::vector<esNN*> teamNNs);
+		void set_team_NNs(const std::vector<esNN*> &teamNNs);
 
 		std::vector<esNN*> produce_random_team_NNs();
 	protected:

@@ -94,7 +94,7 @@ void Warehouse_ES::InitialiseMATeam(){
 }
 
 // Template this
-std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
+std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &states){
  	assert(states.size() == N_EDGES*(1 + incorporates_time));
  	if(agent_type == agent_def::centralized)
  		return maTeam[0]->evaluateNN(states);
@@ -104,7 +104,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
 
  		for (size_t i = 0; i < maTeam.size(); i++)
  			if(incorporates_time)
- 				actions.push_back(maTeam[i]->evaluateNN({states[i], states[i+N_EDGES]})[0]);
+ 				actions.push_back(maTeam[i]->evaluateNN({&states[i], &states[i+N_EDGES]})[0]);
  			else{
  				float t = (maTeam[i]->evaluateNN({states[i]}))[0];
  				actions.push_back(t);
@@ -124,11 +124,11 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
 				state_i.reserve(whAgents[i]->eIDs.size());			
 
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)							
-				state_i.push_back(states[whAgents[i]->eIDs[j]]);			
+				state_i.push_back(states[whAgents[i]->eIDs[j]]);
 			
 			if(incorporates_time)
 				for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)								
-					state_i.push_back(states[whAgents[i]->eIDs[j] + states.size()/2]);			
+					state_i.push_back(states[whAgents[i]->eIDs[j] + states.size()/2]);
 						
 			std::vector<float> actions_i = maTeam[i]->evaluateNN(state_i);			
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)
@@ -144,7 +144,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(std::vector<float> states){
 	} 
 }
 
-void Warehouse_ES::set_team_NNs(std::vector<esNN*> teamNNs){
+void Warehouse_ES::set_team_NNs(const std::vector<esNN*> &teamNNs){
 	for (size_t i = 0; i < maTeam.size(); i++)	
 		maTeam[i]->setNN(teamNNs[i]);
 }
