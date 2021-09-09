@@ -47,8 +47,8 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 				totalCommand += whAGVs[k]->GetNumCommanded();
 			}
 			if(verbose)
-				std::cout<<"Stats:\n Total Move+Ender: "<<totalMove+totalEnter<<
-					"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
+				// std::cout<<"Stats:\n Total Move+Enter: "<<totalMove+totalEnter<<
+				// 	"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
 			results.update((float) totalSuccess, (float) totalMove, (float) totalEnter, (float) totalWait);
 
 			float reward = totalMove + totalEnter;
@@ -59,37 +59,69 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 			//COMAAgent::ERB.add_random({cur_state, next_state, actions, reward});
 		}
 	}
-
+	std::cout<<"Start Training"<<std::endl;
+	// std::cout<<COMAAgent::get_batch_size()<<std::endl;
 	// std::vector<float [][]> targets;
 	float targets[COMAAgent::get_batch_size()][nSteps][maTeam.size()];
 	// Critic's Input: For every agent prepare this as batch_size x nSteps x (State,Action)
 	float q_input[COMAAgent::get_batch_size()][nSteps];
 
 	std::vector<float> q_input_states;
-	q_input_states.reserve(COMAAgent::get_batch_size()*nSteps); 
 	std::vector<float> q_input_actions;
-	q_input_actions.reserve(COMAAgent::get_batch_size()*nSteps);
+	std::vector<float> rewardsV;
 
-	// float temp[COMAAgent::get_batch_size()][nSteps];
-	std::vector<float> temp;
+	// std::cout<<nSteps<<std::endl;	
+	for (size_t i = 0; i < maTeam.size(); ++i){
+		
+		q_input_states.clear();
+		q_input_actions.clear();
+		rewardsV.clear();
+		q_input_states.reserve(COMAAgent::get_batch_size()*nSteps);
+		q_input_actions.reserve(COMAAgent::get_batch_size()*nSteps);
+		rewardsV.reserve(COMAAgent::get_batch_size()*nSteps);		
 
-	for (int i = 0; i < maTeam.size(); ++i){
-		for (int b = 0; b < COMAAgent::get_batch_size(); ++b){
-			for (int t = 0; t < nSteps; ++t){
+		for (size_t b = 0; b < COMAAgent::get_batch_size(); ++b){
+			for (size_t t = 0; t < nSteps; ++t){
 				// q_input[b][t][0] = replay[b*nSteps + t].action[i];
-				q_input_actions[b*nSteps + t] = replay[b*nSteps + t].action[i];
-				// q_input[b][t][1] = replay[b*nSteps + t].current_state[i];		
-				q_input_states[b*nSteps + t]= replay[b*nSteps + t].current_state[i];				
+				q_input_actions.push_back(replay[b*nSteps + t].action[i]);
+				// q_input[b][t][1] = replay[b*nSteps + t].current_state[i];
+				q_input_states.push_back(replay[b*nSteps + t].current_state[i]);
+				// std::cout<<replay[b*nSteps + t].current_state[i]<<std::endl;
+				rewardsV.push_back(replay[b*nSteps + t].reward);
 			}
 		}
 
-		temp = COMAAgent::evaluate_target_critic_NN(q_input_states,q_input_actions);
-		for (int b = 0; b < COMAAgent::get_batch_size(); ++b){
-			for (int t = 0; t < nSteps; ++t){
-				targets[b][t][i] = temp[b*nSteps + t]; //Targets y_t for each agent
-			}
-		}
+		//Train Critic 
+		torch::Tensor Q_targets = COMAAgent::evaluate_target_critic_NN(q_input_states,q_input_actions).squeeze(1);
+		torch::Tensor Q = COMAAgent::evaluate_critic_NN(q_input_states,q_input_actions).squeeze(1);
+
+		torch::Tensor rewards = torch::tensor(rewardsV);//.unsqueeze(0);
+		//std::cout<<rewards<<std::endl;
+		//std::cout << Q_targets << std::endl;
+		Q_targets = Q_targets+rewards;
+
+		torch::Tensor dQ = Q_targets - Q;
+		torch::Tensor critic_loss = torch::mean(torch::pow(dQ,2));
+		// std::cout<<critic_loss<<std::endl;
+
+
+		COMAAgent::optimizerQNN.zero_grad();
+		critic_loss.backward();
+		COMAAgent::optimizerQNN.step();
+
+
+		
+
+		// for (int b = 0; b < COMAAgent::get_batch_size(); ++b){
+		// 	for (int t = 0; t < nSteps; ++t){
+		// 		targets[b][t][i] = temp[b*nSteps + t]; //Targets y_t for each agent
+		// 	}
+		// }
+		
 	}
+
+	// if( COMA_consts::C )
+	COMAAgent::updateTargetWeights(); // Reset Target Critic In EVERY epoch(might change)
 	
 
 

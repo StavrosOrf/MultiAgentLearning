@@ -30,21 +30,24 @@ class COMAAgent{
 		COMAAgent(size_t state_space, size_t action_space);
 		~COMAAgent();
 
-		static std::vector<float> evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		static torch::Tensor evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
 		std::vector<float> evaluate_actor_NN(const std::vector<float>& s);
-		static std::vector<float> evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		static torch::Tensor evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
 
 		static void init_critic_NNs(size_t global_state_space, size_t global_action_space);
-
+		static void updateTargetWeights();
 		// void updateTargetWeights();
 		// void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime,bool verbose);
 		// void updateMuActor(const std::vector<std::vector<float>> states, bool verbose);
 		// void updateMuActorLink(std::vector<std::vector<float>> states,std::vector<std::vector<float>> all_actions,int agentNumber,bool withTime);
 
 		[[maybe_unused]] void printAboutNN();
-
+		// static train_Critic(torch::Tensor critic_loss);
 		static void set_batch_size(size_t i){batch_size = i;}
 		static size_t get_batch_size() {return batch_size;}
+
+		inline static Net temp = Net(1, 1, 1*2);//Fix this
+		inline static torch::optim::Adam optimizerQNN = torch::optim::Adam(temp.parameters(),0.001);
 		
 	protected:
 		inline static CriticNN qNN = CriticNN(1,1,1), qtNN = CriticNN(1,1,1); //TODO thread local
@@ -53,6 +56,6 @@ class COMAAgent{
 
 		// We need a global optimizer, not a new one in each step!!!!!!!!
 		torch::optim::Adam optimizerMuNN;// = torch::optim::Adam(temp.parameters(),0.0001);
-		torch::optim::Adam optimizerQNN;// = torch::optim::Adam(temp.parameters(),0.001);
+		
 };
 

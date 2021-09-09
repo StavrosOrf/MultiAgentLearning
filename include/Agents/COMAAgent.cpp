@@ -4,17 +4,18 @@ const int hiddensize = 256;
 
 COMAAgent::COMAAgent(size_t state_space, size_t action_space)
 	: muNN(state_space, action_space, hiddensize),
-	optimizerMuNN(muNN.parameters(),0.01),
-	optimizerQNN(qNN.parameters(),0.01) {}
+	optimizerMuNN(muNN.parameters(),0.01)
+	// optimizerQNN(qNN.parameters(),0.01)
+	{}
 
 COMAAgent::~COMAAgent() = default;
 
 void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_space){
 	const int hiddensize = 256;
 
-	COMAAgent::qNN = CriticNN(global_state_space+global_action_space, 1, hiddensize);
-	COMAAgent::qtNN = CriticNN(global_state_space+global_action_space, 1, hiddensize);
-
+	COMAAgent::qNN = CriticNN(1+1, 1, hiddensize);
+	COMAAgent::qtNN = CriticNN(1+1, 1, hiddensize);
+	torch::optim::Adam optimizerQNN(qNN.parameters(),0.01);
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN.parameters().size(); i++)
 		qtNN.parameters()[i].set_data(qNN.parameters()[i].detach().clone());
@@ -31,25 +32,32 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
 *************************************************************************************************/
 std::vector<float> COMAAgent::evaluate_actor_NN(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(std::move(s)).unsqueeze(0);
+	// std::cout<<t<<std::endl;
 	t = t.to(torch::kFloat32);
 
-	torch::Tensor t1 = muNN.forward(t);
+	torch::Tensor t1 = muNN.forward(t);	
 	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return to_return;
 }
 
-std::vector<float> COMAAgent::evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
+torch::Tensor COMAAgent::evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
 
 	torch::Tensor t = torch::tensor(input).unsqueeze(0);
+	t = torch::reshape(t,{2,input.size()/2});
+	t = torch::transpose(t,0,1);
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = qNN.forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
-	return to_return;
+	// std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	return t1;
 }
+
+
+
+
 // std::vector<float> DDPGAgent::EvaluateTargetActorNN_DDPG(const std::vector<float>& s){
 // 	torch::Tensor t = torch::tensor(s).unsqueeze(0);
 // 	t = t.to(torch::kFloat32);
@@ -60,18 +68,41 @@ std::vector<float> COMAAgent::evaluate_critic_NN(const std::vector<float>& s, co
 // }
 
 // static std::vector<float> COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
-std::vector<float> COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
+torch::Tensor COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a){
 	std::vector<float> input;
+	// for (int i = 0; i < s.size(); ++i)
+	// {
+	// 	std::cout<<s[i]<<" "<<std::endl;
+	// }
+	// std::cout<<s<<std::endl;
+	// std::cout<<a<<std::endl;
+
 	input.insert(input.begin(),s.begin(),s.end());
 	input.insert(input.end(),a.begin(),a.end());
 
+
+	// std::cout<<input<<std::endl;
 	torch::Tensor t = torch::tensor(input).unsqueeze(0);
+	t = torch::reshape(t,{2,input.size()/2});
+	t = torch::transpose(t,0,1);
+	// std::cout<<t<<std::endl;
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = qtNN.forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
-	return to_return;
+	// std::cout<<t1<<std::endl;
+	// std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	return t1;
 }
+
+void COMAAgent::updateTargetWeights(){
+	for (size_t i = 0; i < qNN.parameters().size(); i++ ){
+		torch::Tensor t = qNN.parameters()[i].detach().clone();
+		// torch::Tensor tt = qtNN.parameters()[i].detach().clone();
+		qtNN.parameters()[i].set_data(t);
+	}
+}
+
+
 
 
 
@@ -80,23 +111,7 @@ std::vector<float> COMAAgent::evaluate_target_critic_NN(const std::vector<float>
  * *Method:updates the network parameters (aka network transition weights) of target networks	*
  * *	by slow updating (with learning rate [TAU]) from non-targer networks			*
 //  * ************************************************************************************************/
-// void DDPGAgent::updateTargetWeights(){
-// 	for (size_t i = 0; i < qNN->parameters().size(); i++ ){
-// 		torch::Tensor t = qNN->parameters()[i].detach().clone();
-// 		torch::Tensor tt = qtNN->parameters()[i].detach().clone();
 
-// 		qtNN->parameters()[i].set_data(TAU*t + (1-TAU)*tt);
-// 	}
-// 	for (size_t i = 0; i < muNN->parameters().size(); i++ ){
-// 		torch::Tensor t = muNN->parameters()[i].detach().clone();
-// 		torch::Tensor tt = mutNN->parameters()[i].detach().clone();
-
-// 		mutNN->parameters()[i].set_data(TAU*t + (1-TAU)*tt);
-// 	}
-
-// 	// std::cout<<torch::all(qtNN->parameters()[0].eq(qNN->parameters()[0]))<<std::endl;
-// 	// std::cout<<torch::all(mutNN->parameters()[0].eq(muNN->parameters()[0]))<<std::endl;
-// }
 // void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprime,bool verbose){
 // 	//TODO try other optimizers too(etc SGD)
 // 	// torch::optim::Adam optimizerQNN(qNN->parameters(),0.01);
