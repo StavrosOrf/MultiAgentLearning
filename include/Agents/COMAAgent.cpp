@@ -15,7 +15,7 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
 
 	COMAAgent::qNN = CriticNN(1+1, 1, hiddensize);
 	COMAAgent::qtNN = CriticNN(1+1, 1, hiddensize);
-	torch::optim::Adam optimizerQNN(qNN.parameters(),0.01);
+	torch::optim::Adam optimizerQNN(qNN.parameters(),0.001);
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN.parameters().size(); i++)
 		qtNN.parameters()[i].set_data(qNN.parameters()[i].detach().clone());

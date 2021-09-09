@@ -46,17 +46,18 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 				totalSuccess += whAGVs[k]->GetNumCompleted();
 				totalCommand += whAGVs[k]->GetNumCommanded();
 			}
-			if(verbose)
+			for (size_t i = 0; i < whAGVs.size(); i++)// Reset all AGVs
+				whAGVs[i]->ResetPerformanceCounters();
+			// if(verbose)
 				// std::cout<<"Stats:\n Total Move+Enter: "<<totalMove+totalEnter<<
-				// 	"\n Total wait: "<<totalWait<< "\n Total Success: "<<totalSuccess<<std::endl;
-			results.update((float) totalSuccess, (float) totalMove, (float) totalEnter, (float) totalWait);
+				// 	"Total wait: "<<totalWait<< " Total Success: "<<totalSuccess<<std::endl;
+			results.update((float) totalSuccess/COMAAgent::get_batch_size(), (float) totalMove/COMAAgent::get_batch_size(), (float) totalEnter/COMAAgent::get_batch_size(), (float) totalWait/COMAAgent::get_batch_size());
 
 			float reward = totalMove + totalEnter;
-
+			// std::cout<<reward<<std::endl;
 			const std::vector<float> next_state = get_edge_utilization();
 
-			replay.push_back({cur_state, next_state, actions, reward});
-			//COMAAgent::ERB.add_random({cur_state, next_state, actions, reward});
+			replay.push_back({cur_state, next_state, actions, reward});			
 		}
 	}
 	std::cout<<"Start Training"<<std::endl;
