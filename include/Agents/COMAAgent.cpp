@@ -14,7 +14,7 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
 
 	COMAAgent::qNN = CriticNN(1+1, 1, hiddensize);
 	COMAAgent::qtNN = CriticNN(1+1, 1, hiddensize);
-	//optimizerQNN(qNN.parameters(), COMA_consts::tau_q);
+	optimizerQNN = std::make_unique<torch::optim::Adam>(qNN.parameters(), COMA_consts::tau_q);
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN.parameters().size(); i++)
 		qtNN.parameters()[i].set_data(qNN.parameters()[i].detach().clone());
@@ -35,7 +35,7 @@ std::vector<float> COMAAgent::evaluate_actor_NN(const std::vector<float>& s){
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = muNN.forward(t);	
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 
@@ -45,7 +45,7 @@ torch::Tensor COMAAgent::evaluate_critic_NN(const std::vector<float>& s, const s
 	input.insert(input.end(),a.begin(),a.end());
 
 	torch::Tensor t = torch::tensor(input).unsqueeze(0);
-	t = torch::reshape(t,{2,input.size()/2});
+	t = torch::reshape(t,{2, static_cast<int>(input.size()/2)});
 	t = torch::transpose(t,0,1);
 	t = t.to(torch::kFloat32);
 
@@ -82,7 +82,7 @@ torch::Tensor COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, 
 
 	// std::cout<<input<<std::endl;
 	torch::Tensor t = torch::tensor(input).unsqueeze(0);
-	t = torch::reshape(t,{2,input.size()/2});
+	t = torch::reshape(t,{2, static_cast<int>(input.size()/2)});
 	t = torch::transpose(t,0,1);
 	// std::cout<<t<<std::endl;
 	t = t.to(torch::kFloat32);

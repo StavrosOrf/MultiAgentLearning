@@ -48,7 +48,7 @@ class COMAAgent{
 		[[nodiscard]] static size_t get_batch_size() {return batch_size;}
 
 		inline static Net temp = Net(1, 1, 1*2);//Fix this
-		inline static torch::optim::Adam optimizerQNN = torch::optim::Adam(temp.parameters(),0.001);
+		inline static std::unique_ptr<torch::optim::Adam> optimizerQNN;// = torch::optim::Adam(temp.parameters(),0.001);
 	protected:
 		inline static CriticNN qNN = CriticNN(1,1,1), qtNN = CriticNN(1,1,1); //TODO thread local
 		ActorNN muNN;
