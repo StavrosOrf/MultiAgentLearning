@@ -48,7 +48,7 @@ torch::Tensor COMAAgent::evaluate_critic_NN(const std::vector<float>& s, const s
 	t = torch::reshape(t,{2,input.size()/2});
 	t = torch::transpose(t,0,1);
 	t = t.to(torch::kFloat32);
-
+	// std::cout<<t<<std::endl;
 	torch::Tensor t1 = qNN.forward(t);
 	// std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
 	return t1;
