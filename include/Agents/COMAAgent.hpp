@@ -22,7 +22,8 @@ namespace COMA_consts{
 	//note: make sure tau mu is updated sufficenlty slower than tau_q
 	const float tau_mu = 0.005; //Actor Learning Rate
 	const float tau_q = 0.01; // Critic Learning Rate
-	const float C = 10; // reset q_t every C steps
+	const size_t C = 10; // reset q_t every C steps
+	const size_t actor_samples = 1024;
 }
 
 class COMAAgent{
@@ -30,12 +31,12 @@ class COMAAgent{
 		COMAAgent(size_t state_space, size_t action_space);
 		~COMAAgent();
 
-		static torch::Tensor evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
-		std::vector<float> evaluate_actor_NN(const std::vector<float>& s);
-		static torch::Tensor evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		[[nodiscard]] static torch::Tensor evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		[[nodiscard]] std::vector<float> evaluate_actor_NN(const std::vector<float>& s);
+		[[nodiscard]] static torch::Tensor evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
 
 		static void init_critic_NNs(size_t global_state_space, size_t global_action_space);
-		static void updateTargetWeights();
+		static void reset_target_critic();
 		// void updateTargetWeights();
 		// void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime,bool verbose);
 		// void updateMuActor(const std::vector<std::vector<float>> states, bool verbose);
@@ -44,11 +45,10 @@ class COMAAgent{
 		[[maybe_unused]] void printAboutNN();
 		// static train_Critic(torch::Tensor critic_loss);
 		static void set_batch_size(size_t i){batch_size = i;}
-		static size_t get_batch_size() {return batch_size;}
+		[[nodiscard]] static size_t get_batch_size() {return batch_size;}
 
 		inline static Net temp = Net(1, 1, 1*2);//Fix this
 		inline static torch::optim::Adam optimizerQNN = torch::optim::Adam(temp.parameters(),0.001);
-		
 	protected:
 		inline static CriticNN qNN = CriticNN(1,1,1), qtNN = CriticNN(1,1,1); //TODO thread local
 		ActorNN muNN;
@@ -56,6 +56,6 @@ class COMAAgent{
 
 		// We need a global optimizer, not a new one in each step!!!!!!!!
 		torch::optim::Adam optimizerMuNN;// = torch::optim::Adam(temp.parameters(),0.0001);
-		
+		//TODO INIT Q opti
 };
 

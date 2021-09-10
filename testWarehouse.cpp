@@ -65,18 +65,17 @@ void warehouse_simulate_COMA(YAML::Node configs, [[maybe_unused]] size_t n_threa
 	eval_file.close();
 	duration = ( std::clock() - startTotalExperiment ) / ((double) CLOCKS_PER_SEC );
 	std::cout<<"Total time elapsed for Experiment:( "<<duration<<" sec)"<<std::endl;
-
 }
 
 void warehouse_simulate_ES(YAML::Node configs, [[maybe_unused]] size_t n_threads){
-	const int runs = configs["ES"]["runs"].as<int>();
+	const size_t runs = configs["ES"]["runs"].as<size_t>();
 	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
 	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
 	const std::string agentType = configs["domain"]["agents"].as<std::string>();
 	const std::string resFolder = create_results_folder(configs);
 
 	std::ofstream eval_file(resFolder + warehouse_type + '_' + "ES" + '_' + agentType + ".csv");
-	for (int i = 0; i != runs; i++){
+	for (size_t i = 0; i != runs; i++){
 		assert(eval_file.is_open());
 
 		eval_file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
@@ -134,7 +133,7 @@ void WarehouseSimulationDDPG(YAML::Node configs){
 	#endif
 }
 
-void WarehouseSimulation(std::string config_file, size_t n_threads){
+void WarehouseSimulation(const std::string &config_file, size_t n_threads){
 	std::cout << "Reading configuration file: " << config_file << "\n";
 
 	YAML::Node configs = YAML::LoadFile(config_file);
@@ -170,7 +169,7 @@ std::string create_results_folder(YAML::Node configs){
 	return resFolder;
 }
 
-static void show_usage(std::string name){
+static void show_usage(const std::string &name){
 	std::cerr << "Usage: " << name << " -c CONFIG_FILE <options>\n"
 		<< "options:\n"
 		<< "\t-h, --help\t\t\tShow this help message\n"

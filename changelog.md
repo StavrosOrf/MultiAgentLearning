@@ -236,3 +236,9 @@ trace if Eigen, Threadpool.cpp
 
 ## v 1.00005k
 - Disabled agent_type::DDPG (-DENABLE_DDPG to re-enable) 
+- 
+## v 1.00006s
+- Implemanted agent_type::COMA Critic learning (still need actor learning)
+- 
+## v 1.00007k
+- clean up agent_type::COMA

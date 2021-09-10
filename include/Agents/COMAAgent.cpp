@@ -4,8 +4,7 @@ const int hiddensize = 256;
 
 COMAAgent::COMAAgent(size_t state_space, size_t action_space)
 	: muNN(state_space, action_space, hiddensize),
-	optimizerMuNN(muNN.parameters(),0.01)
-	// optimizerQNN(qNN.parameters(),0.01)
+	optimizerMuNN(muNN.parameters(), COMA_consts::tau_mu)
 	{}
 
 COMAAgent::~COMAAgent() = default;
@@ -15,12 +14,12 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
 
 	COMAAgent::qNN = CriticNN(1+1, 1, hiddensize);
 	COMAAgent::qtNN = CriticNN(1+1, 1, hiddensize);
-	torch::optim::Adam optimizerQNN(qNN.parameters(),0.001);
+	//optimizerQNN(qNN.parameters(), COMA_consts::tau_q);
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN.parameters().size(); i++)
 		qtNN.parameters()[i].set_data(qNN.parameters()[i].detach().clone());
 
-	//assert that copy was successfull
+	//assert that copy was successful
 	for (size_t i = 0; i < qNN.parameters().size(); i++ )
 		assert(torch::sum(qNN.parameters()[i] == qtNN.parameters()[i]).item<float>() == qNN.parameters()[i].numel());
 }
@@ -94,7 +93,7 @@ torch::Tensor COMAAgent::evaluate_target_critic_NN(const std::vector<float>& s, 
 	return t1;
 }
 
-void COMAAgent::updateTargetWeights(){
+void COMAAgent::reset_target_critic(){
 	for (size_t i = 0; i < qNN.parameters().size(); i++ ){
 		torch::Tensor t = qNN.parameters()[i].detach().clone();
 		// torch::Tensor tt = qtNN.parameters()[i].detach().clone();
