@@ -33,7 +33,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 
 			traverse_one_step(actions);
 			 
-			// Log Perfomance Counters
+			// Log Performance Counters
 			size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
 			for (size_t k = 0; k < whAGVs.size(); k++){
 				totalMove += whAGVs[k]->GetMoveTime();
@@ -44,7 +44,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 			}
 			for (size_t i = 0; i < whAGVs.size(); i++)// Reset all AGVs
 				whAGVs[i]->ResetPerformanceCounters();
-			if(verbose)
+			//if(verbose)
 				// std::cout<<"Stats:\n Total Move+Enter: "<<totalMove+totalEnter<<
 				// 	"Total wait: "<<totalWait<< " Total Success: "<<totalSuccess<<std::endl;
 			results.update((float) totalSuccess/COMAAgent::get_batch_size(), (float) totalMove/COMAAgent::get_batch_size(), (float) totalEnter/COMAAgent::get_batch_size(), (float) totalWait/COMAAgent::get_batch_size());
@@ -100,7 +100,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	
 	//TODO try sampling from history
 	std::vector<float> sample_index;
-	for (int i = 0; i < replay.size(); ++i)
+	for (size_t i = 0; i < replay.size(); ++i)
 		sample_index.push_back(i);
 
 	std::vector<float> state;
@@ -129,8 +129,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 		std::sample(sample_index.begin(), sample_index.end(), std::back_inserter(action_samples),COMA_consts::actor_samples
 					, std::mt19937{std::random_device{}()});
 
-		for (int i = 0; i < action_samples.size(); ++i)
-		{
+		for (size_t i = 0; i < action_samples.size(); ++i){
 			a.push_back(q_input_actions[action_samples[i]]);
 			s.push_back(q_input_states[action_samples[i]]);
 		}
