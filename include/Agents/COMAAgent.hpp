@@ -23,7 +23,7 @@ namespace COMA_consts{
 	const float tau_mu = 0.005; //Actor Learning Rate
 	const float tau_q = 0.01; // Critic Learning Rate
 	const size_t C = 10; // reset q_t every C steps
-	const size_t actor_samples = 1024;
+	const size_t actor_samples = 10;
 }
 
 class COMAAgent{

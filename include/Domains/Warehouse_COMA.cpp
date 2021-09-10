@@ -45,8 +45,8 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 			for (size_t i = 0; i < whAGVs.size(); i++)// Reset all AGVs
 				whAGVs[i]->ResetPerformanceCounters();
 			if(verbose)
-				std::cout<<"Stats:\n Total Move+Enter: "<<totalMove+totalEnter<<
-					"Total wait: "<<totalWait<< " Total Success: "<<totalSuccess<<std::endl;
+				// std::cout<<"Stats:\n Total Move+Enter: "<<totalMove+totalEnter<<
+				// 	"Total wait: "<<totalWait<< " Total Success: "<<totalSuccess<<std::endl;
 			results.update((float) totalSuccess/COMAAgent::get_batch_size(), (float) totalMove/COMAAgent::get_batch_size(), (float) totalEnter/COMAAgent::get_batch_size(), (float) totalWait/COMAAgent::get_batch_size());
 
 			float reward = totalMove + totalEnter;
@@ -68,13 +68,10 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 		rewardsV.clear();
 
 		for (size_t b = 0; b < COMAAgent::get_batch_size(); ++b){
-			for (size_t t = 0; t < nSteps; ++t){
-				// q_input[b][t][0] = replay[b*nSteps + t].action[i];
-				q_input_actions.push_back(replay[b*nSteps + t].action[i]);
-				// q_input[b][t][1] = replay[b*nSteps + t].current_state[i];
+			for (size_t t = 0; t < nSteps; ++t){				
+				q_input_actions.push_back(replay[b*nSteps + t].action[i]);				
 				q_input_states.push_back(replay[b*nSteps + t].current_state[i]);
-				//q_input_states.insert(q_input_states.end(), replay[b*nSteps + t].current_state.begin(), replay[b*nSteps + t].current_state.end());
-				// std::cout<<replay[b*nSteps + t].current_state[i]<<std::endl;
+				//q_input_states.insert(q_input_states.end(), replay[b*nSteps + t].current_state.begin(), replay[b*nSteps + t].current_state.end());				
 				rewardsV.push_back(replay[b*nSteps + t].reward);
 			}
 		}
@@ -100,15 +97,50 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	}
 
 
-	const torch::Tensor monte_carlo_samples = torch::rand(COMA_consts::actor_samples);
+	
 	//TODO try sampling from history
+	std::vector<float> sample_index;
+	for (int i = 0; i < replay.size(); ++i)
+		sample_index.push_back(i);
+
+	std::vector<float> state;
+	std::vector<float> s,a;
+	std::vector<int> action_samples;
+	s.reserve(COMA_consts::actor_samples);
+	a.reserve(COMA_consts::actor_samples);
+	action_samples.reserve(COMA_consts::actor_samples);
 
 	for (size_t i = 0; i < maTeam.size(); ++i) {
 		//Train Actor
-		//const torch Tensor =
+		// const torch::Tensor monte_carlo_samples = torch::rand(COMA_consts::actor_samples);
+		const torch::Tensor monte_carlo_samples = torch::rand(COMA_consts::actor_samples);
 
+		q_input_actions.clear();			
+		q_input_states.clear();
+		a.clear();
+		s.clear();
+		for (size_t b = 0; b < COMAAgent::get_batch_size(); ++b){
+			for (size_t t = 0; t < nSteps; ++t){				
+				q_input_actions.push_back(replay[b*nSteps + t].action[i]);
+				q_input_states.push_back(replay[b*nSteps + t].current_state[i]);				
+			}
+		}
 
+		std::sample(sample_index.begin(), sample_index.end(), std::back_inserter(action_samples),COMA_consts::actor_samples
+					, std::mt19937{std::random_device{}()});
 
+		for (int i = 0; i < action_samples.size(); ++i)
+		{
+			a.push_back(q_input_actions[action_samples[i]]);
+			s.push_back(q_input_states[action_samples[i]]);
+		}
+
+		torch::Tensor Q = COMAAgent::evaluate_critic_NN(s,a).squeeze(1);
+
+		std::cout << Q << std::endl;
+
+		// torch::Tensor Q = COMAAgent::evaluate_critic_NN(s,a).squeeze(1);
+		
 		//torch::Tensor Baseline = ;
 
 		// for (int b = 0; b < COMAAgent::get_batch_size(); ++b){
