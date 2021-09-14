@@ -33,9 +33,9 @@ class COMAAgent{
 		COMAAgent(size_t state_space, size_t action_space);
 		~COMAAgent();
 
-		[[nodiscard]] static torch::Tensor evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
-		[[nodiscard]] std::vector<float> evaluate_actor_NN(const std::vector<float>& s);
-		[[nodiscard]] static torch::Tensor evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		[[nodiscard, gnu::const]] static torch::Tensor evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		[[nodiscard, gnu::const]] std::vector<float> evaluate_actor_NN(const std::vector<float>& s);
+		[[nodiscard, gnu::const]] static torch::Tensor evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
 
 		static void init_critic_NNs(size_t global_state_space, size_t global_action_space);
 		static void reset_target_critic();
@@ -49,15 +49,13 @@ class COMAAgent{
 		static void set_batch_size(size_t i){batch_size = i;}
 		[[nodiscard]] static size_t get_batch_size() {return batch_size;}
 
-		inline static Net temp = Net(1, 1, 1*2);//Fix this
-		inline static std::unique_ptr<torch::optim::Adam> optimizerQNN;// = torch::optim::Adam(temp.parameters(),0.001);
+		inline static std::unique_ptr<torch::optim::Adam> optimizerQNN;
 	protected:
 		inline static CriticNN qNN = CriticNN(1,1,1), qtNN = CriticNN(1,1,1); //TODO thread local
 		ActorCOMA_NN muNN;
 		inline static size_t batch_size = 0;		
 
-		// We need a global optimizer, not a new one in each step!!!!!!!!
-		torch::optim::Adam optimizerMuNN;// = torch::optim::Adam(temp.parameters(),0.0001);
+		torch::optim::Adam optimizerMuNN;
 		//TODO INIT Q opti
 };
 

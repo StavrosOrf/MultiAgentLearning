@@ -6,7 +6,7 @@ agent definitions with each learning algorithm, for purpose of comparing it to
 
 This purpose implements the following algorithms on the warehouse domain/framework
  - ES
- - (MA)DDPG [Disabled] (use -DENABLE_DDPG to enable)
+ - (MA)DDPG [Disabled] (use `-DENABLE_DDPG` to enable)
 
 
 ## Installation ##

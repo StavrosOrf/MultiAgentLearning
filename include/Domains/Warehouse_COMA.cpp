@@ -14,6 +14,7 @@ Warehouse_COMA::~Warehouse_COMA(void){
 }
 
 epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
+
 	epoch_results results; // TODO fix
 	//std::normal_distribution<float> n_process(1, N_proc_std_dev);
 	//std::default_random_engine n_generator(time(NULL));
@@ -35,13 +36,13 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 			traverse_one_step(actions);
 			 
 			// Log Performance Counters
-			size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0, totalCommand = 0;
+			size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0;//, totalCommand = 0;
 			for (size_t k = 0; k < whAGVs.size(); k++){
 				totalMove += whAGVs[k]->GetMoveTime();
 				totalEnter += whAGVs[k]->GetEnterTime();
 				totalWait += whAGVs[k]->GetWaitTime();
 				totalSuccess += whAGVs[k]->GetNumCompleted();
-				totalCommand += whAGVs[k]->GetNumCommanded();
+				//totalCommand += whAGVs[k]->GetNumCommanded();
 			}
 			G += totalSuccess;
 			for (size_t i = 0; i < whAGVs.size(); i++)// Reset all AGVs
@@ -80,8 +81,8 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 		for (size_t b = 0; b < COMAAgent::get_batch_size(); ++b){
 			for (size_t t = 0; t < nSteps; ++t){				
 				q_input_actions.push_back(replay[b*nSteps + t].action[i]);				
-				q_input_states.push_back(replay[b*nSteps + t].current_state[i]);
-				//q_input_states.insert(q_input_states.end(), replay[b*nSteps + t].current_state.begin(), replay[b*nSteps + t].current_state.end());				
+				//q_input_states.push_back(replay[b*nSteps + t].current_state[i]);
+				q_input_states.insert(q_input_states.end(), replay[b*nSteps + t].current_state.begin(), replay[b*nSteps + t].current_state.end());
 				rewardsV.push_back(replay[b*nSteps + t].reward);
 			}
 		}
@@ -139,7 +140,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 		std::sample(sample_index.begin(), sample_index.end(), std::back_inserter(action_samples),COMA_consts::actor_samples
 					, std::mt19937{std::random_device{}()});
 
-		for (size_t i = 0; i < action_samples.size(); ++i){
+		for (size_t j = 0; j < action_samples.size(); j++){
 			a.push_back(q_input_actions[action_samples[i]]);
 			s.push_back(q_input_states[action_samples[i]]);
 		}
@@ -192,7 +193,7 @@ void Warehouse_COMA::InitialiseMATeam(){
 	assert(!maTeam.empty());
 }
 
-std::vector<float> Warehouse_COMA::query_actor_MATeam(std::vector<float> states){
+std::vector<float> Warehouse_COMA::query_actor_MATeam(const std::vector<float> &states){
 	assert(states.size() == N_EDGES*(1 + incorporates_time));
 	assert(agent_type == agent_def::link);
 	std::vector<float> actions;

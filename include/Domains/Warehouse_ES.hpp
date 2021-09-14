@@ -14,7 +14,7 @@
 class Warehouse_ES : public Warehouse {
 	public:
 		Warehouse_ES(YAML::Node configs) : Warehouse(configs){
-			N_proc_std_dev = configs["DDPG"]["rand_proc_std_dev"].as<float>();
+			N_proc_std_dev = configs["DDPG"]["rand_proc_std_dev"].as<float>();//DO NOT FIX HIS BUG yet
 			}
 		~Warehouse_ES(void);
 
