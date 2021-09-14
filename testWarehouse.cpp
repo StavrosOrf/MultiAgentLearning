@@ -10,7 +10,7 @@
 #include <cassert>
 #include <stdio.h>
 #include <unistd.h>
-
+#define ENABLE_DDPG
 #include "Domains/Warehouse.hpp"
 #ifdef ENABLE_DDPG
 #include "Domains/Warehouse_DDPG.hpp"
@@ -143,7 +143,7 @@ void WarehouseSimulation(const std::string &config_file, size_t n_threads){
 
 	if (algo == "DDPG") {
 		std::cout << "(MA)DDPG has been deprecated)" << std::endl;
-		//WarehouseSimulationDDPG(configs);
+		WarehouseSimulationDDPG(configs);
 	}else if (algo == "ES"){
 		warehouse_simulate_ES(configs, n_threads);
 	}else if (algo == "COMA"){

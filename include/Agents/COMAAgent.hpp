@@ -24,6 +24,8 @@ namespace COMA_consts{
 	const float tau_q = 0.01; // Critic Learning Rate
 	const size_t C = 10; // reset q_t every C steps
 	const size_t actor_samples = 10;
+	const int actions_size = 6;
+	const int actions[6] = {0,1,2,4,8,16};
 }
 
 class COMAAgent{
@@ -51,7 +53,7 @@ class COMAAgent{
 		inline static std::unique_ptr<torch::optim::Adam> optimizerQNN;// = torch::optim::Adam(temp.parameters(),0.001);
 	protected:
 		inline static CriticNN qNN = CriticNN(1,1,1), qtNN = CriticNN(1,1,1); //TODO thread local
-		ActorNN muNN;
+		ActorCOMA_NN muNN;
 		inline static size_t batch_size = 0;		
 
 		// We need a global optimizer, not a new one in each step!!!!!!!!

@@ -13,7 +13,6 @@ Warehouse_COMA::~Warehouse_COMA(void){
 	}	
 }
 
-
 epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	epoch_results results; // TODO fix
 	//std::normal_distribution<float> n_process(1, N_proc_std_dev);
@@ -23,14 +22,16 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	///SIMULATE step
 	std::vector<experience_replay> replay; //empty buffer
 	replay.reserve(nSteps*COMAAgent::get_batch_size());
-
+	int maxG = 0;
 	for (size_t e = 0; e != COMAAgent::get_batch_size(); e++){
 		InitialiseNewEpoch();
-
+		std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
+		int G = 0;
 		for (size_t t = 0; t < nSteps; t++){
-			const std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0);
+			
+			std::cout<<"State: "<<cur_state<<std::endl;
 			std::vector<float> actions = query_actor_MATeam(cur_state);
-
+			std::cout<<"Actions: "<<actions<<std::endl;
 			traverse_one_step(actions);
 			 
 			// Log Performance Counters
@@ -42,18 +43,27 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 				totalSuccess += whAGVs[k]->GetNumCompleted();
 				totalCommand += whAGVs[k]->GetNumCommanded();
 			}
+			G += totalSuccess;
 			for (size_t i = 0; i < whAGVs.size(); i++)// Reset all AGVs
 				whAGVs[i]->ResetPerformanceCounters();
+			
 			//if(verbose)
 				// std::cout<<"Stats:\n Total Move+Enter: "<<totalMove+totalEnter<<
 				// 	"Total wait: "<<totalWait<< " Total Success: "<<totalSuccess<<std::endl;
+			std::cout<<"totalSuccess: "<<totalSuccess<<std::endl;
 			results.update((float) totalSuccess/COMAAgent::get_batch_size(), (float) totalMove/COMAAgent::get_batch_size(), (float) totalEnter/COMAAgent::get_batch_size(), (float) totalWait/COMAAgent::get_batch_size());
 
-			float reward = totalMove + totalEnter;
+			float reward = totalMove;// + totalEnter;
+			std::cout<<"Reward: "<<reward<<std::endl;
 			const std::vector<float> next_state = get_edge_utilization();
-
+			cur_state = next_state;
 			replay.push_back({cur_state, next_state, actions, reward});			
 		}
+		if(G > maxG){
+			maxG = G;
+		}
+
+		std::cout<<"============== G: "<<maxG<<std::endl;
 	}
 	std::cout<<"Start Training"<<std::endl;
 
@@ -76,22 +86,22 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 			}
 		}
 
-		//Train Critic 
-		torch::Tensor Q_targets = COMAAgent::evaluate_target_critic_NN(q_input_states,q_input_actions).squeeze(1);
-		torch::Tensor Q = COMAAgent::evaluate_critic_NN(q_input_states,q_input_actions).squeeze(1);
+		// //Train Critic 
+		// // torch::Tensor Q_targets = COMAAgent::evaluate_target_critic_NN(q_input_states,q_input_actions).squeeze(1);
+		// // torch::Tensor Q = COMAAgent::evaluate_critic_NN(q_input_states,q_input_actions).squeeze(1);
 
-		torch::Tensor rewards = torch::tensor(rewardsV);//.unsqueeze(0);
-		//std::cout<<rewards<<std::endl;
-		//std::cout << Q_targets << std::endl;
-		Q_targets = Q_targets+rewards;
+		// torch::Tensor rewards = torch::tensor(rewardsV);//.unsqueeze(0);
+		// //std::cout<<rewards<<std::endl;
+		// //std::cout << Q_targets << std::endl;
+		// Q_targets = Q_targets+rewards;
 
-		torch::Tensor dQ = Q_targets - Q;
-		torch::Tensor critic_loss = torch::mean(torch::pow(dQ,2));
+		// torch::Tensor dQ = Q_targets - Q;
+		// torch::Tensor critic_loss = torch::mean(torch::pow(dQ,2));
 		// std::cout<<critic_loss<<std::endl;
 
-		COMAAgent::optimizerQNN->zero_grad();
-		critic_loss.backward();
-		COMAAgent::optimizerQNN->step();
+		// COMAAgent::optimizerQNN->zero_grad();
+		// critic_loss.backward();
+		// COMAAgent::optimizerQNN->step();
 
 
 	}
@@ -173,7 +183,7 @@ void Warehouse_COMA::InitialiseMATeam(){
 	}
 	else if (agent_type == agent_def::link)
 		for (size_t i = 0; i < whGraph->GetEdges().size(); i++)
-			maTeam.push_back(new COMAAgent((1+incorporates_time), 1));
+			maTeam.push_back(new COMAAgent((1+incorporates_time),COMA_consts::actions_size));
 	else if (agent_type == agent_def::intersection){
 		std::cout << "Intersection Agent Does not work with COMA" << std::endl;
 		exit(EXIT_FAILURE);

@@ -99,6 +99,27 @@ struct CriticNN : torch::nn::Module {
 	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};		
 };
 
+struct ActorCOMA_NN : torch::nn::Module {
+	ActorCOMA_NN (int numIn, int numOut, int numHid) {		
+		fc1 = register_module("fc1",torch::nn::Linear(numIn,numHid));
+		fc2 = register_module("fc2",torch::nn::Linear(numHid,numHid));
+		fc3 = register_module("fc3",torch::nn::Linear(numHid,numOut));
+	}
+
+	torch::Tensor forward(torch::Tensor x) {
+
+		x = torch::relu(fc1->forward(x));
+		// 	x = (x-m)/(s-m);	
+		x = torch::relu(fc2->forward(x));
+		x = torch::nn::functional::softmax(fc3->forward(x),-1);
+		return x;
+	}
+
+	torch::nn::Linear fc1{nullptr},fc2{nullptr},fc3{nullptr};	
+};
+
+
+
 #define DEEP
 
 struct esNN : torch::nn::Module {

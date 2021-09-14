@@ -1,19 +1,21 @@
 #include "COMAAgent.hpp"
 
-const int hiddensize = 256;
+const int hiddensize = 64;
 
-COMAAgent::COMAAgent(size_t state_space, size_t action_space)
-	: muNN(state_space, action_space, hiddensize),
+COMAAgent::COMAAgent(size_t state_space, size_t action_space):
+	muNN(state_space, action_space, hiddensize),
 	optimizerMuNN(muNN.parameters(), COMA_consts::tau_mu)
 	{}
 
 COMAAgent::~COMAAgent() = default;
 
 void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_space){
-	const int hiddensize = 256;
+	const int hiddensize = 64;
 
-	COMAAgent::qNN = CriticNN(1+1, 1, hiddensize);
-	COMAAgent::qtNN = CriticNN(1+1, 1, hiddensize);
+	COMAAgent::qNN = CriticNN(global_state_space + global_action_space + 1,
+		COMA_consts::actions_size, hiddensize);
+	COMAAgent::qtNN = CriticNN(global_state_space + global_action_space + 1,
+		COMA_consts::actions_size, hiddensize);
 	optimizerQNN = std::make_unique<torch::optim::Adam>(qNN.parameters(), COMA_consts::tau_q);
 	//copy {Q', Mu'} <- {Q, Mu}
 	for (size_t i = 0; i < qNN.parameters().size(); i++)
@@ -31,11 +33,16 @@ void COMAAgent::init_critic_NNs(size_t global_state_space, size_t global_action_
 *************************************************************************************************/
 std::vector<float> COMAAgent::evaluate_actor_NN(const std::vector<float>& s){
 	torch::Tensor t = torch::tensor(std::move(s)).unsqueeze(0);
-	// std::cout<<t<<std::endl;
+	// std::cout<<"-- "<<t<<std::endl;
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = muNN.forward(t);	
-	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
+	// std::cout<<t1<<std::endl;
+	// std::cout<<torch::argmax(t1)<<std::endl;
+	// std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
+	std::vector<float> to_return;
+	to_return.push_back(COMA_consts::actions[torch::argmax(t1).item<int>()]);
+	// std::cout<<to_return<<std::endl;
 	return to_return;
 }
 
