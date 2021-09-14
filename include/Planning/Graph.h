@@ -24,7 +24,7 @@ class Graph{
 		~Graph() = default;
 
 		std::vector<vertex_t> GetVertices() const {return itsVertices;}
-		const std::vector<const Edge *> GetEdges() const __attribute__ ((const)){return itsEdges_ref;} 
+		[[maybe_unused, gnu::const]]const std::vector<const Edge*> GetEdges(){return itsEdges_ref;}
 		size_t GetNumVertices() const {return itsVertices.size();}
 		size_t GetNumEdges() const {return itsEdges.size();}
 		size_t GetEdgeID(const Edge *) __attribute__ ((pure));

@@ -22,7 +22,7 @@ class Warehouse_COMA : public Warehouse {
 
 		void InitialiseMATeam(); // create agents for each vertex in graph
 	protected:
-		[[nodiscard]] std::vector<float> query_actor_MATeam(std::vector<float> states) __attribute__ ((pure));
+		[[nodiscard, gnu::pure]] std::vector<float> query_actor_MATeam(const std::vector<float> &states);
 
 		float N_proc_std_dev;
 		std::vector<COMAAgent*> maTeam;

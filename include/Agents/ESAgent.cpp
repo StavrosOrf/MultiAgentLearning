@@ -34,6 +34,6 @@ std::vector<float> ESAgent::evaluateNN(const std::vector<float>& s){
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = NN->forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }

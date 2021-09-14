@@ -40,13 +40,13 @@ void warehouse_simulate_COMA(YAML::Node configs, [[maybe_unused]] size_t n_threa
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
 		startTotalRun = std::clock();
-		Warehouse_COMA * trainDomain = new Warehouse_COMA(configs);
-		trainDomain->InitialiseMATeam();
+		Warehouse_COMA trainDomain = Warehouse_COMA(configs);
+		trainDomain.InitialiseMATeam();
 
 		std::cout << "Starting Run: " << run << std::endl;
 		for (int e = 0; e < nEps; e++){
 			start = std::clock();
-			epoch_results t = trainDomain->simulate_epoch_COMA(verbose);//simulate
+			epoch_results t = trainDomain.simulate_epoch_COMA(verbose);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			if (t.totalDeliveries > max_G){
 				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4u\e[0m, tMove=%6u, tEnter=%6u, tWait=%6u\n",
