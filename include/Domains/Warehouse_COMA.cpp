@@ -203,8 +203,9 @@ std::vector<float> Warehouse_COMA::query_actor_MATeam(const std::vector<float> &
 		if(incorporates_time)
 			actions.push_back(maTeam[i]->evaluate_actor_NN({states[i], states[i+N_EDGES]})[0]);
 		else{
-			float t = (maTeam[i]->evaluate_actor_NN({states[i]}))[0];
-			actions.push_back(t);
+			std::vector<float> v = (maTeam[i]->evaluate_actor_NN({states[i]}));
+			std::cout<<v<<std::endl;			
+			actions.push_back(COMA_consts::actions[std::max_element(v.begin(),v.end()) - v.begin()]);
 		}
 	return actions;
 }

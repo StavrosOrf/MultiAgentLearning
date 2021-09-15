@@ -42,9 +42,9 @@ std::vector<float> COMAAgent::evaluate_actor_NN(const std::vector<float>& s){
 	torch::Tensor t1 = muNN.forward(t);	
 	// std::cout<<t1<<std::endl;
 	// std::cout<<torch::argmax(t1)<<std::endl;
-	// std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
-	std::vector<float> to_return;
-	to_return.push_back(COMA_consts::actions[torch::argmax(t1).item<int>()]);
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
+	// std::vector<float> to_return;
+	// to_return.push_back(COMA_consts::actions[torch::argmax(t1).item<int>()]);
 	// std::cout<<to_return<<std::endl;
 	return to_return;
 }
