@@ -23,7 +23,7 @@ COMA:
 simulation:
   verbose: true
   steps: 200
-  agvs: origins_120.csv #Valid options: 70,90,120,200,400
+  agvs: origins_90.csv #Valid options: 70,90,120,200,400
   goals: goals.csv
 results:
   folder:     ../Results/

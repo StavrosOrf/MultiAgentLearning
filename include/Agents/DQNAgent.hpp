@@ -25,7 +25,7 @@ namespace DQN_consts{
 	const size_t simulation_steps = 1000;
 	const int actions_size = 6;
 	const int actions[6] = {0,1,2,4,8,16};
-	const int batch_size = 50;
+	const int batch_size = 5;
 }
 
 class DQNAgent{
@@ -37,6 +37,7 @@ class DQNAgent{
 		std::vector<float> evaluate_target_critic_NN(const std::vector<float>& s,const std::vector<float>& a);
 		
 		void reset_target_critic();
+		void trainCritic(const std::vector<experience_replayDQN>& samples,const int agentNumber);
 		// void updateTargetWeights();
 		// void updateQCritic(const std::vector<float> Qvals, const std::vector<float> Qprime,bool verbose);
 		// void updateMuActor(const std::vector<std::vector<float>> states, bool verbose);

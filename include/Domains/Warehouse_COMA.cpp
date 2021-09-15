@@ -20,37 +20,53 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	//std::default_random_engine n_generator(time(NULL));
 	
 	///SIMULATE step
-	std::vector<experience_replay> replay,samples; //empty buffer
+	std::vector<experience_replayDQN> replay,samples; //empty buffer
 	samples.reserve(DQN_consts::batch_size);
 	replay.reserve(DQN_consts::simulation_steps);
 
 	InitialiseNewEpoch();
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0),next_state;
-
+	// reward.reserve(maTeam.size());
 
 	for (int t = 0; t < DQN_consts::simulation_steps ; t++){
 		// std::cout<<"State: "<<cur_state<<std::endl;
 		std::vector<float> actions = query_actor_MATeam(cur_state,true);
 		// std::cout<<"Actions: "<<actions<<std::endl;
 		traverse_one_step(actions);
-		 
+		next_state = get_edge_utilization();
+		// std::cout<<"State: "<<next_state<<std::endl;
 		// Log Performance Counters
-		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0;//, totalCommand = 0;
+		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0,totalCommand = 0;
+		// reward.clear();
+		std::vector<float> reward(maTeam.size());
 		for (size_t k = 0; k < whAGVs.size(); k++){
 			totalMove += whAGVs[k]->GetMoveTime();
 			totalEnter += whAGVs[k]->GetEnterTime();
 			totalWait += whAGVs[k]->GetWaitTime();
 			totalSuccess += whAGVs[k]->GetNumCompleted();
-			//totalCommand += whAGVs[k]->GetNumCommanded();
+			totalCommand += whAGVs[k]->GetNumCommanded();
+			// std::cout<<"Move: "<<whAGVs[k]->GetMoveTime()<<std::endl;
+			// std::cout<<"Command:  "<<whAGVs[k]->GetNumCommanded()<<std::endl;
+			
+			// if(whAGVs[k]->GetMoveTime() > 0 && whAGVs[k]->GetNumCompleted() < 1){
+			// 	std::cout<<"Enter:  "<<whAGVs[k]->GetEnterTime()<<std::endl;
+			// 	std::cout<<"Completed:  "<<whAGVs[k]->GetNumCompleted()<<std::endl;	
+			// 	std::cout<<"Edge: "<<whAGVs[k]->GetCurEdge()->GetVertex1()<<std::endl;	
+			// }
 		}
-		
+		// std::cout<<"Total Move: "<<totalMove<<std::endl;
+		// std::cout<<"Total Succesfull: "<<totalSuccess<<std::endl;
+		// if(t == 50)
+		// 	exit(0);
+
 		for (size_t i = 0; i < whAGVs.size(); i++)// Reset all AGVs
 			whAGVs[i]->ResetPerformanceCounters();
 		
 		/* Get reward for each agent explicitly*/
-		float reward = totalMove;// + totalEnter; 
-		// std::cout<<"Reward: "<<reward<<std::endl;
-		next_state = get_edge_utilization();		
+		//Reward thought: |#AGVs that could move - #AGVs that moved|
+		// float reward = totalMove;// + totalEnter; 
+		// std::cout<<"----------------------Reward: "<<reward<<std::endl;
+				
 		replay.push_back({cur_state, next_state, actions, reward});	
 		cur_state = next_state;
 
@@ -63,7 +79,12 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 		samples.clear();
 		std::ranges::sample(replay, std::back_inserter(samples), DQN_consts::batch_size, std::mt19937{std::random_device{}()});
 		// std::cout<samples[1].reward<<std::endl;
-		// std::cout<samples[49].reward<<std::endl;
+		// std::cout<<(float)samples[49].reward<<std::endl;
+
+		for (size_t i = 0; i < maTeam.size(); ++i){
+			maTeam[i]->trainCritic({samples},i);
+		}
+
 
 		/* Reset Target Critic in EVERY C steps*/
 		if(! t % DQN_consts::reset_step )
