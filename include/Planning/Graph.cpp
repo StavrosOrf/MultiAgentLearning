@@ -90,7 +90,7 @@ void Graph::GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vect
 
 void Graph::reset_edge_costs(){
 	//TODO check
-	// assert(0);
+	assert(0);
 	for(Edge e : itsEdges)
 		e.SetCost(e.GetLength());
 }
@@ -107,7 +107,7 @@ void Graph::set_edge_cost(const std::vector<float>& new_costs){
 **Output:All the incomming edges to that [vertex]						*
 *************************************************************************************************/
 std::vector<Edge*> Graph::get_incoming_edges_of_a_vertex(vertex_t vertex){
-	// assert(0);
+	assert(0);
 	std::vector<Edge*> edges;
 	for(Edge e : itsEdges)
 		if (e.GetVertex2() == vertex)
@@ -121,7 +121,7 @@ std::vector<Edge*> Graph::get_incoming_edges_of_a_vertex(vertex_t vertex){
 **Output:All the outgoing edges to that [vertex]						*
 *************************************************************************************************/
 std::vector<Edge*> Graph::get_outgoing_edges_of_a_vertex(vertex_t vertex){
-	// assert(0);
+	assert(0);
 	std::vector<Edge*> edges;
 	for(Edge e : itsEdges)
 		if (e.GetVertex1() == vertex)
