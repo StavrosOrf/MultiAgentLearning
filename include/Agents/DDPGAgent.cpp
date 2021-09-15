@@ -52,7 +52,7 @@ std::vector<float> DDPGAgent::EvaluateActorNN_DDPG(const std::vector<float>& s){
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = muNN->forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 std::vector<float> DDPGAgent::EvaluateCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
@@ -64,7 +64,7 @@ std::vector<float> DDPGAgent::EvaluateCriticNN_DDPG(const std::vector<float>& s,
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = qNN->forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 std::vector<float> DDPGAgent::EvaluateTargetActorNN_DDPG(const std::vector<float>& s){
@@ -72,7 +72,7 @@ std::vector<float> DDPGAgent::EvaluateTargetActorNN_DDPG(const std::vector<float
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = mutNN->forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(const std::vector<float>& s, const std::vector<float>& a){
@@ -84,7 +84,7 @@ std::vector<float> DDPGAgent::EvaluateTargetCriticNN_DDPG(const std::vector<floa
 	t = t.to(torch::kFloat32);
 
 	torch::Tensor t1 = qtNN->forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 

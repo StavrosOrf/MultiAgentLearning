@@ -10,21 +10,22 @@
 #include <cassert>
 #include <stdio.h>
 #include <unistd.h>
-#define ENABLE_DDPG
+
+//#define ENABLE_DDPG
 #include "Domains/Warehouse.hpp"
 #ifdef ENABLE_DDPG
 #include "Domains/Warehouse_DDPG.hpp"
 #endif
 #include "Domains/Warehouse_ES_container.hpp"
-#include "Domains/Warehouse_COMA.hpp"
+#include "Domains/Warehouse_DQN.hpp"
 
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
 std::string config_file;
 
-void warehouse_simulate_COMA(YAML::Node configs, [[maybe_unused]] size_t n_threads){
-	const int nEps = configs["COMA"]["epochs"].as<int>();
-	const int runs = configs["COMA"]["runs"].as<int>();
+void warehouse_simulate_DQN(YAML::Node configs, [[maybe_unused]] size_t n_threads){
+	const int nEps = configs["DQN"]["epochs"].as<int>();
+	const int runs = configs["DQN"]["runs"].as<int>();
 	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
 	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
 	const std::string agentType = configs["domain"]["agents"].as<std::string>();
@@ -35,18 +36,18 @@ void warehouse_simulate_COMA(YAML::Node configs, [[maybe_unused]] size_t n_threa
 	double duration;
 	uint max_G = 0; //Maximum Total Deliveries
 
-	std::ofstream eval_file(resFolder + warehouse_type + '_' + "COMA" + '_' + agentType + ".csv");
+	std::ofstream eval_file(resFolder + warehouse_type + '_' + "DQN" + '_' + agentType + ".csv");
 	for (int run = 0; run != runs; run++){
 		assert(eval_file.is_open());
 		eval_file << "run,Epoch,G,tMove,tEnter,tWait\n";
 		startTotalRun = std::clock();
-		Warehouse_COMA trainDomain = Warehouse_COMA(configs);
+		Warehouse_DQN trainDomain = Warehouse_DQN(configs);
 		trainDomain.InitialiseMATeam();
 
 		std::cout << "Starting Run: " << run << std::endl;
 		for (int e = 0; e < nEps; e++){
 			start = std::clock();
-			epoch_results t = trainDomain.simulate_epoch_COMA(verbose);//simulate
+			epoch_results t = trainDomain.simulate_epoch_DQN(verbose);//simulate
 			duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 			if (t.totalDeliveries > max_G){
 				std::printf("Epoch %3d (%5.1f sec): \e[1mG=%4u\e[0m, tMove=%6u, tEnter=%6u, tWait=%6u\n",
@@ -146,8 +147,8 @@ void WarehouseSimulation(const std::string &config_file, size_t n_threads){
 		WarehouseSimulationDDPG(configs);
 	}else if (algo == "ES"){
 		warehouse_simulate_ES(configs, n_threads);
-	}else if (algo == "COMA"){
-		warehouse_simulate_COMA(configs, n_threads);
+	}else if (algo == "DQN"){
+		warehouse_simulate_DQN(configs, n_threads);
 	}else{
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(EXIT_FAILURE);

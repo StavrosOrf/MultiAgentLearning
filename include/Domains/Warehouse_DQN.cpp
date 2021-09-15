@@ -1,6 +1,6 @@
-#include "Warehouse_COMA.hpp"
+#include "Warehouse_DQN.hpp"
 
-Warehouse_COMA::~Warehouse_COMA(void){
+Warehouse_DQN::~Warehouse_DQN(void){
 	delete whGraph;
 	whGraph = 0;
 	for (size_t i = 0; i < whAGVs.size(); i++){
@@ -13,7 +13,7 @@ Warehouse_COMA::~Warehouse_COMA(void){
 	}	
 }
 
-epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
+epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 
 	epoch_results results; // TODO fix
 	//std::normal_distribution<float> n_process(1, N_proc_std_dev);
@@ -28,7 +28,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0),next_state;
 	// reward.reserve(maTeam.size());
 
-	for (int t = 0; t < DQN_consts::simulation_steps ; t++){
+	for (size_t t = 0; t != DQN_consts::simulation_steps; t++){
 		// std::cout<<"State: "<<cur_state<<std::endl;
 		std::vector<float> actions = query_actor_MATeam(cur_state,true);
 		// std::cout<<"Actions: "<<actions<<std::endl;
@@ -88,7 +88,8 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 
 		/* Reset Target Critic in EVERY C steps*/
 		if(! t % DQN_consts::reset_step )
-			COMAAgent::reset_target_critic(); 
+			for (auto agent : maTeam)
+				agent->reset_target_critic();
 	}
 	return evaluateEpoch();
 
@@ -190,7 +191,7 @@ epoch_results Warehouse_COMA::simulate_epoch_COMA (bool verbose){
 	
 }
 
-epoch_results Warehouse_COMA::evaluateEpoch(){
+epoch_results Warehouse_DQN::evaluateEpoch(){
 	epoch_results results;
 	InitialiseNewEpoch();
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0),next_state;
@@ -223,7 +224,7 @@ epoch_results Warehouse_COMA::evaluateEpoch(){
 	return results;
 }
 
-void Warehouse_COMA::InitialiseMATeam(){
+void Warehouse_DQN::InitialiseMATeam(){
 	assert(whAgents.size());//this must be called after whAgents have been initialized
 	if (algo != algo_type::coma){
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
@@ -238,7 +239,7 @@ void Warehouse_COMA::InitialiseMATeam(){
 	else if (agent_type == agent_def::link)
 		for (size_t i = 0; i < whGraph->GetEdges().size(); i++)
 			maTeam.push_back(new DQNAgent((1+incorporates_time),DQN_consts::actions_size));
-	else if (agent_type == agent_def::intersection){
+	else if (agent_type == agent_def::intersection){//IMPLEMENT
 		std::cout << "Intersection Agent Does not work with DQN yet" << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -246,11 +247,11 @@ void Warehouse_COMA::InitialiseMATeam(){
 	assert(!maTeam.empty());
 }
 
-std::vector<float> Warehouse_COMA::query_actor_MATeam(std::vector<float> &states,bool training){
+std::vector<float> Warehouse_DQN::query_actor_MATeam(std::vector<float> &states,bool training){
 	srand((unsigned)time(NULL));
 
 	assert(states.size() == N_EDGES*(1 + incorporates_time));
-	assert(agent_type == agent_def::link);
+	assert(agent_type == agent_def::link); //TODO REMOVE
 	std::vector<float> actions;
 	actions.reserve(N_EDGES);
 

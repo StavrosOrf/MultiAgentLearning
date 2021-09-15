@@ -84,7 +84,7 @@ void Graph::GenerateEdges(std::vector< std::vector<vertex_t> > &edges, std::vect
 		}
 
 		//Edge * e = new Edge(v1, v2, costs[i]);
-		itsEdges.push_back(Edge(v1, v2, costs[i]));
+		itsEdges.emplace_back(v1, v2, costs[i]);
 	}
 }
 

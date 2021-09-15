@@ -19,7 +19,7 @@
 namespace DQN_consts{ 
 	const static size_t replay_buffer_size = 200*100; //1024*1024
 	const float gamma = 0.99;
-		const float tau_q = 0.01; // Critic Learning Rate
+	const float tau_q = 0.01; // Critic Learning Rate
 	const size_t reset_step = 15; // reset q_t every C steps
 	const size_t actor_samples = 10;
 	const size_t simulation_steps = 1000;
@@ -31,11 +31,11 @@ namespace DQN_consts{
 class DQNAgent{
 	public:
 		DQNAgent(size_t state_space, size_t action_space);
-		~DQNAgent();
+		~DQNAgent() = default;
 
-		std::vector<float> evaluate_critic_NN(const std::vector<float>& s,const std::vector<float>& a);		
-		std::vector<float> evaluate_target_critic_NN(const std::vector<float>& s,const std::vector<float>& a);
-		
+		[[nodiscard, gnu::pure]] std::vector<float> evaluate_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+		[[nodiscard, gnu::pure]] std::vector<float> evaluate_target_critic_NN(const std::vector<float>& s, const std::vector<float>& a);
+
 		void reset_target_critic();
 		void trainCritic(const std::vector<experience_replayDQN>& samples,const int agentNumber);
 		// void updateTargetWeights();
@@ -50,13 +50,6 @@ class DQNAgent{
 
 		
 	protected:
-		CriticNN qNN = CriticNN(1,1,1), qtNN = CriticNN(1,1,1); //TODO thread local		
-		// size_t batch_size = 0;		
-
-
-		// torch::optim::Adam optimizerQNN;
-		// torch::optim::Adam optimizerQtNN;
-
-
+		CriticNN qNN, qtNN;
 };
 

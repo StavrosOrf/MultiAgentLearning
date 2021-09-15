@@ -2,25 +2,20 @@
 
 const int hiddensize = 64;
 
-DQNAgent::DQNAgent(size_t state_space, size_t action_space){
-	
-	qNN = CriticNN(state_space, action_space, hiddensize);
-	qtNN = CriticNN(state_space,action_space, hiddensize);
-	
-	// optimizerQNN(Q.parameters(), 0.001);
-	// optimizerQtNN(Qt.parameters(), 0.001);
-	
+DQNAgent::DQNAgent(size_t state_space, size_t action_space) :
+	qNN(state_space+action_space, DQN_consts::actions_size, hiddensize),
+	qtNN(state_space+action_space, DQN_consts::actions_size, hiddensize)
+	//optimizerMuNN(muNN.parameters(), COMA_consts::tau_mu)
+	{
+		//copy {Q'} <- {Q}
+		for (size_t i = 0; i < qNN.parameters().size(); i++)
+			qtNN.parameters()[i].set_data(qNN.parameters()[i].detach().clone());
 
-	//copy {Q', Mu'} <- {Q, Mu}
-	for (size_t i = 0; i < qNN.parameters().size(); i++)
-		qtNN.parameters()[i].set_data(qNN.parameters()[i].detach().clone());
+		//assert that copy was successful
+		for (size_t i = 0; i < qNN.parameters().size(); i++ )
+			assert(torch::sum(qNN.parameters()[i] == qtNN.parameters()[i]).item<float>() == qNN.parameters()[i].numel());
 
-	//assert that copy was successful
-	for (size_t i = 0; i < qNN.parameters().size(); i++ )
-		assert(torch::sum(qNN.parameters()[i] == qtNN.parameters()[i]).item<float>() == qNN.parameters()[i].numel());
-}
-
-DQNAgent::~DQNAgent() = default;
+	}
 
 std::vector<float> DQNAgent::evaluate_critic_NN(const std::vector<float>& s,const std::vector<float>& a){
 	std::vector<float> input;
@@ -33,7 +28,7 @@ std::vector<float> DQNAgent::evaluate_critic_NN(const std::vector<float>& s,cons
 	t = t.to(torch::kFloat32);
 	// std::cout<<t<<std::endl;
 	torch::Tensor t1 = qNN.forward(t);
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 
@@ -60,7 +55,7 @@ std::vector<float> DQNAgent::evaluate_target_critic_NN(const std::vector<float>&
 
 	torch::Tensor t1 = qtNN.forward(t);
 	// std::cout<<t1<<std::endl;
-	std::vector<float> to_return(t1.data<float>(), t1.data<float>() + t1.numel());
+	std::vector<float> to_return(t1.data_ptr<float>(), t1.data_ptr<float>() + t1.numel());
 	return to_return;
 }
 

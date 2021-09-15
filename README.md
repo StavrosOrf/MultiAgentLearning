@@ -65,3 +65,9 @@ With Callgrind
 ```
 cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make && valgrind --tool=callgrind ./testWarehouse -c ../config.yaml
 ```
+
+# Authors
+ - [Kallinteris Andreas](https://github.com/kallinteris-andreas)
+ - [Starvos Orfanoudakis](https://github.com/stavrosgreece/)
+ 
+This is repo is a fork of https://github.com/JenJenChung/multiagent_learning
