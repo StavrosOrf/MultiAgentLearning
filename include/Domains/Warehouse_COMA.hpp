@@ -9,21 +9,25 @@
 #include "Planning/Search.h"
 #include "Agents/experience_replay.hpp"
 #include "Agents/COMAAgent.hpp"
+#include "Agents/DQNAgent.hpp"
+#include <time.h>
+#include <iostream>
 
 class Warehouse_COMA : public Warehouse {
 	public:
 		Warehouse_COMA(YAML::Node configs) : Warehouse(configs), N_proc_std_dev(0){
 			N_proc_std_dev = configs["COMA"]["rand_proc_std_dev"].as<float>();
-			COMAAgent::set_batch_size(configs["COMA"]["batch_size"].as<uint>());
+			// DQNAgent::set_batch_size(configs["COMA"]["batch_size"].as<uint>());
 		}
 		~Warehouse_COMA(void);
 
 		virtual epoch_results simulate_epoch_COMA(bool verbose);
 
+
 		void InitialiseMATeam(); // create agents for each vertex in graph
 	protected:
-		[[nodiscard, gnu::pure]] std::vector<float> query_actor_MATeam(const std::vector<float> &states);
-
+		std::vector<float> query_actor_MATeam(std::vector<float> &states, bool training);
+		epoch_results evaluateEpoch();
 		float N_proc_std_dev;
-		std::vector<COMAAgent*> maTeam;
+		std::vector<DQNAgent*> maTeam;
 };

@@ -17,7 +17,7 @@ ES:
   rand_proc_std_dev: 1 #standard deviation of the random process, higher values encourage more exploration
 COMA:
   epochs: 1
-  runs: 1 # number of statistical runs
+  runs: 2 # number of statistical runs
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   batch_size: 3   
 simulation:
