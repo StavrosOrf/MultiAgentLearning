@@ -19,7 +19,7 @@ DQN:
   epochs: 1
   runs: 2 # number of statistical runs
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
-  batch_size: 3   
+  # batch_size: 3   
 simulation:
   verbose: true
   steps: 200

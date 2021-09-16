@@ -226,7 +226,7 @@ epoch_results Warehouse_DQN::evaluateEpoch(){
 
 void Warehouse_DQN::InitialiseMATeam(){
 	assert(whAgents.size());//this must be called after whAgents have been initialized
-	if (algo != algo_type::coma){
+	if (algo != algo_type::dqn){
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
 		exit(EXIT_FAILURE);
 	}
@@ -263,10 +263,12 @@ std::vector<float> Warehouse_DQN::query_actor_MATeam(std::vector<float> &states,
 			std::vector<float> v;
 			if(training){
 				float r = (float) rand()/RAND_MAX;
-				// std::cout<<r<<std::endl;
+				
 				if(r > 0.5){
 					actions.push_back(DQN_consts::actions[rand() % DQN_consts::actions_size]);
 				}else{
+					// std::cout<<states<<std::endl;
+					// assert(states.size())	;
 					v = (maTeam[i]->evaluate_critic_NN({states[i]},{states[i]}));			
 					actions.push_back(DQN_consts::actions[std::max_element(v.begin(),v.end()) - v.begin()]);	
 				}

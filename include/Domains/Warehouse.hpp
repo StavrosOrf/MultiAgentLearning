@@ -21,7 +21,7 @@
 #define N_EDGES whGraph->GetEdges().size()
 
 
-enum class algo_type{ddpg, evolutionary_strategies, coma};
+enum class algo_type{ddpg, evolutionary_strategies, coma ,dqn};
 
 enum class agent_def{centralized, link, intersection};
 

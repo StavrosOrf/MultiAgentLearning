@@ -15,6 +15,8 @@ Warehouse::Warehouse(YAML::Node configs){
 		algo = algo_type::evolutionary_strategies;
 	else if(configs["mode"]["algo"].as<std::string>() == "COMA")
 		algo = algo_type::coma;
+	else if(configs["mode"]["algo"].as<std::string>() == "DQN")
+		algo = algo_type::dqn;
 	else{
 		std::cout << "ERROR: Currently only configured for 'DDPG' and 'ES' and 'COMA'! Exiting.\n";
 		exit(EXIT_FAILURE);
