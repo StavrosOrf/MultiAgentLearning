@@ -3,10 +3,10 @@
 const int hiddensize = 64;
 
 DQNAgent::DQNAgent(size_t state_space, size_t action_space) :
-	qNN(state_space+action_space, DQN_consts::actions_size, hiddensize),
-	qtNN(state_space+action_space, DQN_consts::actions_size, hiddensize),
-	qOptimizer(qNN.parameters(),DQN_consts::a),
-	qtOptimizer(qtNN.parameters(),DQN_consts::a)
+	qNN(state_space, DQN_consts::actions_size, hiddensize),
+	qtNN(state_space, DQN_consts::actions_size, hiddensize),
+	qOptimizer(qNN.parameters(),torch::optim::AdamOptions(DQN_consts::a)),
+	qtOptimizer(qtNN.parameters(),torch::optim::AdamOptions(DQN_consts::a))
 	{
 		//copy {Q'} <- {Q}
 		for (size_t i = 0; i < qNN.parameters().size(); i++)
@@ -22,7 +22,7 @@ std::vector<float> DQNAgent::evaluate_critic_NN(const std::vector<float>& s,cons
 	std::vector<float> input;
 	input.insert(input.begin(),s.begin(),s.end());
 	// input.insert(input.end(),a.begin(),a.end());
-	std::cout<<s<<std::endl;
+	// std::cout<<s<<std::endl;
 	torch::Tensor t = torch::tensor(input).unsqueeze(0);
 	// t = torch::reshape(t,{2, static_cast<int>(input.size()/2)});
 	// t = torch::transpose(t,0,1);

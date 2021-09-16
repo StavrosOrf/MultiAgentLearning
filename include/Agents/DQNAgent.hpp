@@ -51,6 +51,6 @@ class DQNAgent{
 		
 	protected:
 		CriticNN qNN, qtNN;
-		torch::optim::Adam qOptimizer,qtOptimizer;
+		torch::optim::Adam qOptimizer, qtOptimizer;
 };
 
