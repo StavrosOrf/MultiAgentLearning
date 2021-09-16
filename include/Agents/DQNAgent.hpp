@@ -19,7 +19,7 @@
 namespace DQN_consts{ 
 	const static size_t replay_buffer_size = 200*100; //1024*1024
 	const float gamma = 0.99;
-	const float tau_q = 0.01; // Critic Learning Rate
+	const float a = 0.001; // Critic Learning Rate
 	const size_t reset_step = 15; // reset q_t every C steps
 	const size_t actor_samples = 10;
 	const size_t simulation_steps = 1000;
@@ -51,5 +51,6 @@ class DQNAgent{
 		
 	protected:
 		CriticNN qNN, qtNN;
+		torch::optim::Adam qOptimizer,qtOptimizer;
 };
 
