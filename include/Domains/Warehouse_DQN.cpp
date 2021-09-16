@@ -34,7 +34,7 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 		// std::cout<<"Actions: "<<actions<<std::endl;
 		traverse_one_step(actions);
 		next_state = get_edge_utilization();
-		// std::cout<<"State: "<<next_state<<std::endl;
+		std::cout<<t <<". |State: "<<next_state<<std::endl;
 		// Log Performance Counters
 		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0,totalCommand = 0;
 		// reward.clear();
@@ -65,7 +65,11 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 		/* Get reward for each agent explicitly*/
 		//Reward thought: |#AGVs that could move - #AGVs that moved|
 		// float reward = totalMove;// + totalEnter; 
-		// std::cout<<"----------------------Reward: "<<reward<<std::endl;
+		for (size_t i = 0; i < maTeam.size(); ++i)
+		{
+			reward[i] = totalMove ;//+ totalEnter;
+		}
+		std::cout<<"---Reward: "<<reward[0]<<std::endl;
 				
 		replay.push_back({cur_state, next_state, actions, reward});	
 		cur_state = next_state;
@@ -93,102 +97,6 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 	}
 	return evaluateEpoch();
 
-	// std::vector<float> q_input_states, q_input_actions, rewardsV;
-	// q_input_states.reserve(COMAAgent::get_batch_size()*nSteps);
-	// q_input_actions.reserve(COMAAgent::get_batch_size()*nSteps);
-	// rewardsV.reserve(COMAAgent::get_batch_size()*nSteps);
-
-	// for (size_t i = 0; i < maTeam.size(); ++i){
-	// 	q_input_states.clear();
-	// 	q_input_actions.clear();
-	// 	rewardsV.clear();
-
-	// 	for (size_t b = 0; b < COMAAgent::get_batch_size(); ++b){
-	// 		for (size_t t = 0; t < nSteps; ++t){				
-	// 			q_input_actions.push_back(replay[b*nSteps + t].action[i]);				
-	// 			//q_input_states.push_back(replay[b*nSteps + t].current_state[i]);
-	// 			q_input_states.insert(q_input_states.end(), replay[b*nSteps + t].current_state.begin(), replay[b*nSteps + t].current_state.end());
-	// 			rewardsV.push_back(replay[b*nSteps + t].reward);
-	// 		}
-	// 	}
-
-	// 	// //Train Critic 
-	// 	// // torch::Tensor Q_targets = COMAAgent::evaluate_target_critic_NN(q_input_states,q_input_actions).squeeze(1);
-	// 	// // torch::Tensor Q = COMAAgent::evaluate_critic_NN(q_input_states,q_input_actions).squeeze(1);
-
-	// 	// torch::Tensor rewards = torch::tensor(rewardsV);//.unsqueeze(0);
-	// 	// //std::cout<<rewards<<std::endl;
-	// 	// //std::cout << Q_targets << std::endl;
-	// 	// Q_targets = Q_targets+rewards;
-
-	// 	// torch::Tensor dQ = Q_targets - Q;
-	// 	// torch::Tensor critic_loss = torch::mean(torch::pow(dQ,2));
-	// 	// std::cout<<critic_loss<<std::endl;
-
-	// 	// COMAAgent::optimizerQNN->zero_grad();
-	// 	// critic_loss.backward();
-	// 	// COMAAgent::optimizerQNN->step();
-
-
-	// }
-
-
-	
-	//TODO try sampling from history
-	// std::vector<float> sample_index;
-	// for (size_t i = 0; i < replay.size(); ++i)
-	// 	sample_index.push_back(i);
-
-	// std::vector<float> state;
-	// std::vector<float> s,a;
-	// std::vector<int> action_samples;
-	// s.reserve(COMA_consts::actor_samples);
-	// a.reserve(COMA_consts::actor_samples);
-	// action_samples.reserve(COMA_consts::actor_samples);
-
-	// for (size_t i = 0; i < maTeam.size(); ++i) {
-		//Train Actor
-		// const torch::Tensor monte_carlo_samples = torch::rand(COMA_consts::actor_samples);
-		// const torch::Tensor monte_carlo_samples = torch::rand(COMA_consts::actor_samples);
-
-		// q_input_actions.clear();			
-		// q_input_states.clear();
-		// a.clear();
-		// s.clear();
-		// for (size_t b = 0; b < COMAAgent::get_batch_size(); ++b){
-		// 	for (size_t t = 0; t < nSteps; ++t){				
-		// 		q_input_actions.push_back(replay[b*nSteps + t].action[i]);
-		// 		q_input_states.push_back(replay[b*nSteps + t].current_state[i]);				
-		// 	}
-		// }
-
-		// std::sample(sample_index.begin(), sample_index.end(), std::back_inserter(action_samples),COMA_consts::actor_samples
-		// 			, std::mt19937{std::random_device{}()});
-
-		// for (size_t j = 0; j < action_samples.size(); j++){
-		// 	a.push_back(q_input_actions[action_samples[i]]);
-		// 	s.push_back(q_input_states[action_samples[i]]);
-		// }
-
-		// torch::Tensor Q = COMAAgent::evaluate_critic_NN(s,a).squeeze(1);
-
-		// std::cout << Q << std::endl;
-
-		// torch::Tensor Q = COMAAgent::evaluate_critic_NN(s,a).squeeze(1);
-		
-		//torch::Tensor Baseline = ;
-
-		// for (int b = 0; b < COMAAgent::get_batch_size(); ++b){
-		// 	for (int t = 0; t < nSteps; ++t){
-		// 		targets[b][t][i] = temp[b*nSteps + t]; //Targets y_t for each agent
-		// 	}
-	// 	}
-	// }
-
-
-
-
-	
 }
 
 epoch_results Warehouse_DQN::evaluateEpoch(){

@@ -16,8 +16,8 @@ ES:
   learning_rate: 0.001
   rand_proc_std_dev: 1 #standard deviation of the random process, higher values encourage more exploration
 DQN:
-  epochs: 1
-  runs: 2 # number of statistical runs
+  epochs: 50
+  runs: 1 # number of statistical runs
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   # batch_size: 3   
 simulation:
