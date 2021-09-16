@@ -5,8 +5,8 @@ const int hiddensize = 64;
 DQNAgent::DQNAgent(size_t state_space, size_t action_space) :
 	qNN(state_space, DQN_consts::actions_size, hiddensize),
 	qtNN(state_space, DQN_consts::actions_size, hiddensize),
-	qOptimizer(qNN.parameters(),torch::optim::AdamOptions(DQN_consts::a)),
-	qtOptimizer(qtNN.parameters(),torch::optim::AdamOptions(DQN_consts::a))
+	qOptimizer(qNN.parameters(),DQN_consts::a),
+	qtOptimizer(qtNN.parameters(),DQN_consts::a)
 	{
 		//copy {Q'} <- {Q}
 		for (size_t i = 0; i < qNN.parameters().size(); i++)

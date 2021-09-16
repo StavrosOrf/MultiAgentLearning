@@ -1,4 +1,5 @@
 #include "Warehouse_DQN.hpp"
+#define REWARD_METHOD_3_BUFFER_SIZE 30
 
 Warehouse_DQN::~Warehouse_DQN(void){
 	delete whGraph;
@@ -15,26 +16,31 @@ Warehouse_DQN::~Warehouse_DQN(void){
 
 epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 
-	epoch_results results; // TODO fix
-	//std::normal_distribution<float> n_process(1, N_proc_std_dev);
-	//std::default_random_engine n_generator(time(NULL));
-	
-	///SIMULATE step
+	maTeam[0]->printAboutNN();
+	epoch_results results;
+
 	std::vector<experience_replayDQN> replay,samples; //empty buffer
 	samples.reserve(DQN_consts::batch_size);
 	replay.reserve(DQN_consts::simulation_steps);
 
 	InitialiseNewEpoch();
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0),next_state;
-	// reward.reserve(maTeam.size());
+	
+	int index = 0;
+	std::vector<float> bufferCurrStates[REWARD_METHOD_3_BUFFER_SIZE];
+	std::vector<float> bufferActions[REWARD_METHOD_3_BUFFER_SIZE];
+	float bufferRewards[REWARD_METHOD_3_BUFFER_SIZE];
+	for (int i = 0; i < REWARD_METHOD_3_BUFFER_SIZE; i++)
+		bufferRewards[i] = -1;
 
 	for (size_t t = 0; t != DQN_consts::simulation_steps; t++){
 		// std::cout<<"State: "<<cur_state<<std::endl;
 		std::vector<float> actions = query_actor_MATeam(cur_state,true);
-		// std::cout<<"Actions: "<<actions<<std::endl;
+		
 		traverse_one_step(actions);
 		next_state = get_edge_utilization();
 		std::cout<<t <<". |State: "<<next_state<<std::endl;
+		// std::cout<<"Actions: "<<actions<<std::endl;
 		// Log Performance Counters
 		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0,totalCommand = 0;
 		// reward.clear();
@@ -64,14 +70,42 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 		
 		/* Get reward for each agent explicitly*/
 		//Reward thought: |#AGVs that could move - #AGVs that moved|
-		// float reward = totalMove;// + totalEnter; 
+		// float reward = totalMove;// + totalEnter;
+
+		//Update current values for each state
+		for (int i = 0; i< REWARD_METHOD_3_BUFFER_SIZE; i++){
+			if (bufferRewards[i] != -1)
+				bufferRewards[i] += totalSuccess;
+		}
+
+		//Time to write replay
+		if (bufferRewards[index] != -1 ){
+			// experience_replay r = {bufferCurrStates[index],cur_state,bufferActions[index],bufferRewards[index]/100};
+			for (size_t i = 0; i < maTeam.size(); ++i)
+			{
+				reward[i] = totalSuccess; // totalMove ;//+ totalEnter;
+				reward[i] = bufferRewards[index]; // totalMove ;//+ totalEnter;
+			}						
+			replay.push_back({cur_state, next_state, actions,reward});		
+			std::cout<<"Reward: "<<bufferRewards[index]<<std::endl;
+		}
+
+		bufferActions[index] = actions;
+		bufferCurrStates[index] = cur_state;
+		bufferRewards[index] = 0;
+		//Move buffer pointer
+		index ++;
+
+		if(index >= REWARD_METHOD_3_BUFFER_SIZE)
+			index = 0;
+
 		for (size_t i = 0; i < maTeam.size(); ++i)
 		{
-			reward[i] = totalMove ;//+ totalEnter;
+			reward[i] = totalSuccess; // totalMove ;//+ totalEnter;
 		}
-		std::cout<<"---Reward: "<<reward[0]<<std::endl;
+		// std::cout<<"---Reward: "<<reward[0]<<std::endl;
 				
-		replay.push_back({cur_state, next_state, actions, reward});	
+		
 		cur_state = next_state;
 
 		// TRAINING
@@ -95,6 +129,7 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 			for (auto agent : maTeam)
 				agent->reset_target_critic();
 	}
+
 	return evaluateEpoch();
 
 }
@@ -103,12 +138,12 @@ epoch_results Warehouse_DQN::evaluateEpoch(){
 	epoch_results results;
 	InitialiseNewEpoch();
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0),next_state;
-
+	std::cout<<"==================================="<<std::endl;
 	for (size_t t = 0; t < 200; t++){
 		
-		// std::cout<<"State: "<<cur_state<<std::endl;
 		std::vector<float> actions = query_actor_MATeam(cur_state,false);
-		// std::cout<<"Actions: "<<actions<<std::endl;
+		std::cout<<t <<". |Actions: "<<actions<<std::endl;
+		std::cout<<"    State: "<<next_state<<"\n"<<std::endl;
 		traverse_one_step(actions);
 		 
 		// Log Performance Counters
@@ -147,6 +182,7 @@ void Warehouse_DQN::InitialiseMATeam(){
 	else if (agent_type == agent_def::link)
 		for (size_t i = 0; i < whGraph->GetEdges().size(); i++)
 			maTeam.push_back(new DQNAgent((1+incorporates_time),DQN_consts::actions_size));
+			// maTeam.push_back(new DQNAgent(1 + whGraph->GetEdges().size()*(1+incorporates_time),DQN_consts::actions_size));
 	else if (agent_type == agent_def::intersection){//IMPLEMENT
 		std::cout << "Intersection Agent Does not work with DQN yet" << std::endl;
 		exit(EXIT_FAILURE);

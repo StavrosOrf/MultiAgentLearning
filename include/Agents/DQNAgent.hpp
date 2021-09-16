@@ -22,10 +22,10 @@ namespace DQN_consts{
 	const float a = 0.001; // Critic Learning Rate
 	const size_t reset_step = 40; // reset q_t every C steps
 	const size_t actor_samples = 10;
-	const size_t simulation_steps = 200;
-	const int actions_size = 6;
-	const int actions[6] = {0,1,2,4,8,16};
-	const int batch_size = 25;
+	const size_t simulation_steps = 500;
+	const int actions_size = 7;
+	const int actions[7] = {0,1,2,4,8,16,32};
+	const int batch_size = 50;
 }
 
 class DQNAgent{
@@ -51,6 +51,6 @@ class DQNAgent{
 		
 	protected:
 		CriticNN qNN, qtNN;
-		torch::optim::Adam qOptimizer, qtOptimizer;
+		torch::optim::RMSprop qOptimizer, qtOptimizer;
 };
 
