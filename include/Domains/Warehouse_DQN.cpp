@@ -28,6 +28,7 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 	
 	int index = 0;
 	std::vector<float> bufferCurrStates[REWARD_METHOD_3_BUFFER_SIZE];
+	std::vector<float> bufferNextStates[REWARD_METHOD_3_BUFFER_SIZE];
 	std::vector<float> bufferActions[REWARD_METHOD_3_BUFFER_SIZE];
 	float bufferRewards[REWARD_METHOD_3_BUFFER_SIZE];
 	for (int i = 0; i < REWARD_METHOD_3_BUFFER_SIZE; i++)
@@ -86,12 +87,13 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 				reward[i] = totalSuccess; // totalMove ;//+ totalEnter;
 				reward[i] = bufferRewards[index]; // totalMove ;//+ totalEnter;
 			}						
-			replay.push_back({cur_state, next_state, actions,reward});		
+			replay.push_back({bufferCurrStates[index], bufferNextStates[index], bufferActions[index],reward});		
 			std::cout<<"Reward: "<<bufferRewards[index]<<std::endl;
 		}
 
 		bufferActions[index] = actions;
 		bufferCurrStates[index] = cur_state;
+		bufferNextStates[index] = next_state;
 		bufferRewards[index] = 0;
 		//Move buffer pointer
 		index ++;
@@ -114,12 +116,11 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 			continue;
 		
 		/*Get samples(batch)*/
-		samples.clear();
-		std::ranges::sample(replay, std::back_inserter(samples), DQN_consts::batch_size, std::mt19937{std::random_device{}()});
-		// std::cout<samples[1].reward<<std::endl;
-		// std::cout<<(float)samples[49].reward<<std::endl;
-
+		
 		for (size_t i = 0; i < maTeam.size(); ++i){
+			samples.clear();
+			std::ranges::sample(replay, std::back_inserter(samples), DQN_consts::batch_size, std::mt19937{std::random_device{}()});
+			// std::cout<"TRAIN"<<std::endl;
 			maTeam[i]->trainCritic({samples},i);
 		}
 
@@ -129,7 +130,6 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 			for (auto agent : maTeam)
 				agent->reset_target_critic();
 	}
-
 	return evaluateEpoch();
 
 }
@@ -138,7 +138,7 @@ epoch_results Warehouse_DQN::evaluateEpoch(){
 	epoch_results results;
 	InitialiseNewEpoch();
 	std::vector<float> cur_state(N_EDGES*(incorporates_time+1),0),next_state;
-	std::cout<<"==================================="<<std::endl;
+	std::cout<<"=================================== Evaluation ========================="<<std::endl;
 	for (size_t t = 0; t < 200; t++){
 		
 		std::vector<float> actions = query_actor_MATeam(cur_state,false);
@@ -181,8 +181,8 @@ void Warehouse_DQN::InitialiseMATeam(){
 	}
 	else if (agent_type == agent_def::link)
 		for (size_t i = 0; i < whGraph->GetEdges().size(); i++)
-			maTeam.push_back(new DQNAgent((1+incorporates_time),DQN_consts::actions_size));
-			// maTeam.push_back(new DQNAgent(1 + whGraph->GetEdges().size()*(1+incorporates_time),DQN_consts::actions_size));
+			// maTeam.push_back(new DQNAgent((1+incorporates_time),DQN_consts::actions_size));
+			maTeam.push_back(new DQNAgent(1 + whGraph->GetEdges().size()*(1+incorporates_time),DQN_consts::actions_size));
 	else if (agent_type == agent_def::intersection){//IMPLEMENT
 		std::cout << "Intersection Agent Does not work with DQN yet" << std::endl;
 		exit(EXIT_FAILURE);
@@ -197,6 +197,7 @@ std::vector<float> Warehouse_DQN::query_actor_MATeam(std::vector<float> &states,
 	assert(states.size() == N_EDGES*(1 + incorporates_time));
 	assert(agent_type == agent_def::link); //TODO REMOVE
 	std::vector<float> actions;
+	std::vector<float> state_temp;
 	actions.reserve(N_EDGES);
 
 	for (size_t i = 0; i < maTeam.size(); i++)
@@ -212,12 +213,16 @@ std::vector<float> Warehouse_DQN::query_actor_MATeam(std::vector<float> &states,
 					actions.push_back(DQN_consts::actions[rand() % DQN_consts::actions_size]);
 				}else{
 					// std::cout<<states<<std::endl;
-					// assert(states.size())	;
-					v = (maTeam[i]->evaluate_critic_NN({states[i]},{states[i]}));			
+					// assert(states.size());
+					state_temp = states;
+					state_temp.push_back(i+1);
+					v = (maTeam[i]->evaluate_critic_NN({state_temp},{states[i]}));			
 					actions.push_back(DQN_consts::actions[std::max_element(v.begin(),v.end()) - v.begin()]);	
 				}
 			}else{
-				v = (maTeam[i]->evaluate_critic_NN({states[i]},{states[i]}));			
+				state_temp = states;
+				state_temp.push_back(i+1);
+				v = (maTeam[i]->evaluate_critic_NN({state_temp},{states[i]}));			
 				actions.push_back(DQN_consts::actions[std::max_element(v.begin(),v.end()) - v.begin()]);
 			}
 			

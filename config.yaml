@@ -16,14 +16,14 @@ ES:
   learning_rate: 0.001
   rand_proc_std_dev: 1 #standard deviation of the random process, higher values encourage more exploration
 DQN:
-  epochs: 500
+  epochs: 200
   runs: 1 # number of statistical runs
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   # batch_size: 3   
 simulation:
   verbose: true
   steps: 200
-  agvs: origins_400.csv #Valid options: 70,90,120,200,400
+  agvs: origins_120.csv #Valid options: 70,90,120,200,400
   goals: goals.csv
 results:
   folder:     ../Results/

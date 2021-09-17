@@ -20,10 +20,11 @@ namespace DQN_consts{
 	const static size_t replay_buffer_size = 200*100; //1024*1024
 	const float gamma = 0.99;
 	const float a = 0.001; // Critic Learning Rate
-	const size_t reset_step = 40; // reset q_t every C steps
+	const size_t reset_step = 10; // reset q_t every C steps
 	const size_t actor_samples = 10;
-	const size_t simulation_steps = 500;
+	const size_t simulation_steps = 200;
 	const int actions_size = 7;
+	// const int actions[29] = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28};
 	const int actions[7] = {0,1,2,4,8,16,32};
 	const int batch_size = 50;
 }

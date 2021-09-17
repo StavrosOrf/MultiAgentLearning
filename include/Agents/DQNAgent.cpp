@@ -70,27 +70,49 @@ void DQNAgent::reset_target_critic(){
 
 void DQNAgent::trainCritic(const std::vector<experience_replayDQN>& samples,const int agentNumber){
 	
-	std::vector<float> states(DQN_consts::batch_size);
-	std::vector<float> next_states(DQN_consts::batch_size);
+	std::vector<std::vector<float> > states(DQN_consts::batch_size);
+	std::vector<std::vector<float> > next_states(DQN_consts::batch_size);
 	std::vector<float> rewards(DQN_consts::batch_size);
 	std::vector<float> actions(DQN_consts::batch_size);
+	std::vector<float> agent_ids(DQN_consts::batch_size);
 
 	for (int i = 0; i < DQN_consts::batch_size; ++i){
-		states[i] = samples[i].current_state[agentNumber];
-		next_states[i] = samples[i].next_state[agentNumber];
+		states[i] = samples[i].current_state;
+		next_states[i] = samples[i].next_state;
 		rewards[i] = samples[i].reward[agentNumber];
 		actions[i] = samples[i].action[agentNumber];
+		agent_ids[i] = agentNumber + 1;
 	}
 
-	torch::Tensor s = torch::tensor(states);
-	s = torch::reshape(s,{DQN_consts::batch_size,1});
-	torch::Tensor n_s = torch::tensor(next_states);
-	n_s = torch::reshape(n_s,{DQN_consts::batch_size,1});
+	torch::Tensor s = torch::tensor(states[0]).unsqueeze(0);
+	for (size_t i = 1; i != DQN_consts::batch_size; i++){
+		torch::Tensor temp = torch::tensor(states[i]).unsqueeze(0);
+		s = torch::cat({s,temp},0);
+	}
+
+	// std::cout<< s<<std::endl;
+	torch::Tensor agent_id = torch::tensor(agent_ids);
+
+	agent_id = torch::reshape(agent_id,{DQN_consts::batch_size,1});	
+	// std::cout<<agent_id<<std::endl;
+	s = torch::cat({s,agent_id},1);
+	// std::cout<<s<<std::endl;
+
+	torch::Tensor n_s = torch::tensor(next_states[0]).unsqueeze(0);
+	for (size_t i = 1; i != DQN_consts::batch_size; i++){
+		torch::Tensor temp = torch::tensor(next_states[i]).unsqueeze(0);
+		n_s = torch::cat({n_s,temp},0);
+	}
+
+	n_s = torch::cat({n_s,agent_id},1);
+	// std::cout<<n_s<<std::endl;
+
 	torch::Tensor a = torch::tensor(actions);
 	torch::Tensor r = torch::tensor(rewards);
 
 	torch::Tensor temp = qtNN.forward(n_s);
 	// std::cout<< temp<<std::endl;
+	
 	torch::Tensor t1 = std::get<0>(torch::max(temp,1));
 	// std::cout<< t1<<std::endl;
 
@@ -117,14 +139,14 @@ void DQNAgent::trainCritic(const std::vector<experience_replayDQN>& samples,cons
 		aa[z] = temp2[z][index[z]];
 	}
 	
-    // std::cout<<aa<<std::endl;
-    // std::cout<<r - aa<<std::endl;
+    // std::cout<<"Q(s,a)"<<aa<<std::endl;
+    // std::cout<<"Reward"<<r<<std::endl;
     // std::cout<<DQN_consts::gamma *t1<<std::endl;
 
 	torch::Tensor loss = (r + DQN_consts::gamma *t1 - aa);
-	// std::cout<< loss<<std::endl;
+	// std::cout<<"Pow^2"<< torch::pow(loss,2)<<std::endl;
 	loss = torch::mean(torch::pow(loss,2));
-	// std::cout<< loss<<std::endl;
+	// std::cout<<"Loss: "<<loss<<std::endl;
 
 	qOptimizer.zero_grad();
 	loss.backward();
