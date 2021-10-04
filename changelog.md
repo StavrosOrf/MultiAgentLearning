@@ -242,3 +242,7 @@ trace if Eigen, Threadpool.cpp
 - 
 ## v 1.00007k
 - clean up agent_type::COMA
+- 
+## v 1.00008k
+- added agent_type::hardcoded
+- added plot scripts 

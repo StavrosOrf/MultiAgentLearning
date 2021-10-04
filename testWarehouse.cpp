@@ -18,10 +18,19 @@
 #endif
 #include "Domains/Warehouse_ES_container.hpp"
 #include "Domains/Warehouse_DQN.hpp"
+#include "Domains/Warehouse_hardcoded.hpp"
 
 Warehouse* create_warehouse(YAML::Node configs);
 std::string create_results_folder(YAML::Node configs);
 std::string config_file;
+
+void warehouse_simulate_hardcoded(YAML::Node configs, [[maybe_unused]] size_t n_threads) {
+	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
+
+	Warehouse_hardcoded trainDomain = Warehouse_hardcoded(configs);
+	epoch_results t = trainDomain.simulate_epoch(verbose);//simulate
+}
+
 
 void warehouse_simulate_DQN(YAML::Node configs, [[maybe_unused]] size_t n_threads){
 	const int nEps = configs["DQN"]["epochs"].as<int>();
@@ -149,7 +158,10 @@ void WarehouseSimulation(const std::string &config_file, size_t n_threads){
 		warehouse_simulate_ES(configs, n_threads);
 	}else if (algo == "DQN"){
 		warehouse_simulate_DQN(configs, n_threads);
-	}else{
+	}else if (algo == "HARDCODED") {
+		warehouse_simulate_hardcoded(configs, n_threads);
+	}
+	else{
 		std::cout << "Error: unknown algo! Exiting.\n";
 		exit(EXIT_FAILURE);
 	}

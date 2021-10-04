@@ -9,6 +9,7 @@ Warehouse::Warehouse(YAML::Node configs){
 	std::string cFile = domainDir + configs["graph"]["capacities"].as<std::string>();
 	nSteps = configs["simulation"]["steps"].as<size_t>();
 
+	/*
 	if(configs["mode"]["algo"].as<std::string>() == "DDPG")
 		algo = algo_type::ddpg;
 	else if(configs["mode"]["algo"].as<std::string>() == "ES")
@@ -21,6 +22,7 @@ Warehouse::Warehouse(YAML::Node configs){
 		std::cout << "ERROR: Currently only configured for 'DDPG' and 'ES' and 'COMA'! Exiting.\n";
 		exit(EXIT_FAILURE);
 	}
+	 */
 	std::string agentType = configs["domain"]["agents"].as<std::string>();
 
 	if(agentType.starts_with("centralized"))
