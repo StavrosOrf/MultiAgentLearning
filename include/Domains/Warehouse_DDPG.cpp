@@ -311,7 +311,7 @@ std::vector<float> Warehouse_DDPG::QueryActorMATeam(std::vector<float> states){
 		return actions;
 	}
 	else{
-		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
+		std::cout << "ERROR: Invalid agent_defintion" << std::endl; 
 		exit(EXIT_FAILURE);
 		return {0};
 	} 

@@ -88,6 +88,7 @@ struct CriticNN : torch::nn::Module {
 		x = torch::relu(fc1->forward(x));
 		x = torch::relu(fc2->forward(x));
 		x = (fc3->forward(x));
+		// x = torch::nn::functional::softmax(fc3->forward(x),-1);
 		
 		// m = torch::min(x);
 		// s = torch::max(x);		
