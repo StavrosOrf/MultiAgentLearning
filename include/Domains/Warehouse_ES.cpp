@@ -57,7 +57,7 @@ epoch_resultsES Warehouse_ES::SimulateEpochES(const int epoch, bool verbose){
 	}
 
 	epoch_resultsES results;
-	// Log Perfomance Counters
+	// Log Performance Counters
 	size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0;
 	for (size_t k = 0; k < whAGVs.size(); k++){
 		totalMove += whAGVs[k]->GetMoveTime();
@@ -150,7 +150,6 @@ void Warehouse_ES::set_team_NNs(const std::vector<esNN*> &teamNNs){
 }
 
 /************************************************************************************************
-**Note	:This is very Junky solution								*
 **Output:A random std::vector<esNN*> which contains the NNs of a multiagent team		*
 ************************************************************************************************/
 std::vector<esNN*> Warehouse_ES::produce_random_team_NNs(){

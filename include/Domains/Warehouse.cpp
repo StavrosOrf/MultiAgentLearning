@@ -216,14 +216,15 @@ void Warehouse::print_warehouse_state(){
 }
 
 /************************************************************************************************
-*Input:	[verbose] which if true will print progress, [normalize] which if true normalized the	*
-*	outputs to [0,1]									*
+*Input:	[normalize] which if true normalized the outputs to [0,1]				*
+*	[care about time] if true incorparates travel time to the output 			*
 *Method:Count for each edge how many AGVs are on it and if it [incorporates_time] also		*
 *	observe what is the remaining time of the closest to finish AGV,			*
 *	finnaly if [normalize] is true, divide edge count by the maximum base travel among all	*
 *	the edges and (if [incorporates_time] is true) divide edge time left with it's capacity	*
 *Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
-*	And the minimum remaining distance of AGVs on edge indexed by EdgeID+N_EDGES		*
+*	And if [care_about_time] the minimum remaining distance of AGVs on edge indexed by	*
+ *	EdgeID+N_EDGES										*
 ************************************************************************************************/
 std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false);}
 std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool normalize){
@@ -271,8 +272,8 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool no
 }
 
 /************************************************************************************************
-**Input:[cost_add] a vector containing aditional planing costs indexed by EdgedIDs		*
-**Method:Replans the AGVs using Methos of the {Graph} class					*
+**Input:[cost_add] a vector containing additional planing costs indexed by EdgedIDs		*
+**Method:Replans the AGVs using Methods of the {Graph} class					*
 *************************************************************************************************/
 void Warehouse::replan_AGVs(const std::vector<float> &cost_add){
 	// Replan AGVs as necessary
@@ -391,8 +392,7 @@ void Warehouse::GetJointState(std::vector<size_t> &s){
 }
 
 /************************************************************************************************
-**Input: [include_start_vertexes] which if true it will AGVs that outside the graph,		*
-	[goal_vertex] which if inputed it will count AGVs that have that goal_vertex		*
+**Input:[include_start_vertexes] which if true it will count AGVs that outside the graph,	*
 **Method:Checks how many AGVs are on each Edge, if AGVs are outside the graph they count as	*
 **	Being on their origin vertex								*
 **Output:The number of AGVs on each Vertex							*

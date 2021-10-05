@@ -51,7 +51,7 @@ Node * Search::PathSearch(){
 	}
 }
 
-//TODO(Kallinteris) improve performance by reseting existing queue
+//TODO improve performance by reseting existing queue
 void Search::ResetSearch(){
 	assert(itsQueue);
 	itsQueue->reset();

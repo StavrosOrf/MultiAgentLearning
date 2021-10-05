@@ -44,7 +44,7 @@ DDPGAgent::~DDPGAgent(){
 
 /************************************************************************************************
  * *Input:a vector [s] of the input state and a vector [a] of input actions			*
- * *Method:Does a foward pass of the associated NN						*
+ * *Method:Does a forward pass of the associated NN						*
  * *Output:Returns a vector of the final nodes of the NN					*
  * ************************************************************************************************/
 std::vector<float> DDPGAgent::EvaluateActorNN_DDPG(const std::vector<float>& s){
@@ -129,7 +129,7 @@ std::vector<experience_replay> DDPGAgent::getReplayBufferBatch(size_t size){
 
 /************************************************************************************************
  * *Method:updates the network parameters (aka network transition weights) of target networks	*
- * *	by slow updating (with learning rate [TAU]) from non-targer networks			*
+ * *	by slow updating (with learning rate [TAU]) from non-target networks			*
  * ************************************************************************************************/
 void DDPGAgent::updateTargetWeights(){
 	for (size_t i = 0; i < qNN->parameters().size(); i++ ){
