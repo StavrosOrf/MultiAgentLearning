@@ -19,11 +19,11 @@ sed -i -e "1d" ES/*/x*
 
 
 #prepare CCEA/ [WIP]
-rm -r CCEA/*/Replay CCEA/*/neural_nets.csv
-awk -i inplace -F "," '{print $2}' CCEA/*/*.* #get max g
-#rename -n 's/CCEA/*/*\.*//' *
-i=0
-for file in $(find CCEA/*/* -type f); do
-        mv $file $(dirname -- $file)/e$i
-        i=$(($i+1))
-done
+#rm -r CCEA/*/Replay CCEA/*/neural_nets.csv
+#awk -i inplace -F "," '{print $2}' CCEA/*/*.* #get max g
+##rename -n 's/CCEA/*/*\.*//' *
+#i=0
+#for file in $(find CCEA/*/* -type f); do
+        #mv $file $(dirname -- $file)/e$i
+        #i=$(($i+1))
+#done

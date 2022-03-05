@@ -48,10 +48,10 @@ if sys.argv[1] == '--max':
     PLOT_TYPE = 'max' #possible values 'max', 'average'
 if sys.argv[1] == '--ave':
     PLOT_TYPE = 'average' #possible values 'max', 'average'
-AGV_COUNT = ['90', '120', '200'] # number of Autonomous Ground Vehicles (AGVs)
+AGV_COUNT = ['90', '120', '200', '400'] # number of Autonomous Ground Vehicles (AGVs)
 
-Y_LIM_AVE = [(350, 525), (400, 650), (400, 800)]
-Y_LIM_MAX = [(450, 560), (425, 725), (450, 950)]
+Y_LIM_AVE = [(350, 525), (400, 650), (400, 800), (400, 800)]
+Y_LIM_MAX = [(450, 560), (425, 725), (450, 950), (450, 950)]
 
 fig, axis = matplotlib.pyplot.subplots(1,len(AGV_COUNT))
 
@@ -164,8 +164,9 @@ for i in range(len(AGV_COUNT)):
 fig.set_figwidth(11)
 fig.set_figheight(2.25)
 axis[0].set_ylabel('Total Deliveries')
-if PLOT_TYPE == 'average':
-    axis[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.185), fancybox=True, ncol=4)
+#if PLOT_TYPE == 'average':
+    #axis[1].legend(loc='upper center', bbox_to_anchor=(1, -0.185), fancybox=True, ncol=4)
+axis[1].legend(loc='upper center', bbox_to_anchor=(1, -0.185), fancybox=True, ncol=4)
 
 if PLOT_TYPE == 'average':
     matplotlib.pyplot.savefig('ESvsGA_average.eps',bbox_inches='tight')

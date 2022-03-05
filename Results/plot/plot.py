@@ -56,14 +56,18 @@ if sys.argv[1] == '--print':
     PLOT_TYPE = 'print'
 
 
-#AGV_COUNT = ['90', '120', '200', '400'] # number of Autonomous Ground Vehicles (AGVs)
-AGV_COUNT = ['90', '120', '200'] # number of Autonomous Ground Vehicles (AGVs)
+AGV_COUNT = ['90', '120', '200', '400'] # number of Autonomous Ground Vehicles (AGVs)
+#AGV_COUNT = ['90', '120', '200'] # number of Autonomous Ground Vehicles (AGVs)
 ALGO = 'ES'
 ALGO = 'CCEA'
 
-Y_LIM_AVE = [(400, 550), (400, 650), (400, 800)]
-Y_LIM_MAX = [(450, 580), (450, 750), (450, 950)]
-fig, axis = matplotlib.pyplot.subplots(1,len(AGV_COUNT))
+Y_LIM_AVE = [(400, 550), (400, 650), (400, 800), (450, 850)]
+Y_LIM_MAX = [(450, 580), (450, 750), (450, 950), (500, 950)]
+if PLOT_TYPE == 'violin':
+    fig, axis = matplotlib.pyplot.subplots(2, 2)
+    #fig, axis = matplotlib.pyplot.subplots(1,len(AGV_COUNT))
+else:
+    fig, axis = matplotlib.pyplot.subplots(1,len(AGV_COUNT))
 
 for i in range(len(AGV_COUNT)):
     data_c = read_runs(ALGO + '/C_' + AGV_COUNT[i])
@@ -119,6 +123,9 @@ for i in range(len(AGV_COUNT)):
         #axis[i].fill_between(x=x, y1=min_i_t, y2=max_c_t, color='#b695c0')
         #axis[i].fill_between(x=x, y1=min_l, y2=max_c, color='#add8e6')
         #axis[i].fill_between(x=x, y1=min_l_t, y2=max_c_t, color='#ff7276')
+        axis[i].set_title(AGV_COUNT[i] + ' AGVs')
+        axis[i].tick_params(which='major', direction='in')
+        axis[0].set_ylabel('Total Deliveries')
     elif PLOT_TYPE == 'max':
         axis[i].set_ylim(Y_LIM_MAX[i][0], Y_LIM_MAX[i][1])
         axis[i].set_xlim(0,500)
@@ -129,33 +136,42 @@ for i in range(len(AGV_COUNT)):
         axis[i].plot(max_i_t, label='Intersection, time', color='purple', linewidth=0.5)
         axis[i].plot(max_l, label='Link', color='blue', linewidth=0.5)
         axis[i].plot(max_l_t, label='Link, time', color='red', linewidth=0.5)
+        axis[i].set_title(AGV_COUNT[i] + ' AGVs')
+        axis[i].tick_params(which='major', direction='in')
+        axis[0].set_ylabel('Total Deliveries')
     elif PLOT_TYPE == 'violin':
-        axis[i].set_ylim(Y_LIM_AVE[i][0], Y_LIM_MAX[i][1])
-        axis[i].violinplot([last_l, last_l_t, last_i, last_i_t, last_c, last_c_t], showextrema = False)
-        axis[i].collections[0].set_facecolor('blue')
-        axis[i].collections[1].set_facecolor('red')
-        axis[i].collections[2].set_facecolor('orange')
-        axis[i].collections[3].set_facecolor('purple')
-        axis[i].collections[4].set_facecolor('green')
-        axis[i].collections[5].set_facecolor('cyan')
+        axis[int(i/2)][i%2].set_ylim(Y_LIM_AVE[i][0], Y_LIM_MAX[i][1])
+        axis[int(i/2)][i%2].violinplot([last_l, last_l_t, last_i, last_i_t, last_c, last_c_t], showextrema = False)
+        axis[int(i/2)][i%2].collections[0].set_facecolor('blue')
+        axis[int(i/2)][i%2].collections[1].set_facecolor('red')
+        axis[int(i/2)][i%2].collections[2].set_facecolor('orange')
+        axis[int(i/2)][i%2].collections[3].set_facecolor('purple')
+        axis[int(i/2)][i%2].collections[4].set_facecolor('green')
+        axis[int(i/2)][i%2].collections[5].set_facecolor('cyan')
 
-        axis[i].scatter(1, statistics.median(last_l), marker='x', color='black', zorder=1,s=40, label='median')
-        axis[i].scatter(2, statistics.median(last_l_t), marker='x', color='black', zorder=1,s=40)
-        axis[i].scatter(3, statistics.median(last_i), marker='x', color='black', zorder=1,s=40)
-        axis[i].scatter(4, statistics.median(last_i_t), marker='x', color='black', zorder=1,s=40)
-        axis[i].scatter(5, statistics.median(last_c), marker='x', color='black', zorder=1,s=40)
-        axis[i].scatter(6, statistics.median(last_c_t), marker='x', color='black', zorder=1,s=40)
+        axis[int(i/2)][i%2].scatter(1, statistics.median(last_l), marker='x', color='black', zorder=1,s=40, label='median')
+        axis[int(i/2)][i%2].scatter(2, statistics.median(last_l_t), marker='x', color='black', zorder=1,s=40)
+        axis[int(i/2)][i%2].scatter(3, statistics.median(last_i), marker='x', color='black', zorder=1,s=40)
+        axis[int(i/2)][i%2].scatter(4, statistics.median(last_i_t), marker='x', color='black', zorder=1,s=40)
+        axis[int(i/2)][i%2].scatter(5, statistics.median(last_c), marker='x', color='black', zorder=1,s=40)
+        axis[int(i/2)][i%2].scatter(6, statistics.median(last_c_t), marker='x', color='black', zorder=1,s=40)
 
-        axis[i].scatter(1, statistics.mean(last_l), marker='+', color='black', zorder=1, s=80, label='mean')
-        axis[i].scatter(2, statistics.mean(last_l_t), marker='+', color='black', zorder=1,s=80)
-        axis[i].scatter(3, statistics.mean(last_i), marker='+', color='black', zorder=1,s=80)
-        axis[i].scatter(4, statistics.mean(last_i_t), marker='+', color='black', zorder=1,s=80)
-        axis[i].scatter(5, statistics.mean(last_c), marker='+', color='black', zorder=1,s=80)
-        axis[i].scatter(6, statistics.mean(last_c_t), marker='+', color='black', zorder=1,s=80)
+        axis[int(i/2)][i%2].scatter(1, statistics.mean(last_l), marker='+', color='black', zorder=1, s=80, label='mean')
+        axis[int(i/2)][i%2].scatter(2, statistics.mean(last_l_t), marker='+', color='black', zorder=1,s=80)
+        axis[int(i/2)][i%2].scatter(3, statistics.mean(last_i), marker='+', color='black', zorder=1,s=80)
+        axis[int(i/2)][i%2].scatter(4, statistics.mean(last_i_t), marker='+', color='black', zorder=1,s=80)
+        axis[int(i/2)][i%2].scatter(5, statistics.mean(last_c), marker='+', color='black', zorder=1,s=80)
+        axis[int(i/2)][i%2].scatter(6, statistics.mean(last_c_t), marker='+', color='black', zorder=1,s=80)
 
-        x_labels = ['','Link','Link time','Intersection','Intersection Time','Centralized','centralized Time']
-        axis[i].set_xticklabels(x_labels, rotation = 45, ha="right")
-        axis[i].legend()
+        X_LABELS = ['','Link','Link time','Intersection','Intersection Time','Centralized','centralized Time']
+        X_LABELS_EMPTY = ['','','','','','','']
+        axis[1][0].set_xticklabels(X_LABELS, rotation = 45, ha="right")
+        axis[1][1].set_xticklabels(X_LABELS, rotation = 45, ha="right")
+        axis[0][i%2].set_xticklabels(X_LABELS_EMPTY, rotation = 45, ha="right")
+        axis[int(i/2)][i%2].set_title(AGV_COUNT[i] + ' AGVs')
+        axis[1][0].legend()
+        axis[int(i/2)][i%2].tick_params(which='major', direction='in')
+        axis[int(i/2)][0].set_ylabel('Total Deliveries')
     elif PLOT_TYPE == 'print':
         print(ALGO + '_' + AGV_COUNT[i])
         print('max Centralized:' + str(max(max_c)))
@@ -195,17 +211,15 @@ for i in range(len(AGV_COUNT)):
     else:
         print('invalid PLOT_TYPE')
         exit()
-    axis[i].set_title(AGV_COUNT[i] + ' AGVs')
-    axis[i].tick_params(which='major', direction='in')
 
-axis[0].set_ylabel('Total Deliveries')
 if PLOT_TYPE != 'violin':
-    axis[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.175), fancybox=True, ncol=6)
-    fig.set_figwidth(11)
-    fig.set_figheight(2.5)
-else:
+    axis[1].legend(loc='upper center', bbox_to_anchor=(1, -0.175), fancybox=True, ncol=6)
+    #axis[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, ncol=6)
     fig.set_figwidth(13)
-    fig.set_figheight(5)
+    fig.set_figheight(2.75)
+else:
+    fig.set_figwidth(9)
+    fig.set_figheight(9)
 
 if PLOT_TYPE == 'average':
     matplotlib.pyplot.savefig(ALGO + '_ave_perf.eps',bbox_inches='tight')
@@ -216,4 +230,6 @@ elif PLOT_TYPE == 'max':
 elif PLOT_TYPE == 'violin':
     matplotlib.pyplot.savefig(ALGO + '_violin.eps',bbox_inches='tight')
     matplotlib.pyplot.savefig(ALGO + '_violin.png',bbox_inches='tight')
-#matplotlib.pyplot.show()
+
+#if PLOT_TYPE != 'print':
+    #matplotlib.pyplot.show()
