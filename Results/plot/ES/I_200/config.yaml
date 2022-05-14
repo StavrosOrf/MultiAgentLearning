@@ -1,0 +1,34 @@
+mode:
+  algo: ES #Valid Options: 'DDPG', 'ES'
+  type: train
+# NOTE: agent_policies and eval_file are only used if [mode][type] = test
+# agent_policies: ../Domains/Small_120_AGVs_SS_centralised_no_time/Results/neural_nets.csv # file containing agent policies
+# eval_file: ../Domains/Small_120_AGVs_SS_centralised_no_time/Results/evaluation_29.csv # file containing best teams
+domain:
+  folder: ../Domains/
+  warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS', 'Min_SS'
+  agents: intersection #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
+DDPG: #config options for 'DDPG' leanring algorihm
+  epochs: 10 # set to 1 in test mode
+  runs: 1 # number of statistical runs
+  rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
+  batch_size: 50 
+ES:
+  epochs: 500
+  runs: 25 # number of statistical runs
+  population_size: 1000
+  learning_rate: 0.001
+  rand_proc_std_dev: 1 #standard deviation of the random process, higher values encourage more exploration
+simulation:
+  verbose: true
+  steps: 200
+  agvs: origins_200.csv #Valid options: 70,90,120,200,400
+  goals: goals.csv
+results:
+  folder:     ../Results/
+  #evaluation: evaluation
+  #policies:   neural_nets.csv
+graph: #do not change this unless you know what you are doing
+  vertices:   vertices.csv
+  edges:      edges.csv
+  capacities: capacities.csv
