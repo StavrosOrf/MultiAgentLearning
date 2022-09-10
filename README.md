@@ -1,13 +1,15 @@
-# multiagent_learning
+# Analyzing the Performance Impact of Combining Agent Factorization with Different Learning Algorithms for Multiagent Coordination.
 
-This project Implements (MA)DDPG, I-DQN, and (MA)-ES on a warehouse domain using multiple
+This project implements various algorithms on a warehouse domain using multiple
 agent definitions with each learning algorithm, for purpose of comparing it to
 [CCEA](https://github.com/JenJenChung/multiagent_learning).
 
-This purpose implements the following algorithms on the warehouse domain/framework
+It contains implementations of the following algorithms on the warehouse domain/framework
  - ES
  - (MA)DDPG [Disabled] (use `-DENABLE_DDPG` to enable)
+ - I-DQN
 
+The Analysis of the results can be found in our [paper](https://dl.acm.org/doi/10.1145/3549737.3549773)
 
 ## Installation ##
 
