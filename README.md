@@ -9,7 +9,7 @@ It contains implementations of the following algorithms on the warehouse domain/
  - (MA)DDPG [Disabled] (use `-DENABLE_DDPG` to enable)
  - I-DQN
 
-The Analysis of the results can be found in our [paper](https://dl.acm.org/doi/10.1145/3549737.3549773)
+The Analysis of the results can be found in our [paper](https://dl.acm.org/doi/10.1145/3549737.3549773).
 
 ## Installation ##
 
