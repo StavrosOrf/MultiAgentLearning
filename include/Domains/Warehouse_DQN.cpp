@@ -40,7 +40,7 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 		
 		traverse_one_step(actions);
 		next_state = get_edge_utilization();
-		std::cout<<t <<". |State: "<<next_state<<std::endl;
+		//std::cout<<t <<". |State: "<<next_state<<std::endl;
 		// std::cout<<"Actions: "<<actions<<std::endl;
 		// Log Performance Counters
 		size_t totalMove = 0, totalEnter = 0, totalWait = 0, totalSuccess = 0,totalCommand = 0;
@@ -88,7 +88,7 @@ epoch_results Warehouse_DQN::simulate_epoch_DQN([[maybe_unused]] bool verbose){
 				reward[i] = bufferRewards[index]; // totalMove ;//+ totalEnter;
 			}						
 			replay.push_back({bufferCurrStates[index], bufferNextStates[index], bufferActions[index],reward});		
-			std::cout<<"Reward: "<<bufferRewards[index]<<std::endl;
+			//std::cout<<"Reward: "<<bufferRewards[index]<<std::endl;
 		}
 
 		bufferActions[index] = actions;
@@ -142,8 +142,8 @@ epoch_results Warehouse_DQN::evaluateEpoch(){
 	for (size_t t = 0; t < 200; t++){
 		
 		std::vector<float> actions = query_actor_MATeam(cur_state,false);
-		std::cout<<t <<". |Actions: "<<actions<<std::endl;
-		std::cout<<"    State: "<<next_state<<"\n"<<std::endl;
+		//std::cout<<t <<". |Actions: "<<actions<<std::endl;
+		//std::cout<<"    State: "<<next_state<<"\n"<<std::endl;
 		traverse_one_step(actions);
 		 
 		// Log Performance Counters
@@ -169,10 +169,12 @@ epoch_results Warehouse_DQN::evaluateEpoch(){
 
 void Warehouse_DQN::InitialiseMATeam(){
 	assert(whAgents.size());//this must be called after whAgents have been initialized
+	/*
 	if (algo != algo_type::dqn){
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
 		exit(EXIT_FAILURE);
 	}
+	*/
 	
 	assert(maTeam.empty());
 	if (agent_type == agent_def::centralized){
