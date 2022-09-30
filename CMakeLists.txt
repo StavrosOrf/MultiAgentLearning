@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-set(CMAKE_CXX_COMPILER "/usr/bin/g++-10")
-set(CMAKE_C_COMPILER "gcc-10")  
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR) 
 project(test_includes)
 
 
