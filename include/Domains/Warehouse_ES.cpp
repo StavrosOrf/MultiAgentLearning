@@ -79,15 +79,15 @@ void Warehouse_ES::InitialiseMATeam(){
 	assert(maTeam.empty());
 
 	if(agent_type == agent_def::centralized)
-		maTeam.push_back(new ESAgent(N_EDGES*(1+incorporates_time), N_EDGES));
+		maTeam.push_back(new ESAgent(N_EDGES*(1+incorporates_time+incorporates_avg_time), N_EDGES));
 	else if(agent_type == agent_def::link){			
 		for (size_t i = 0; i < whGraph->GetEdges().size(); i++){				
-			maTeam.push_back(new ESAgent((1+incorporates_time), 1));
+			maTeam.push_back(new ESAgent((1+incorporates_time+incorporates_avg_time), 1));
 		}
 	}
 	else if (agent_type == agent_def::intersection){
 		for (int v : whGraph->GetVertices())
-			maTeam.push_back(new ESAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()));
+			maTeam.push_back(new ESAgent((1+incorporates_time+incorporates_avg_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()));
 	}
 
 	assert(!maTeam.empty());
@@ -95,7 +95,7 @@ void Warehouse_ES::InitialiseMATeam(){
 
 // Template this
 std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &states){
- 	assert(states.size() == N_EDGES*(1 + incorporates_time));
+ 	assert(states.size() == N_EDGES*(1 + incorporates_time+incorporates_avg_time));
  	if(agent_type == agent_def::centralized)
  		return maTeam[0]->evaluateNN(states);
  	else if (agent_type == agent_def::link){
@@ -103,7 +103,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
  		actions.reserve(N_EDGES);
 
  		for (size_t i = 0; i < maTeam.size(); i++)
- 			if(incorporates_time)
+ 			if(incorporates_time or incorporates_avg_time)
  				actions.push_back(maTeam[i]->evaluateNN({states[i], states[i+N_EDGES]})[0]);
  			else{
  				float t = (maTeam[i]->evaluateNN({states[i]}))[0];
@@ -118,7 +118,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
  		// std::cout<<"i"<<std::endl;
 		for (size_t i = 0; i < maTeam.size(); i++){
 			std::vector<float> state_i;
-			if(incorporates_time)
+			if(incorporates_time or incorporates_avg_time)
 				state_i.reserve(whAgents[i]->eIDs.size()*2);
 			else
 				state_i.reserve(whAgents[i]->eIDs.size());			
@@ -126,7 +126,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)							
 				state_i.push_back(states[whAgents[i]->eIDs[j]]);
 			
-			if(incorporates_time)
+			if(incorporates_time or incorporates_avg_time)
 				for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)								
 					state_i.push_back(states[whAgents[i]->eIDs[j] + states.size()/2]);
 						
@@ -156,13 +156,13 @@ std::vector<esNN*> Warehouse_ES::produce_random_team_NNs(){
 	std::vector<esNN*> team;
 
 	if (agent_type == agent_def::centralized)
-		team.push_back((new ESAgent(N_EDGES*(1+incorporates_time), N_EDGES))->NN);
+		team.push_back((new ESAgent(N_EDGES*(1+incorporates_time + incorporates_avg_time), N_EDGES))->NN);
 	else if (agent_type == agent_def::link)
 		for (size_t i = 0; i < whGraph->GetEdges().size(); i++)
-			team.push_back((new ESAgent((1+incorporates_time), 1))->NN);
+			team.push_back((new ESAgent((1+incorporates_time + incorporates_avg_time), 1))->NN);
 	else if (agent_type == agent_def::intersection)
 		for (int v : whGraph->GetVertices())
-			team.push_back((new ESAgent((1+incorporates_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()))->NN);
+			team.push_back((new ESAgent((1+incorporates_time + incorporates_avg_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()))->NN);
 
 	return team;
 }

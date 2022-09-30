@@ -76,7 +76,7 @@ class Warehouse{
 		void GetJointState(std::vector<size_t> &s);//__attribute__((deprecated))
 		void print_warehouse_state();
 		std::vector<float> get_edge_utilization() __attribute__ ((pure));
-		std::vector<float> get_edge_utilization(bool with_time, bool normalize=false) __attribute__ ((pure));
+		std::vector<float> get_edge_utilization(bool with_time, bool normalize=false, bool care_about_avg_time=false) __attribute__ ((pure));
 		std::vector<vertex_t> get_vertex_utilization(const bool include_start_vertexes=true) __attribute__ ((pure));
 		std::vector<vertex_t> get_vertex_utilization(const vertex_t goal_vertex, const bool include_start_vertexes=true) __attribute__ ((pure));
 		float get_vertex_remaining_outgoing_capacity(vertex_t vertex) __attribute__ ((pure));
@@ -107,6 +107,6 @@ class Warehouse{
 
 		bool incorporates_time; //True means that the domain incorpated time to it's state
 		//as described in github.io/anthropomorphic/Papers/Chung2018multiagent.pdf
-
+		bool incorporates_avg_time = false;
 		agent_def agent_type;
 };

@@ -37,6 +37,8 @@ Warehouse::Warehouse(YAML::Node configs){
 	}
 	incorporates_time = agentType.ends_with("_t");
 
+	incorporates_avg_time = agentType.ends_with("_avgt");
+
 	InitialiseGraph(vFile, eFile, cFile, configs);
 }
 
@@ -226,11 +228,13 @@ void Warehouse::print_warehouse_state(){
 *	And if [care_about_time] the minimum remaining distance of AGVs on edge indexed by	*
  *	EdgeID+N_EDGES										*
 ************************************************************************************************/
-std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false);}
-std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool normalize){
-	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time)),0);
-	if (care_about_time)
-		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
+std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false,incorporates_avg_time);}
+std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool normalize, bool care_about_avg_time){
+	assert(! (nor care_about_time and care_about_avg_time));
+	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time + care_about_avg_time)),0);
+
+	if (care_about_time or care_about_avg_time)
+		for(size_t i = N_EDGES; i < N_EDGES*(care_about_time + care_about_avg_time); i++)
 			edge_utilization[i] = std::numeric_limits<float>::infinity();
 
 	for(AGV* a: whAGVs)
@@ -241,13 +245,39 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool no
 			if (care_about_time)
 				edge_utilization[Edge_ID+N_EDGES] = std::min<float>(
 						edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
+
+			// if (care_about_avg_time)
+			// 	edge_utilization[Edge_ID+N_EDGES] = std::min<float>(
+			// 			edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
+
+			// 	edge_utilization[Edge_ID+N_EDGES*2] = std::avg<float>(
+			// 		edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
+
 		}
 
-	if (care_about_time)
+	//find average of each edge
+	if (care_about_avg_time){//TODO FACTORIZE IT TO BE BETTER
+		std::vector<size_t> total_time(N_EDGES);
+		for (int i = 0; i < N_EDGES; ++i) {
+			total_time[i] = 0;
+		}
+		
+		for(AGV* a: whAGVs)
+			if(a->is_on_edge()){
+				const int Edge_ID = whGraph->GetEdgeID(a->GetCurEdge());
+				total_time[Edge_ID] += a->GetT2V();
+			}
+		//caclulate Average
+		for (auto Edge_ID = 0; Edge_ID != N_EDGES; Edge_ID++)
+			edge_utilization[Edge_ID+N_EDGES] = total_time[Edge_ID]/edge_utilization[Edge_ID];
+	}
+
+	if (care_about_time or care_about_avg_time)
 		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
 			if (std::isinf(edge_utilization[i]))
 				edge_utilization[i] = 0;
-	if (care_about_time)
+
+	if (care_about_time or care_about_avg_time)
 		for(size_t i = 0; i < N_EDGES; i++)
 			assert((edge_utilization[i+N_EDGES]==0) == (edge_utilization[i]==0));
 

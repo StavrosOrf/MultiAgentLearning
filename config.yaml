@@ -1,18 +1,18 @@
 mode:
-  algo: HARDCODED #Valid Options: 'DDPG', 'ES', 'DQN', 'HARDCODED'
+  algo: ES #Valid Options: 'DDPG', 'ES', 'DQN', 'HARDCODED'
 domain:
   folder: ../Domains/
   warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS', 'Min_SS', 'Medium_SS'
-  agents: link #Valid Opt: 'centralized', 'centralized_t', 'link', 'link_t', 'intersection', 'intersection_t'
+  agents: centralized_avgt #Valid Opt: 'centralized', 'centralized_t','centralized_avgt', 'link', 'link_t', 'link_avgt', 'intersection', 'intersection_t','intersection_avgt'
 DDPG: #config options for 'DDPG' leanring algorihm
   epochs: 10
   runs: 1 # number of statistical runs
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   batch_size: 50 
 ES:
-  epochs: 500
-  runs: 22 # number of statistical runs
-  population_size: 1000
+  epochs: 2
+  runs: 1 # number of statistical runs
+  population_size: 100
   learning_rate: 0.001
   rand_proc_std_dev: 1 #standard deviation of the random process, higher values encourage more exploration
 DQN:
@@ -22,7 +22,7 @@ DQN:
   # batch_size: 3   
 simulation:
   verbose: true
-  steps: 200
+  steps: 20
   agvs: origins_120.csv #Valid options: 70,90,120,200,400
   goals: goals.csv
 results:
