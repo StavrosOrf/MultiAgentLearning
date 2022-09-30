@@ -15,3 +15,4 @@ Results
 .clangd*
 *.json
 *.py
+.idea*
