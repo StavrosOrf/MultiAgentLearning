@@ -29,9 +29,9 @@ git clone git@github.com:stavrosgreece/multiagentlearning.git
 install CTorch/LibTorch (C++ version of PyTorch):
 ```
 cd multiagentlearning
-wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-latest%2Bcpu.zip
-unzip libtorch-cxx11-abi-shared-with-deps-latest+cpu.zip
-rm libtorch-cxx11-abi-shared-with-deps-latest+cpu.zip
+wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.10.1%2Bcpu.zip
+unzip libtorch-shared-with-deps-1.10.1+cpu.zip
+rm libtorch-shared-with-deps-1.10.1+cpu.zip
 ```
 Note: you can download and install LibTorch with different computer platform (e.g. CUDA/RocM) on https://pytorch.org/, be sure to instal the c++11+ ABI version
 
