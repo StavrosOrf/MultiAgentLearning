@@ -112,7 +112,7 @@ struct ActorCOMA_NN : torch::nn::Module {
 		x = torch::relu(fc1->forward(x));
 		// 	x = (x-m)/(s-m);	
 		x = torch::relu(fc2->forward(x));
-		// x = torch::nn::functional::softmax(fc3->forward(x),-1);
+		 x = torch::nn::functional::softmax(fc3->forward(x),-1);
 		return x;
 	}
 

@@ -16,7 +16,7 @@ class Warehouse_DQN : public Warehouse {
 	public:
 		Warehouse_DQN(YAML::Node configs) : Warehouse(configs), N_proc_std_dev(0){
 			N_proc_std_dev = configs["DQN"]["rand_proc_std_dev"].as<float>();
-			// DQNAgent::set_batch_size(configs["COMA"]["batch_size"].as<uint>());
+			//DQNAgent::set_batch_size(configs["COMA"]["batch_size"].as<uint>());
 		}
 		~Warehouse_DQN(void);
 

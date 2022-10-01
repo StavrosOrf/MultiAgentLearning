@@ -246,3 +246,12 @@ trace if Eigen, Threadpool.cpp
 ## v 1.00008k
 - added agent_type::hardcoded
 - added plot scripts 
+
+## v 1.00009s
+- Added template for new agent definition, AgentwithAvgTime 
+- broke COMA module
+
+## v 1.00010k
+- restored COMA module
+- minor code cleapup for AgentwithAvgTime 
+- restored broken COMA module (there is still no COMA agent)

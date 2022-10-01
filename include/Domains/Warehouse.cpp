@@ -230,7 +230,8 @@ void Warehouse::print_warehouse_state(){
 ************************************************************************************************/
 std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false,incorporates_avg_time);}
 std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool normalize, bool care_about_avg_time){
-	assert(! (nor care_about_time and care_about_avg_time));
+	assert(! (care_about_time and care_about_avg_time));
+	const bool care_about_both_times = care_about_avg_time and care_about_time;
 	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time + care_about_avg_time)),0);
 
 	if (care_about_time or care_about_avg_time)
@@ -257,10 +258,7 @@ std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool no
 
 	//find average of each edge
 	if (care_about_avg_time){//TODO FACTORIZE IT TO BE BETTER
-		std::vector<size_t> total_time(N_EDGES);
-		for (int i = 0; i < N_EDGES; ++i) {
-			total_time[i] = 0;
-		}
+		std::vector<size_t> total_time(N_EDGES, 0);
 		
 		for(AGV* a: whAGVs)
 			if(a->is_on_edge()){
