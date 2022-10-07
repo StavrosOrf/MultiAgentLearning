@@ -35,7 +35,7 @@ set( LIBS_TO_LINK
                   Planning
                   yaml-cpp
                   ${TORCH_LIBRARIES}
-                  ${CMAKE_THREAD_LIBS_INIT})# -llapack
+                  ${CMAKE_THREAD_LIBS_INIT})
 
 #add_executable(test_search ./tests/test_search.cpp)
 #target_link_libraries(test_search ${LIBS_TO_LINK})
