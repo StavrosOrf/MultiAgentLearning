@@ -29,7 +29,7 @@ git clone git@github.com:stavrosgreece/multiagentlearning.git
 install CTorch/LibTorch (C++ version of PyTorch):
 ```
 cd multiagentlearning
-wget https://download.pytorch.org/libtorch/cpu/libtorch-shared-with-deps-1.10.1%2Bcpu.zip
+wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-1.12.1%2Bcpu.zip
 unzip libtorch-shared-with-deps-1.10.1+cpu.zip
 rm libtorch-shared-with-deps-1.10.1+cpu.zip
 ```
