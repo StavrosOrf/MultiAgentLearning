@@ -222,79 +222,70 @@ void Warehouse::print_warehouse_state(){
 *	[care about time] if true incorparates travel time to the output 			*
 *Method:Count for each edge how many AGVs are on it and if it [incorporates_time] also		*
 *	observe what is the remaining time of the closest to finish AGV,			*
+*	if [care_about_avg_time] is true, also observe the average time of all AGVs in the 	*
+*	edge.											*
 *	finnaly if [normalize] is true, divide edge count by the maximum base travel among all	*
 *	the edges and (if [incorporates_time] is true) divide edge time left with it's capacity	*
-*Output:A vector<size_t> which contains the number of AGVs on each edge, indexed by EdgeID	*
-*	And if [care_about_time] the minimum remaining distance of AGVs on edge indexed by	*
- *	EdgeID+N_EDGES										*
+*Output:A vector<float> which contains the number of AGVs on each edge, indexed by EdgeID	*
+*	And if [care_about_last_time] the minimum remaining distance of AGVs on edge indexed by	*
+*	EdgeID+N_EDGES										*
+*	And if [care_avg_about_time] the average distance of AGVs on edge indexed by 		*
+*	EdgeID+N_EDGES										*
+*	Finnaly if both [care_about_last_time] [care_about_avg_time] then the minimum remaining *
+*	distance of AGVs on edge indexed by EdgeID+N_EDGES and average distance of AGVs is	*
+*	indexed by EdgeID+2*N_EDGES								*
 ************************************************************************************************/
-std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false,incorporates_avg_time);}
-std::vector<float> Warehouse::get_edge_utilization(bool care_about_time, bool normalize, bool care_about_avg_time){
-	assert(! (care_about_time and care_about_avg_time));
-	const bool care_about_both_times = care_about_avg_time and care_about_time;
-	std::vector<float> edge_utilization(N_EDGES * (1+(care_about_time + care_about_avg_time)),0);
+std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false, incorporates_avg_time);}
+std::vector<float> Warehouse::get_edge_utilization(bool care_about_last_time, bool normalize, bool care_about_avg_time){
+	const bool care_about_both_times = care_about_avg_time and care_about_last_time;
+	const size_t state_space_size = N_EDGES * (1+care_about_last_time+care_about_avg_time);
+	std::vector<float> edge_utilization(state_space_size, 0);
+	std::vector<float> total_time(N_EDGES, 0);
 
-	if (care_about_time or care_about_avg_time)
-		for(size_t i = N_EDGES; i < N_EDGES*(care_about_time + care_about_avg_time); i++)
-			edge_utilization[i] = std::numeric_limits<float>::infinity();
+	std::fill(edge_utilization.begin()+N_EDGES, edge_utilization.end(), std::numeric_limits<float>::infinity())
 
 	for(AGV* a: whAGVs)
 		if(a->is_on_edge()){
-			const int Edge_ID = whGraph->GetEdgeID(a->GetCurEdge());
-			//assert(Edge_ID < edge_utilization.size()/(1+(care_about_time)));
+			const size_t Edge_ID = whGraph->GetEdgeID(a->GetCurEdge());
 			edge_utilization[Edge_ID]++;
-			if (care_about_time)
-				edge_utilization[Edge_ID+N_EDGES] = std::min<float>(
-						edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
-
-			// if (care_about_avg_time)
-			// 	edge_utilization[Edge_ID+N_EDGES] = std::min<float>(
-			// 			edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
-
-			// 	edge_utilization[Edge_ID+N_EDGES*2] = std::avg<float>(
-			// 		edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
-
+			if (care_about_last_time)
+				edge_utilization[Edge_ID+N_EDGES] = std::min<float>(edge_utilization[Edge_ID+N_EDGES], a->GetT2V());
+			if (care_about_avg_time)
+				total_time[Edge_ID] += static_cast<float>(a->GetT2V());
 		}
 
 	//find average of each edge
-	if (care_about_avg_time){//TODO FACTORIZE IT TO BE BETTER
-		std::vector<size_t> total_time(N_EDGES, 0);
-		
-		for(AGV* a: whAGVs)
-			if(a->is_on_edge()){
-				const int Edge_ID = whGraph->GetEdgeID(a->GetCurEdge());
-				total_time[Edge_ID] += a->GetT2V();
-			}
-		//caclulate Average
-		for (auto Edge_ID = 0; Edge_ID != N_EDGES; Edge_ID++)
-			edge_utilization[Edge_ID+N_EDGES] = total_time[Edge_ID]/edge_utilization[Edge_ID];
-	}
+	if (care_about_avg_time)
+		for (size_t Edge_ID = 0; Edge_ID != N_EDGES; Edge_ID++)
+			if (edge_utilization[Edge_ID] != 0)
+				edge_utilization[Edge_ID+N_EDGES*(1+care_about_last_time)] = total_time[Edge_ID]/edge_utilization[Edge_ID];
 
-	if (care_about_time or care_about_avg_time)
-		for(size_t i = N_EDGES; i < N_EDGES*2; i++)
-			if (std::isinf(edge_utilization[i]))
-				edge_utilization[i] = 0;
+	for(size_t i = N_EDGES; i != state_space_size; i++)
+		if (std::isinf(edge_utilization[i]))
+			edge_utilization[i] = 0;
 
-	if (care_about_time or care_about_avg_time)
-		for(size_t i = 0; i < N_EDGES; i++)
+	if (care_about_last_time or care_about_avg_time)
+		for(size_t i = 0; i != N_EDGES; i++)
 			assert((edge_utilization[i+N_EDGES]==0) == (edge_utilization[i]==0));
+	if (care_about_last_time and care_about_avg_time)
+		for(size_t i = 0; i != N_EDGES; i++)
+			assert((edge_utilization[i+N_EDGES*2]==0) == (edge_utilization[i]==0));
 
 	assert(!normalize);//this should be called with the current implemenetions
 	if(normalize){//TODO update doc
 	 	for (size_t i = 0; i != N_EDGES; i++){
 	 		edge_utilization[i] /= max_base_travel_cost();
 	 		// edge_utilization[i] = edge_utilization[i]*2-1;//normalize to -[1,1]
-	 		 edge_utilization[i] = edge_utilization[i]*1.8-0.9;//normalize to [-0.9,0.9]
+	 		edge_utilization[i] = edge_utilization[i]*1.8-0.9;//normalize to [-0.9,0.9]
 	 	}
-	 	if(care_about_time){
-	 		for(size_t i = N_EDGES; i < N_EDGES*2; i++){
+	 	if(care_about_last_time or care_about_avg_time){
+			for(size_t i = N_EDGES; i != state_space_size; i++){
 	 			edge_utilization[i] /= capacities[i];
 				// edge_utilization[i] = edge_utilization[i]*2-1;
 	 			edge_utilization[i] = edge_utilization[i]*1.8-0.9;
 	 		}
-				
 	 	}
-	 }
+	}
 
 	return edge_utilization;
 }
