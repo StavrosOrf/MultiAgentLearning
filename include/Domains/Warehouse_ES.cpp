@@ -77,17 +77,18 @@ epoch_resultsES Warehouse_ES::SimulateEpochES(const int epoch, bool verbose){
 void Warehouse_ES::InitialiseMATeam(){
 	assert(whAgents.size());//this must be called after whAgents have been initialized
 	assert(maTeam.empty());
+	const size_t input_size_multiplier = 1 + incorporates_time + incorporates_avg_time;
 
 	if(agent_type == agent_def::centralized)
-		maTeam.push_back(new ESAgent(N_EDGES*(1+incorporates_time+incorporates_avg_time), N_EDGES));
+		maTeam.push_back(new ESAgent(N_EDGES * input_size_multiplier, N_EDGES));
 	else if(agent_type == agent_def::link){			
 		for (size_t i = 0; i < whGraph->GetEdges().size(); i++){				
-			maTeam.push_back(new ESAgent((1+incorporates_time+incorporates_avg_time), 1));
+			maTeam.push_back(new ESAgent(input_size_multiplier, 1));
 		}
 	}
 	else if (agent_type == agent_def::intersection){
 		for (int v : whGraph->GetVertices())
-			maTeam.push_back(new ESAgent((1+incorporates_time+incorporates_avg_time)*whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()));
+			maTeam.push_back(new ESAgent(input_size_multiplier * whAgents[v]->eIDs.size(), whAgents[v]->eIDs.size()));
 	}
 
 	assert(!maTeam.empty());
@@ -95,7 +96,8 @@ void Warehouse_ES::InitialiseMATeam(){
 
 // Template this
 std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &states){
- 	assert(states.size() == N_EDGES*(1 + incorporates_time+incorporates_avg_time));
+	const size_t input_size_multiplier = 1 + incorporates_time + incorporates_avg_time;
+ 	assert(states.size() == N_EDGES*input_size_multiplier);
  	if(agent_type == agent_def::centralized)
  		return maTeam[0]->evaluateNN(states);
  	else if (agent_type == agent_def::link){
@@ -103,7 +105,9 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
  		actions.reserve(N_EDGES);
 
  		for (size_t i = 0; i < maTeam.size(); i++)
- 			if(incorporates_time or incorporates_avg_time)
+			if (incorporates_time and incorporates_avg_time)
+ 				actions.push_back(maTeam[i]->evaluateNN({states[i], states[i+N_EDGES], states[i+N_EDGES*2]})[0]);
+ 			else if(incorporates_time or incorporates_avg_time)
  				actions.push_back(maTeam[i]->evaluateNN({states[i], states[i+N_EDGES]})[0]);
  			else{
  				float t = (maTeam[i]->evaluateNN({states[i]}))[0];
@@ -113,22 +117,21 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
 
  		return actions;
  	}else if (agent_type == agent_def::intersection){
-
 		std::vector<float> actions(N_EDGES); 		
- 		// std::cout<<"i"<<std::endl;
 		for (size_t i = 0; i < maTeam.size(); i++){
 			std::vector<float> state_i;
-			if(incorporates_time or incorporates_avg_time)
-				state_i.reserve(whAgents[i]->eIDs.size()*2);
-			else
-				state_i.reserve(whAgents[i]->eIDs.size());			
+			state_i.reserve(whAgents[i]->eIDs.size() * input_size_multiplier);
 
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)							
 				state_i.push_back(states[whAgents[i]->eIDs[j]]);
 			
 			if(incorporates_time or incorporates_avg_time)
 				for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)								
-					state_i.push_back(states[whAgents[i]->eIDs[j] + states.size()/2]);
+					state_i.push_back(states[whAgents[i]->eIDs[j] + N_EDGES]);
+			
+			if(incorporates_time and incorporates_avg_time)
+				for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)								
+					state_i.push_back(states[whAgents[i]->eIDs[j] + N_EDGES*2]);
 						
 			std::vector<float> actions_i = maTeam[i]->evaluateNN(state_i);			
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)
@@ -140,7 +143,6 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
 	else{
 		std::cout << "ERROR: Invalid agent_defintion" << std::endl;
 		exit(EXIT_FAILURE);
-		return {0};
 	} 
 }
 
