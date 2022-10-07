@@ -1,13 +1,6 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR) 
 project(test_includes)
 
-
-#There are lots of scripts with cmake
-#for finding external libraries. 
-#see /usr/local/share/cmake-2.6/Modules/Find*.cmake for more examples
-#find_package(Boost COMPONENTS system filesystem REQUIRED)
-#include_directories( ${Boost_INCLUDE_DIRS} )
-
 set(Torch_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libtorch/share/cmake/Torch")
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
@@ -35,8 +28,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 add_subdirectory(include)
-
-#link_directories(libraries)
 
 set( LIBS_TO_LINK
                   Domains
