@@ -38,6 +38,11 @@ Warehouse::Warehouse(YAML::Node configs){
 	incorporates_time = agentType.ends_with("_t");
 
 	incorporates_avg_time = agentType.ends_with("_avgt");
+	
+	if (agentType.ends_with("_botht")){
+		incorporates_time = true;
+		incorporates_avg_time = true;
+	}
 
 	InitialiseGraph(vFile, eFile, cFile, configs);
 }
@@ -237,12 +242,11 @@ void Warehouse::print_warehouse_state(){
 ************************************************************************************************/
 std::vector<float> Warehouse::get_edge_utilization(){return get_edge_utilization(incorporates_time, false, incorporates_avg_time);}
 std::vector<float> Warehouse::get_edge_utilization(bool care_about_last_time, bool normalize, bool care_about_avg_time){
-	const bool care_about_both_times = care_about_avg_time and care_about_last_time;
 	const size_t state_space_size = N_EDGES * (1+care_about_last_time+care_about_avg_time);
 	std::vector<float> edge_utilization(state_space_size, 0);
 	std::vector<float> total_time(N_EDGES, 0);
 
-	std::fill(edge_utilization.begin()+N_EDGES, edge_utilization.end(), std::numeric_limits<float>::infinity())
+	std::fill(edge_utilization.begin()+N_EDGES, edge_utilization.end(), std::numeric_limits<float>::infinity());
 
 	for(AGV* a: whAGVs)
 		if(a->is_on_edge()){
