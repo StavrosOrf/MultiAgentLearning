@@ -255,3 +255,7 @@ trace if Eigen, Threadpool.cpp
 - restored COMA module
 - minor code cleapup for AgentwithAvgTime 
 - restored broken COMA module (there is still no COMA agent)
+
+## v 1.00011k
+- Fully implanted and test the new agent definitions ('with average time', 'with both average and last time')
+- minor code cleapup

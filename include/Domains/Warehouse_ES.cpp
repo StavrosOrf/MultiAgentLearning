@@ -137,7 +137,7 @@ std::vector<float> Warehouse_ES::QueryActorMATeam(const std::vector<float> &stat
 			for (size_t j = 0; j < whAgents[i]->eIDs.size(); j++)
 				actions[whAgents[i]->eIDs[j]] = actions_i[j];	
 			
-			}
+		}
 		return actions;
 	}
 	else{
