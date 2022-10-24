@@ -73,3 +73,24 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make && valgrind --tool=callgrind 
  - [Starvos Orfanoudakis](https://github.com/stavrosgreece/)
  
 This is repo is a fork of https://github.com/JenJenChung/multiagent_learning
+
+# Cite
+```
+    @inproceedings{10.1145/3549737.3549773,
+    author = {Kallinteris, Andreas and Orfanoudakis, Stavros and Chalkiadakis, Georgios},
+    title = {The Performance Impact of Combining Agent Factorization with Different Learning Algorithms for Multiagent Coordination},
+    year = {2022},
+    isbn = {9781450395977},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3549737.3549773},
+    doi = {10.1145/3549737.3549773},
+    abstract = {Factorizing a multiagent system refers to partitioning the state-action space to individual agents and defining the interactions between those agents. This so-called agent factorization is of much importance in real-world industrial settings, and is a process that can have significant performance implications. In this work, we explore if the performance impact of agent factorization is different when using different learning algorithms in multiagent coordination settings. We evaluated six different agent factorization instances—or agent definitions—in the warehouse traffic management domain, comparing the performance of (mainly) two learning algorithms suitable for learning coordinated multiagent policies: the Evolutionary Strategies (ES), and a genetic algorithm (CCEA) previously used in this setting. Our results demonstrate that different learning algorithms are affected in different ways by alternative agent definitions. Given this, we can deduce that many important multiagent coordination problems can potentially be solved by an appropriate agent factorization in conjunction with an appropriate choice of a learning algorithm. Moreover, our work shows that ES is an effective learning algorithm for the warehouse traffic management domain; while, interestingly, celebrated policy gradient methods do not fare well in this complex real-world problem setting.},
+    booktitle = {Proceedings of the 12th Hellenic Conference on Artificial Intelligence},
+    articleno = {32},
+    numpages = {10},
+    keywords = {Agent Factorization, Multiagent Coordination, Evolutionary Strategies, Warehouse Traffic Management},
+    location = {Corfu, Greece},
+    series = {SETN '22}
+    }
+```
