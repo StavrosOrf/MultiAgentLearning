@@ -54,8 +54,8 @@ class DDPGAgent{
 		Net* temp = new Net(1, 1, 1*2);
 
 		// We need a global optimizer, not a new one in each step!!!!!!!!
-		torch::optim::Adam optimizerMuNN = torch::optim::Adam(temp->parameters(),0.0001);
-		torch::optim::Adam optimizerQNN = torch::optim::Adam(temp->parameters(),0.001);
+		torch::optim::Adam *optimizerMuNN;// = torch::optim::Adam(temp->parameters(),0.0001);
+		torch::optim::Adam *optimizerQNN; //= torch::optim::Adam(temp->parameters(),0.001);
 };
 
 #endif // DDPG_AGENT_H_

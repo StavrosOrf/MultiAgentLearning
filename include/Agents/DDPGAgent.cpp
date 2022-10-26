@@ -27,8 +27,9 @@ DDPGAgent::DDPGAgent(size_t state_space, size_t action_space,size_t global_state
 
 
 	
-	optimizerMuNN = torch::optim::Adam(muNN->parameters(),0.01);
-	optimizerQNN = torch::optim::Adam(qNN->parameters(),0.01);
+
+	optimizerMuNN = new torch::optim::Adam(muNN->parameters(),0.01);
+	optimizerQNN = new torch::optim::Adam(qNN->parameters(),0.01);
 }
 
 DDPGAgent::~DDPGAgent(){
@@ -156,9 +157,9 @@ void DDPGAgent::updateQCritic(std::vector<float> Qvals, std::vector<float> Qprim
 	//Update critic loss
 	torch::Tensor loss= torch::mse_loss(QvalsTensor,QprimeTensor);
 
-	optimizerQNN.zero_grad();
+	optimizerQNN->zero_grad();
 	loss.backward();
-	optimizerQNN.step();
+	optimizerQNN->step();
 
 	// std::cout<<"QVals \t\t Qprime"<<std::endl;
 	// for (int i = 0; i != batch_size; i++){
@@ -211,9 +212,9 @@ void DDPGAgent::updateMuActorLink(std::vector<std::vector<float>> states,std::ve
 	// std::cout<<qNN->forward(input)<<std::endl;
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 
-	optimizerMuNN.zero_grad();
+	optimizerMuNN->zero_grad();
 	policy_loss.backward();
-	optimizerMuNN.step();
+	optimizerMuNN->step();
 
 	// std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
 }
@@ -240,9 +241,9 @@ void DDPGAgent::updateMuActor(std::vector<std::vector<float>> states,bool verbos
 
 	torch::Tensor policy_loss = -torch::mean(qNN->forward(input));
 
-	optimizerMuNN.zero_grad();
+	optimizerMuNN->zero_grad();
 	policy_loss.backward();
-	optimizerMuNN.step();
+	optimizerMuNN->step();
 
 	if(verbose)
 		std::cout<<"ActorLoss:\t"<<policy_loss.item<float>()<<std::endl;
