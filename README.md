@@ -6,7 +6,7 @@ agent definitions with each learning algorithm, for purpose of comparing it to
 
 It contains implementations of the following algorithms on the warehouse domain/framework
  - ES
- - (MA)DDPG [Disabled] (use `-DENABLE_DDPG` to enable)
+ - (MA)DDPG
  - I-DQN
 
 The Analysis of the results can be found in our [paper](https://dl.acm.org/doi/10.1145/3549737.3549773).

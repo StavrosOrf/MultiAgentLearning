@@ -11,11 +11,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-//#define ENABLE_DDPG
 #include "Domains/Warehouse.hpp"
-#ifdef ENABLE_DDPG
 #include "Domains/Warehouse_DDPG.hpp"
-#endif
 #include "Domains/Warehouse_ES_container.hpp"
 #include "Domains/Warehouse_DQN.hpp"
 #include "Domains/Warehouse_hardcoded.hpp"
