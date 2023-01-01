@@ -13,6 +13,7 @@
 #include <time.h>
 #include <chrono>
 #include <ctime>
+#include <math.h>
 
 
 class Warehouse_ES_container {
@@ -26,6 +27,7 @@ class Warehouse_ES_container {
 		}
 
 		uint evolution_strategy(const size_t n_threads, bool verbose, size_t run, std::ofstream &file);
+		uint evolution_strategy_ADAM(const size_t n_threads, bool verbose, size_t run, std::ofstream &file);
 
 		void copy_best_team_policy(std::vector<esNN*> sourceNNs,std::vector<esNN*> targetNNs);
 		void save_best_team_policy(std::vector<esNN*> teamNNs,int epoch,int G);
@@ -35,6 +37,8 @@ class Warehouse_ES_container {
 		int epoch;
 		float learning_rate;
 		float N_proc_std_dev;
+		float b1;
+		float b2;
 		//std::ofstream* file;
 
 };

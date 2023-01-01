@@ -259,3 +259,7 @@ trace if Eigen, Threadpool.cpp
 ## v 1.00011k
 - Fully implanted and test the new agent definitions ('with average time', 'with both average and last time')
 - minor code cleapup
+
+## v 1.00012o
+- Implemented and tested the new ES variation: Adam_ES
+- Additional tests might be required before launch of final experiments

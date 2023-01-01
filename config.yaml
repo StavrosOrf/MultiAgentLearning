@@ -1,20 +1,22 @@
 mode:
-  algo: ES #Valid Options: 'DDPG', 'ES', 'DQN', 'HARDCODED'
+  algo: ADAM_ES #Valid Options: 'DDPG', 'ES', 'DQN','ADAM_ES' 'HARDCODED'
 domain:
   folder: ../Domains/
   warehouse: Small_SS #Valid Opt: 'Small_SS', 'Tiny_SS', 'Min_SS', 'Medium_SS'
-  agents: centralized_avgt #Valid Opt: 'centralized', 'centralized_t','centralized_avgt', 'centralized_botht', 'link', 'link_t', 'link_avgt', 'link_botht', 'intersection', 'intersection_t', 'intersection_avgt', 'intersection_botht'
+  agents: centralized #Valid Opt: 'centralized', 'centralized_t','centralized_avgt', 'centralized_botht', 'link', 'link_t', 'link_avgt', 'link_botht', 'intersection', 'intersection_t', 'intersection_avgt', 'intersection_botht'
 DDPG: #config options for 'DDPG' leanring algorihm
   epochs: 10
   runs: 1 # number of statistical runs
   rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
   batch_size: 50 
 ES:
-  epochs: 2
-  runs: 1 # number of statistical runs
-  population_size: 100
-  learning_rate: 0.001
-  rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration
+  epochs: 100
+  runs: 2 # number of statistical runs
+  population_size: 1000 #1000 is the default size
+  learning_rate: 0.1 # 0.001 for ES, 0.1 for AdamES
+  rand_proc_std_dev: 0.2 #standard deviation of the random process, higher values encourage more exploration, 0.2 for ES, 1 for AdamES
+  b1: 0.9 # Adam_ES momentum exponential weight defined in [0,1]
+  b2: 0.9999 # Adam_ES dampening exponential weight defined in [0,1]
 DQN:
   epochs: 200
   runs: 1 # number of statistical runs
@@ -22,8 +24,8 @@ DQN:
   # batch_size: 3   
 simulation:
   verbose: true
-  steps: 20
-  agvs: origins_120.csv #Valid options: 70,90,120,200,400
+  steps: 200
+  agvs: origins_90.csv #Valid options: 70,90,120,200,400
   goals: goals.csv
 results:
   folder:     ../Results/
