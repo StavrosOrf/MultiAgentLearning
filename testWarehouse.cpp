@@ -86,13 +86,30 @@ void warehouse_simulate_ES(YAML::Node configs, [[maybe_unused]] size_t n_threads
 		assert(eval_file.is_open());
 
 		eval_file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
-		Warehouse_ES_container esc(configs);
+		Warehouse_ES_container esc(configs,"ES");
 		[[maybe_unused]] uint G = esc.evolution_strategy(n_threads, verbose, i, eval_file);
 	}
 }
 
+void warehouse_simulate_ES_canonical(YAML::Node configs, [[maybe_unused]] size_t n_threads){
+	const size_t runs = configs["CANONICAL_ES"]["runs"].as<size_t>();
+	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
+	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
+	const std::string agentType = configs["domain"]["agents"].as<std::string>();
+	const std::string resFolder = create_results_folder(configs);
+	
+	std::ofstream eval_file(resFolder + warehouse_type + '_' + "ES" + '_' + agentType + ".csv");
+	for (size_t i = 0; i != runs; i++){
+		assert(eval_file.is_open());
+
+		eval_file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
+		Warehouse_ES_container esc(configs,"CANONICAL_ES");
+		[[maybe_unused]] uint G = esc.evolution_strategy_canonical(n_threads, verbose, i, eval_file);
+	}
+}
+
 void warehouse_simulate_ADAM_ES(YAML::Node configs, [[maybe_unused]] size_t n_threads){
-	const size_t runs = configs["ES"]["runs"].as<size_t>();
+	const size_t runs = configs["ADAM_ES"]["runs"].as<size_t>();
 	[[maybe_unused]] const bool verbose = configs["simulation"]["verbose"].as<bool>();
 	const std::string warehouse_type = configs["domain"]["warehouse"].as<std::string>();
 	const std::string agentType = configs["domain"]["agents"].as<std::string>();
@@ -103,7 +120,7 @@ void warehouse_simulate_ADAM_ES(YAML::Node configs, [[maybe_unused]] size_t n_th
 		assert(eval_file.is_open());
 
 		eval_file <<",Epoch,MAX_G,MAX_MOVE,MAX_ENTER,MAX_WAIT,AVG_G"<< std::endl;
-		Warehouse_ES_container esc(configs);
+		Warehouse_ES_container esc(configs,"ADAM_ES");
 		[[maybe_unused]] uint G = esc.evolution_strategy_ADAM(n_threads, verbose, i, eval_file);
 	}
 }
@@ -172,6 +189,8 @@ void WarehouseSimulation(const std::string &config_file, size_t n_threads){
 		warehouse_simulate_ES(configs, n_threads);
 	}else if (algo == "ADAM_ES"){
 		warehouse_simulate_ADAM_ES(configs, n_threads);
+	}else if (algo == "CANONICAL_ES"){
+		warehouse_simulate_ES_canonical(configs, n_threads);
 	}else if (algo == "DQN"){
 		warehouse_simulate_DQN(configs, n_threads);
 	}else if (algo == "HARDCODED") {

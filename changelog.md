@@ -260,6 +260,10 @@ trace if Eigen, Threadpool.cpp
 - Fully implanted and test the new agent definitions ('with average time', 'with both average and last time')
 - minor code cleapup
 
-## v 1.00012o
+## v 1.00012s
 - Implemented and tested the new ES variation: Adam_ES
 - Additional tests might be required before launch of final experiments
+
+## v 1.00013o
+- Implemented and tested the new Canonical ES variation
+- Working as intended, so experiments can start
