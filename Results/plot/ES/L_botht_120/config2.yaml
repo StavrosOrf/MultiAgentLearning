@@ -1,0 +1,32 @@
+DDPG:
+  batch_size: 50
+  epochs: 10
+  rand_proc_std_dev: 0.2
+  runs: 1
+DQN:
+  epochs: 200
+  rand_proc_std_dev: 0.2
+  runs: 1
+ES:
+  epochs: 500
+  learning_rate: 0.001
+  population_size: 1000
+  rand_proc_std_dev: 0.2
+  runs: 30
+domain:
+  agents: link_botht
+  folder: ../Domains/
+  warehouse: Small_SS
+graph:
+  capacities: capacities.csv
+  edges: edges.csv
+  vertices: vertices.csv
+mode:
+  algo: ES
+results:
+  folder: ../Results/
+simulation:
+  agvs: origins_120.csv
+  goals: goals.csv
+  steps: 200
+  verbose: false
