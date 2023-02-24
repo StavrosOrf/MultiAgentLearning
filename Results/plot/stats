@@ -1,247 +1,3 @@
-CCEA_90
-max Centralized:538.0
-max Centralized last time:525.0
-max Centralized avg time:525.0
-max Centralized both time:516.0
-max Intersecton:549.0
-max Intersecton last time:549.0
-max Intersecton avg time:549.0
-max Intersecton both time:549.0
-max link:544.0
-max link last time:554.0
-max link avg time:554.0
-max link both time:554.0
-average Centralized:519.762
-average Centralized last time:511.61
-average Centralized avg time:512.69
-average Centralized both time:501.512
-average Intersecton:535.238
-average Intersecton last time:532.788
-average Intersecton avg time:534.022
-average Intersecton both time:526.386
-average link:528.15
-average link last time:541.98
-average link avg time:543.442
-average link both time:547.692
-standard deviation Centralized:19.84425391411381
-standard deviation Centralized last time:14.128962672712266
-standard deviation Centralized avg time:13.610171990434043
-standard deviation Centralized both time:12.360904255878228
-standard deviation Intersecton:105.17595547079856
-standard deviation Intersecton last time:33.38944702168326
-standard deviation Intersecton avg time:26.010188101155116
-standard deviation Intersecton both time:78.221759620715
-standard deviation link:72.82311272615608
-standard deviation link last time:35.39343727725311
-standard deviation link avg time:62.30264472901519
-standard deviation link both time:62.87970635478801
-dispersion Centralized:0.7911754890325903
-dispersion Centralized last time:0.39957483227961677
-dispersion Centralized avg time:0.36880166234907497
-dispersion Centralized both time:0.3096924951482775
-dispersion Intersecton:23.216695695806777
-dispersion Intersecton last time:2.163926965088884
-dispersion Intersecton avg time:1.2946288544826265
-dispersion Intersecton both time:12.504040214225315
-dispersion link:12.097648271142354
-dispersion link last time:2.550448732199899
-dispersion link avg time:7.820064885292898
-dispersion link both time:7.908769445121418
-skew Centralized:-0.5991802125414665
-skew Centralized last time:-0.35661319376260686
-skew Centralized avg time:-0.9586397486620143
-skew Centralized both time:0.06665638429672753
-skew Intersecton:-1.6521236824191965
-skew Intersecton last time:-1.276811412188033
-skew Intersecton avg time:-2.0083807153966853
-skew Intersecton both time:-2.679448074865923
-skew link:-1.8395866704049655
-skew link last time:0.8782782701954367
-skew link avg time:-1.8955175764235646
-skew link both time:-1.9574103140318095
-CCEA_120
-max Centralized:631.0
-max Centralized last time:627.0
-max Centralized avg time:619.0
-max Centralized both time:608.0
-max Intersecton:669.0
-max Intersecton last time:673.0
-max Intersecton avg time:672.0
-max Intersecton both time:665.0
-max link:676.0
-max link last time:692.0
-max link avg time:691.0
-max link both time:692.0
-average Centralized:607.556
-average Centralized last time:599.646
-average Centralized avg time:590.016
-average Centralized both time:583.168
-average Intersecton:645.648
-average Intersecton last time:638.92
-average Intersecton avg time:639.572
-average Intersecton both time:621.242
-average link:657.43
-average link last time:668.112
-average link avg time:665.646
-average link both time:666.126
-standard deviation Centralized:30.002769890750393
-standard deviation Centralized last time:15.250551148887295
-standard deviation Centralized avg time:16.495523600376398
-standard deviation Centralized both time:14.988923113151058
-standard deviation Intersecton:79.53598188111532
-standard deviation Intersecton last time:40.53521244888032
-standard deviation Intersecton avg time:39.81023954228099
-standard deviation Intersecton both time:68.51502897468772
-standard deviation link:87.47797752419827
-standard deviation link last time:83.72045026815998
-standard deviation link avg time:82.36926248485445
-standard deviation link both time:87.7794781347508
-dispersion Centralized:1.5621105442382968
-dispersion Centralized last time:0.39567762903169035
-dispersion Centralized avg time:0.4659020013422317
-dispersion Centralized both time:0.38787100666159985
-dispersion Intersecton:9.924650790387675
-dispersion Intersecton last time:2.599847228284592
-dispersion Intersecton avg time:2.4887801074337204
-dispersion Intersecton both time:7.99212734022297
-dispersion link:14.26355368448115
-dispersion link last time:11.191304156320372
-dispersion link avg time:10.940116209027977
-dispersion link both time:12.462643058457832
-skew Centralized:-1.2647007849585152
-skew Centralized last time:0.8860915826766689
-skew Centralized avg time:-0.32440074300716776
-skew Centralized both time:-0.3720609499513724
-skew Intersecton:-3.920847288135589
-skew Intersecton last time:-2.441735868031467
-skew Intersecton avg time:-3.927762555590682
-skew Intersecton both time:-0.9331621369029269
-skew link:0.5031515085352382
-skew link last time:-1.173349272627454
-skew link avg time:-1.0550276652875927
-skew link both time:-0.9733211034481017
-CCEA_200
-max Centralized:716.0
-max Centralized last time:704.0
-max Centralized avg time:719.0
-max Centralized both time:713.0
-max Intersecton:842.0
-max Intersecton last time:854.0
-max Intersecton avg time:832.0
-max Intersecton both time:823.0
-max link:723.0
-max link last time:874.0
-max link avg time:894.0
-max link both time:879.0
-average Centralized:676.976
-average Centralized last time:669.84
-average Centralized avg time:669.534
-average Centralized both time:666.632
-average Intersecton:744.084
-average Intersecton last time:763.546
-average Intersecton avg time:729.456
-average Intersecton both time:718.184
-average link:660.994
-average link last time:784.098
-average link avg time:785.116
-average link both time:781.068
-standard deviation Centralized:47.893685283199986
-standard deviation Centralized last time:27.860902445137548
-standard deviation Centralized avg time:33.402130154386484
-standard deviation Centralized both time:27.904269850008063
-standard deviation Intersecton:64.92350937037767
-standard deviation Intersecton last time:53.715684047060954
-standard deviation Intersecton avg time:80.37601289113476
-standard deviation Intersecton both time:89.7853122668211
-standard deviation link:95.69545203524504
-standard deviation link last time:98.10574285743519
-standard deviation link avg time:127.119027397305
-standard deviation link both time:126.55283299962069
-dispersion Centralized:3.677279267911625
-dispersion Centralized last time:1.1985021385344385
-dispersion Centralized avg time:1.6975741221036282
-dispersion Centralized both time:1.2012469544308375
-dispersion Intersecton:5.94340393255149
-dispersion Intersecton last time:3.947521040647134
-dispersion Intersecton avg time:9.266069202920054
-dispersion Intersecton both time:12.589384121057638
-dispersion link:16.351918707630293
-dispersion link last time:14.03500235494463
-dispersion link avg time:24.052464092934926
-dispersion link both time:24.73964194464222
-skew Centralized:-1.0902851380295169
-skew Centralized last time:0.09271384573773428
-skew Centralized avg time:-0.07281205396657899
-skew Centralized both time:0.06097605640985136
-skew Intersecton:-0.6037359233979886
-skew Intersecton last time:0.14271020232068662
-skew Intersecton avg time:-1.2759824709488996
-skew Intersecton both time:-1.1013883599195846
-skew link:0.3194243688486591
-skew link last time:-0.27652666606936355
-skew link avg time:-0.2685203933788263
-skew link both time:-0.05421823609966418
-CCEA_400
-max Centralized:679.0
-max Centralized last time:709.0
-max Centralized avg time:708.0
-max Centralized both time:684.0
-max Intersecton:849.0
-max Intersecton last time:864.0
-max Intersecton avg time:859.0
-max Intersecton both time:819.0
-max link:809.0
-max link last time:899.0
-max link avg time:908.0
-max link both time:899.0
-average Centralized:637.888
-average Centralized last time:661.322
-average Centralized avg time:670.37
-average Centralized both time:656.176
-average Intersecton:759.16
-average Intersecton last time:754.196
-average Intersecton avg time:774.632
-average Intersecton both time:730.688
-average link:743.024
-average link last time:804.83
-average link avg time:843.444
-average link both time:795.176
-standard deviation Centralized:44.399440816609236
-standard deviation Centralized last time:34.82239007556363
-standard deviation Centralized avg time:25.895546148803806
-standard deviation Centralized both time:21.26464336572011
-standard deviation Intersecton:113.03485374396492
-standard deviation Intersecton last time:81.6074427527519
-standard deviation Intersecton avg time:112.14912588505364
-standard deviation Intersecton both time:96.44728772933341
-standard deviation link:90.57045266836047
-standard deviation link last time:119.45766335121968
-standard deviation link avg time:159.97088815616192
-standard deviation link both time:150.12463787317432
-dispersion Centralized:3.1898225644459326
-dispersion Centralized last time:1.8491315771484462
-dispersion Centralized avg time:1.0071782973037364
-dispersion Centralized both time:0.7005914230304153
-dispersion Intersecton:18.308480360507556
-dispersion Intersecton last time:9.325674074837114
-dispersion Intersecton avg time:17.645924009888617
-dispersion Intersecton both time:13.475415486520104
-dispersion link:12.991775255862725
-dispersion link last time:20.739463230307138
-dispersion link avg time:35.894920129237796
-dispersion link both time:34.50307240745824
-skew Centralized:-0.8781723082452382
-skew Centralized last time:-0.5012681544870192
-skew Centralized avg time:-0.8882463669708117
-skew Centralized both time:-0.15646398825162683
-skew Intersecton:-0.9838999578803934
-skew Intersecton last time:-1.3319418580904658
-skew Intersecton avg time:-1.033690196016697
-skew Intersecton both time:-1.7371126584800578
-skew link:-0.45857555713338954
-skew link last time:-0.8859984734619561
-skew link avg time:-1.010087873735203
-skew link both time:-0.474003256227768
 ES_90
 max Centralized:554.0
 max Centralized last time:554.0
@@ -730,3 +486,247 @@ skew link:1.0347851632104639
 skew link last time:0.408248290463863
 skew link avg time:-0.10512350709210061
 skew link both time:-1.454801932124846
+CCEA_90
+max Centralized:538.0
+max Centralized last time:525.0
+max Centralized avg time:525.0
+max Centralized both time:516.0
+max Intersecton:549.0
+max Intersecton last time:549.0
+max Intersecton avg time:549.0
+max Intersecton both time:549.0
+max link:544.0
+max link last time:554.0
+max link avg time:554.0
+max link both time:554.0
+average Centralized:519.762
+average Centralized last time:511.61
+average Centralized avg time:512.69
+average Centralized both time:501.512
+average Intersecton:535.238
+average Intersecton last time:532.788
+average Intersecton avg time:534.022
+average Intersecton both time:526.386
+average link:528.15
+average link last time:541.98
+average link avg time:543.442
+average link both time:547.692
+standard deviation Centralized:19.84425391411381
+standard deviation Centralized last time:14.128962672712266
+standard deviation Centralized avg time:13.610171990434043
+standard deviation Centralized both time:12.360904255878228
+standard deviation Intersecton:105.17595547079856
+standard deviation Intersecton last time:33.38944702168326
+standard deviation Intersecton avg time:26.010188101155116
+standard deviation Intersecton both time:78.221759620715
+standard deviation link:72.82311272615608
+standard deviation link last time:35.39343727725311
+standard deviation link avg time:62.30264472901519
+standard deviation link both time:62.87970635478801
+dispersion Centralized:0.7911754890325903
+dispersion Centralized last time:0.39957483227961677
+dispersion Centralized avg time:0.36880166234907497
+dispersion Centralized both time:0.3096924951482775
+dispersion Intersecton:23.216695695806777
+dispersion Intersecton last time:2.163926965088884
+dispersion Intersecton avg time:1.2946288544826265
+dispersion Intersecton both time:12.504040214225315
+dispersion link:12.097648271142354
+dispersion link last time:2.550448732199899
+dispersion link avg time:7.820064885292898
+dispersion link both time:7.908769445121418
+skew Centralized:-0.5991802125414665
+skew Centralized last time:-0.35661319376260686
+skew Centralized avg time:-0.9586397486620143
+skew Centralized both time:0.06665638429672753
+skew Intersecton:-1.6521236824191965
+skew Intersecton last time:-1.276811412188033
+skew Intersecton avg time:-2.0083807153966853
+skew Intersecton both time:-2.679448074865923
+skew link:-1.8395866704049655
+skew link last time:0.8782782701954367
+skew link avg time:-1.8955175764235646
+skew link both time:-1.9574103140318095
+CCEA_120
+max Centralized:631.0
+max Centralized last time:627.0
+max Centralized avg time:619.0
+max Centralized both time:608.0
+max Intersecton:669.0
+max Intersecton last time:673.0
+max Intersecton avg time:672.0
+max Intersecton both time:665.0
+max link:676.0
+max link last time:692.0
+max link avg time:691.0
+max link both time:692.0
+average Centralized:607.556
+average Centralized last time:599.646
+average Centralized avg time:590.016
+average Centralized both time:583.168
+average Intersecton:645.648
+average Intersecton last time:638.92
+average Intersecton avg time:639.572
+average Intersecton both time:621.242
+average link:657.43
+average link last time:668.112
+average link avg time:665.646
+average link both time:666.126
+standard deviation Centralized:30.002769890750393
+standard deviation Centralized last time:15.250551148887295
+standard deviation Centralized avg time:16.495523600376398
+standard deviation Centralized both time:14.988923113151058
+standard deviation Intersecton:79.53598188111532
+standard deviation Intersecton last time:40.53521244888032
+standard deviation Intersecton avg time:39.81023954228099
+standard deviation Intersecton both time:68.51502897468772
+standard deviation link:87.47797752419827
+standard deviation link last time:83.72045026815998
+standard deviation link avg time:82.36926248485445
+standard deviation link both time:87.7794781347508
+dispersion Centralized:1.5621105442382968
+dispersion Centralized last time:0.39567762903169035
+dispersion Centralized avg time:0.4659020013422317
+dispersion Centralized both time:0.38787100666159985
+dispersion Intersecton:9.924650790387675
+dispersion Intersecton last time:2.599847228284592
+dispersion Intersecton avg time:2.4887801074337204
+dispersion Intersecton both time:7.99212734022297
+dispersion link:14.26355368448115
+dispersion link last time:11.191304156320372
+dispersion link avg time:10.940116209027977
+dispersion link both time:12.462643058457832
+skew Centralized:-1.2647007849585152
+skew Centralized last time:0.8860915826766689
+skew Centralized avg time:-0.32440074300716776
+skew Centralized both time:-0.3720609499513724
+skew Intersecton:-3.920847288135589
+skew Intersecton last time:-2.441735868031467
+skew Intersecton avg time:-3.927762555590682
+skew Intersecton both time:-0.9331621369029269
+skew link:0.5031515085352382
+skew link last time:-1.173349272627454
+skew link avg time:-1.0550276652875927
+skew link both time:-0.9733211034481017
+CCEA_200
+max Centralized:716.0
+max Centralized last time:704.0
+max Centralized avg time:719.0
+max Centralized both time:713.0
+max Intersecton:842.0
+max Intersecton last time:854.0
+max Intersecton avg time:832.0
+max Intersecton both time:823.0
+max link:723.0
+max link last time:874.0
+max link avg time:894.0
+max link both time:879.0
+average Centralized:676.976
+average Centralized last time:669.84
+average Centralized avg time:669.534
+average Centralized both time:666.632
+average Intersecton:744.084
+average Intersecton last time:763.546
+average Intersecton avg time:729.456
+average Intersecton both time:718.184
+average link:660.994
+average link last time:784.098
+average link avg time:785.116
+average link both time:781.068
+standard deviation Centralized:47.893685283199986
+standard deviation Centralized last time:27.860902445137548
+standard deviation Centralized avg time:33.402130154386484
+standard deviation Centralized both time:27.904269850008063
+standard deviation Intersecton:64.92350937037767
+standard deviation Intersecton last time:53.715684047060954
+standard deviation Intersecton avg time:80.37601289113476
+standard deviation Intersecton both time:89.7853122668211
+standard deviation link:95.69545203524504
+standard deviation link last time:98.10574285743519
+standard deviation link avg time:127.119027397305
+standard deviation link both time:126.55283299962069
+dispersion Centralized:3.677279267911625
+dispersion Centralized last time:1.1985021385344385
+dispersion Centralized avg time:1.6975741221036282
+dispersion Centralized both time:1.2012469544308375
+dispersion Intersecton:5.94340393255149
+dispersion Intersecton last time:3.947521040647134
+dispersion Intersecton avg time:9.266069202920054
+dispersion Intersecton both time:12.589384121057638
+dispersion link:16.351918707630293
+dispersion link last time:14.03500235494463
+dispersion link avg time:24.052464092934926
+dispersion link both time:24.73964194464222
+skew Centralized:-1.0902851380295169
+skew Centralized last time:0.09271384573773428
+skew Centralized avg time:-0.07281205396657899
+skew Centralized both time:0.06097605640985136
+skew Intersecton:-0.6037359233979886
+skew Intersecton last time:0.14271020232068662
+skew Intersecton avg time:-1.2759824709488996
+skew Intersecton both time:-1.1013883599195846
+skew link:0.3194243688486591
+skew link last time:-0.27652666606936355
+skew link avg time:-0.2685203933788263
+skew link both time:-0.05421823609966418
+CCEA_400
+max Centralized:679.0
+max Centralized last time:709.0
+max Centralized avg time:708.0
+max Centralized both time:684.0
+max Intersecton:849.0
+max Intersecton last time:864.0
+max Intersecton avg time:859.0
+max Intersecton both time:819.0
+max link:809.0
+max link last time:899.0
+max link avg time:908.0
+max link both time:899.0
+average Centralized:637.888
+average Centralized last time:661.322
+average Centralized avg time:670.37
+average Centralized both time:656.176
+average Intersecton:759.16
+average Intersecton last time:754.196
+average Intersecton avg time:774.632
+average Intersecton both time:730.688
+average link:743.024
+average link last time:804.83
+average link avg time:843.444
+average link both time:795.176
+standard deviation Centralized:44.399440816609236
+standard deviation Centralized last time:34.82239007556363
+standard deviation Centralized avg time:25.895546148803806
+standard deviation Centralized both time:21.26464336572011
+standard deviation Intersecton:113.03485374396492
+standard deviation Intersecton last time:81.6074427527519
+standard deviation Intersecton avg time:112.14912588505364
+standard deviation Intersecton both time:96.44728772933341
+standard deviation link:90.57045266836047
+standard deviation link last time:119.45766335121968
+standard deviation link avg time:159.97088815616192
+standard deviation link both time:150.12463787317432
+dispersion Centralized:3.1898225644459326
+dispersion Centralized last time:1.8491315771484462
+dispersion Centralized avg time:1.0071782973037364
+dispersion Centralized both time:0.7005914230304153
+dispersion Intersecton:18.308480360507556
+dispersion Intersecton last time:9.325674074837114
+dispersion Intersecton avg time:17.645924009888617
+dispersion Intersecton both time:13.475415486520104
+dispersion link:12.991775255862725
+dispersion link last time:20.739463230307138
+dispersion link avg time:35.894920129237796
+dispersion link both time:34.50307240745824
+skew Centralized:-0.8781723082452382
+skew Centralized last time:-0.5012681544870192
+skew Centralized avg time:-0.8882463669708117
+skew Centralized both time:-0.15646398825162683
+skew Intersecton:-0.9838999578803934
+skew Intersecton last time:-1.3319418580904658
+skew Intersecton avg time:-1.033690196016697
+skew Intersecton both time:-1.7371126584800578
+skew link:-0.45857555713338954
+skew link last time:-0.8859984734619561
+skew link avg time:-1.010087873735203
+skew link both time:-0.474003256227768
