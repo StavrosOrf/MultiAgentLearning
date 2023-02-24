@@ -371,7 +371,7 @@ max Centralized avg time:919.0
 max Centralized both time:934.0
 max Intersecton:944.0
 max Intersecton last time:944.0
-max Intersecton avg time:722.0
+max Intersecton avg time:924.0
 max Intersecton both time:748.0
 max link:914.0
 max link last time:914.0
@@ -382,8 +382,8 @@ average Centralized last time:904.864
 average Centralized avg time:891.838
 average Centralized both time:904.568
 average Intersecton:885.474
-average Intersecton last time:913.764
-average Intersecton avg time:698.35
+average Intersecton last time:914.194
+average Intersecton avg time:880.696
 average Intersecton both time:704.93
 average link:884.132
 average link last time:875.442
@@ -394,8 +394,8 @@ standard deviation Centralized last time:54.93642790636383
 standard deviation Centralized avg time:87.09005556191693
 standard deviation Centralized both time:83.89649707956956
 standard deviation Intersecton:92.7485848948651
-standard deviation Intersecton last time:130.5565011786085
-standard deviation Intersecton avg time:0.0
+standard deviation Intersecton last time:115.69410097321298
+standard deviation Intersecton avg time:80.01666493091716
 standard deviation Intersecton both time:24.090108620206205
 standard deviation link:105.09009739946276
 standard deviation link last time:137.1393451931283
@@ -406,8 +406,8 @@ dispersion Centralized last time:3.341094997355376
 dispersion Centralized avg time:8.836860978419875
 dispersion Centralized both time:8.097816638543744
 dispersion Intersecton:11.079726944873777
-dispersion Intersecton last time:20.123966942148762
-dispersion Intersecton avg time:0.0
+dispersion Intersecton last time:16.64040404040404
+dispersion Intersecton avg time:8.598030438675023
 dispersion Intersecton both time:0.7931662870159454
 dispersion link:15.408341222781402
 dispersion link last time:25.615908471806048
@@ -418,8 +418,8 @@ skew Centralized last time:-2.600915042685355
 skew Centralized avg time:-0.9353546488178928
 skew Centralized both time:-0.8526163816221451
 skew Intersecton:1.3439813575905195
-skew Intersecton last time:-0.40750338661281005
-skew Intersecton avg time:nan
+skew Intersecton last time:0.44297415207095564
+skew Intersecton avg time:1.6147874119011998
 skew Intersecton both time:-0.6729920582219168
 skew link:0.1289233852353167
 skew link last time:-0.3196334644366054
@@ -443,8 +443,8 @@ average Centralized last time:917.598
 average Centralized avg time:895.942
 average Centralized both time:917.032
 average Intersecton:910.268
-average Intersecton last time:915.81
-average Intersecton avg time:916.038
+average Intersecton last time:922.102
+average Intersecton avg time:917.27
 average Intersecton both time:885.216
 average link:873.092
 average link last time:768.524
@@ -455,8 +455,8 @@ standard deviation Centralized last time:14.747881203752625
 standard deviation Centralized avg time:45.27692569068709
 standard deviation Centralized both time:16.80773631397161
 standard deviation Intersecton:56.71566509057852
-standard deviation Intersecton last time:0.0
-standard deviation Intersecton avg time:69.2820323027551
+standard deviation Intersecton last time:3.5355339059327378
+standard deviation Intersecton avg time:65.72670690061993
 standard deviation Intersecton both time:66.58328118479393
 standard deviation link:105.09519494249011
 standard deviation link last time:57.510868538042445
@@ -467,8 +467,8 @@ dispersion Centralized last time:0.2369281045751634
 dispersion Centralized avg time:2.2930648769574944
 dispersion Centralized both time:0.30673181324647125
 dispersion Intersecton:3.5386872020535387
-dispersion Intersecton last time:0.0
-dispersion Intersecton avg time:5.555555555555555
+dispersion Intersecton last time:0.013312034078807242
+dispersion Intersecton avg time:4.821428571428571
 dispersion Intersecton both time:4.977544910179641
 dispersion link:14.325551232166019
 dispersion link last time:4.433646112600536
@@ -479,8 +479,8 @@ skew Centralized last time:1.3933319214743294
 skew Centralized avg time:-1.4093214976585609
 skew Centralized both time:0.5403933775294201
 skew Intersecton:-1.14878011571205
-skew Intersecton last time:nan
-skew Intersecton avg time:0.7071067811865475
+skew Intersecton last time:0.0
+skew Intersecton avg time:-0.408248290463863
 skew Intersecton both time:-0.6892054981428731
 skew link:1.0347851632104639
 skew link last time:0.408248290463863
