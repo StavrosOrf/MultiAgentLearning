@@ -16,6 +16,18 @@ sed -i -e "1d" ES/*/x*
 
 #rm ES/*/*.yaml #ES/*/*.csv
 
+#PREPARE ES_CN/
+rm ES_CN/*/x*
+
+for dir in ES_CN/*;
+do
+	cd $dir && split --lines 501 *.csv && cd $SCRIPT_DIR
+done
+
+find ES_CN/*/* -size -10c -delete
+#awk -i inplace -F "," '{print $7}' */x* #get average
+awk -i inplace -F "," '{print $3}' ES_CN/*/x* #get max
+sed -i -e "1d" ES_CN/*/x*
 
 
 #prepare CCEA/ [WIP]
