@@ -247,7 +247,7 @@ for i in range(len(AGV_COUNT)):
         axis[1][1].set_xticks(ticks=[0,1,2,3,4,5,6,7,8,9,10,11,12], labels=X_LABELS, rotation=90, ha="right")
         axis[0][i%2].set_xticks(ticks=[0,1,2,3,4,5,6,7,8,9,10,11,12], labels=X_LABELS_EMPTY, rotation=70, ha="right")
         axis[int(i/2)][i%2].set_title(AGV_COUNT[i] + ' AGVs')
-        axis[1][0].legend()
+        axis[1][0].legend(loc="lower right")
         axis[int(i/2)][i%2].tick_params(which='major', direction='in')
         axis[int(i/2)][0].set_ylabel('Total Deliveries')
     elif PLOT_TYPE == 'print':
@@ -322,7 +322,7 @@ for i in range(len(AGV_COUNT)):
 
 if PLOT_TYPE != 'violin':
     #axis[1].legend(loc='upper center', bbox_to_anchor=(1, -0.175), fancybox=True, ncol=6)
-    axis[1][1].legend(loc='upper center', bbox_to_anchor=(-0.10, -0.10), fancybox=True, ncol=6)
+    axis[1][1].legend(loc='upper center', bbox_to_anchor=(-0.10, -0.10), fancybox=True, ncol=5, fontsize="x-large")
     fig.set_figwidth(14.1*1.1)
     fig.set_figheight(10*1.1)
 else:

@@ -347,9 +347,9 @@ axis[0][i%2].set_ylabel('Total Deliveries')
 axis[1][0].legend(loc='upper center', bbox_to_anchor=(1.1, -0.10), fancybox=True, ncol=6)
 
 if PLOT_TYPE == 'average':
-    matplotlib.pyplot.savefig('ESvsGA_average.eps',bbox_inches='tight')
-    matplotlib.pyplot.savefig('ESvsGA_average.png',bbox_inches='tight')
+    matplotlib.pyplot.savefig('vs_2x2_average.eps',bbox_inches='tight')
+    matplotlib.pyplot.savefig('vs_2x2_average.png',bbox_inches='tight')
 elif PLOT_TYPE == 'max':
-    matplotlib.pyplot.savefig('ESvsGA_max.eps',bbox_inches='tight')
-    matplotlib.pyplot.savefig('ESvsGA_max.png',bbox_inches='tight')
+    matplotlib.pyplot.savefig('vs_2x2_max.eps',bbox_inches='tight')
+    matplotlib.pyplot.savefig('vs_2x2_max.png',bbox_inches='tight')
 #matplotlib.pyplot.show()
