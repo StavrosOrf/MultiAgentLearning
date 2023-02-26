@@ -6,6 +6,8 @@ agent definitions with each learning algorithm, for purpose of comparing it to
 
 It contains implementations of the following algorithms on the warehouse domain/framework
  - ES
+ - AdamES
+ - Canonical ES
  - (MA)DDPG
  - I-DQN
 
@@ -75,6 +77,7 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make && valgrind --tool=callgrind 
 This is repo is a fork of https://github.com/JenJenChung/multiagent_learning
 
 # Cite
+In order the orignal paper:
 ```
     @inproceedings{10.1145/3549737.3549773,
     author = {Kallinteris, Andreas and Orfanoudakis, Stavros and Chalkiadakis, Georgios},
