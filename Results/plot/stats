@@ -185,7 +185,7 @@ ES_400
 max Centralized:883.0
 max Centralized last time:859.0
 max Centralized avg time:849.0
-max Centralized both time:839.0
+max Centralized both time:859.0
 max Intersecton:944.0
 max Intersecton last time:924.0
 max Intersecton avg time:894.0
@@ -197,7 +197,7 @@ max link both time:914.0
 average Centralized:816.322
 average Centralized last time:791.416
 average Centralized avg time:790.892
-average Centralized both time:787.288
+average Centralized both time:799.33
 average Intersecton:888.896
 average Intersecton last time:862.744
 average Intersecton avg time:829.202
@@ -209,7 +209,7 @@ average link both time:816.354
 standard deviation Centralized:87.02291942785605
 standard deviation Centralized last time:77.33079415173448
 standard deviation Centralized avg time:32.115828446135545
-standard deviation Centralized both time:22.404964988599087
+standard deviation Centralized both time:25.906434207226074
 standard deviation Intersecton:110.52354510686176
 standard deviation Intersecton last time:67.30698243910116
 standard deviation Intersecton avg time:77.2563553660438
@@ -221,7 +221,7 @@ standard deviation link both time:93.75499986667377
 dispersion Centralized:10.631242637922966
 dispersion Centralized last time:8.231316894890476
 dispersion Centralized avg time:1.3603021542818077
-dispersion Centralized both time:0.662890371605968
+dispersion Centralized both time:0.8788279558628396
 dispersion Intersecton:15.557784788353013
 dispersion Intersecton last time:5.672241091474297
 dispersion Intersecton avg time:7.700354076176551
@@ -233,7 +233,7 @@ dispersion link both time:11.327319587628866
 skew Centralized:-0.6570467411205251
 skew Centralized last time:-1.0054566891655994
 skew Centralized avg time:-0.054319012182347574
-skew Centralized both time:0.5291246956262602
+skew Centralized both time:0.46188443098826787
 skew Intersecton:-0.6751974216001209
 skew Intersecton last time:-1.0995245193011118
 skew Intersecton avg time:-1.3706999450948638

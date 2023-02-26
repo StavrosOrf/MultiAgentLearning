@@ -183,15 +183,15 @@ for i in range(len(AGV_COUNT)):
         axis[int(i/2)][i%2].set_xlim(0,500)
         axis[int(i/2)][i%2].set_xlabel('Epoch')
         axis[int(i/2)][i%2].plot(max_c, label='Centralized', color='green', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_c_t, label='Centralized, time', color='cyan', linewidth=0.5)
+        axis[int(i/2)][i%2].plot(max_c_t, label='Centralized, last time', color='cyan', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_c_avgt, label='Centralized, avg time', color='orange', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_c_botht, label='Centralized, both time', color='brown', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_i, ls='dotted', label='Intersection', color='yellow', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_i_t, ls='dotted', label='Intersection, time', color='purple', linewidth=0.5)
+        axis[int(i/2)][i%2].plot(max_i_t, ls='dotted', label='Intersection, last time', color='purple', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_i_avgt, ls='dotted', label='Intersection, avg time', color='pink', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_i_botht, ls='dotted', label='Intersection, both time', color='gray', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_l, ls='dashed', label='Link', color='blue', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_l_t, ls='dashed', label='Link, time', color='red', linewidth=0.5)
+        axis[int(i/2)][i%2].plot(max_l_t, ls='dashed', label='Link, last time', color='red', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_l_avgt, ls='dashed', label='Link, avg time', color='olive', linewidth=0.5)
         axis[int(i/2)][i%2].plot(max_l_botht, ls='dashed', label='Link, both time', color='black', linewidth=0.5)
         axis[int(i/2)][i%2].set_title(AGV_COUNT[i] + ' AGVs')
@@ -326,7 +326,7 @@ if PLOT_TYPE != 'violin':
     fig.set_figwidth(14.1*1.1)
     fig.set_figheight(10*1.1)
 else:
-    fig.set_figwidth(9)
+    fig.set_figwidth(11)
     fig.set_figheight(9)
 
 if PLOT_TYPE == 'average':
