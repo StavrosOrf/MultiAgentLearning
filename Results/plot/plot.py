@@ -70,7 +70,7 @@ elif sys.argv[2] == '--es_cn':
 elif sys.argv[2] == '--ccea':
     ALGO = 'CCEA'
 
-Y_LIM_AVE = [(400, 575), (400, 725), (400, 900), (450, 950)]
+Y_LIM_AVE = [(350, 575), (400, 725), (400, 900), (400, 950)]
 Y_LIM_MAX = [(450, 580), (450, 750), (450, 950), (500, 950)]
 if PLOT_TYPE == 'violin':
     fig, axis = matplotlib.pyplot.subplots(2, 2)
@@ -277,6 +277,19 @@ for i in range(len(AGV_COUNT)):
         print('average link last time:' + str(statistics.mean(max_l_t)))
         print('average link avg time:' + str(statistics.mean(max_l_avgt)))
         print('average link both time:' + str(statistics.mean(max_l_botht)))
+
+        print('Worse Centralized:' + str(min(max_c)))
+        print('Worse Centralized last time:' + str(min(max_c_t)))
+        print('Worse Centralized avg time:' + str(min(max_c_avgt)))
+        print('Worse Centralized both time:' + str(min(max_c_botht)))
+        print('Worse Intersecton:' + str(min(max_i)))
+        print('Worse Intersecton last time:' + str(min(max_i_t)))
+        print('Worse Intersecton avg time:' + str(min(max_i_avgt)))
+        print('Worse Intersecton both time:' + str(min(max_i_botht)))
+        print('Worse link:' + str(min(max_l)))
+        print('Worse link last time:' + str(min(max_l_t)))
+        print('Worse link avg time:' + str(min(max_l_avgt)))
+        print('Worse link both time:' + str(min(max_l_botht)))
 
         print('standard deviation Centralized:' + str(statistics.stdev(last_c)))
         print('standard deviation Centralized last time:' + str(statistics.stdev(last_c_t)))

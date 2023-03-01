@@ -2,14 +2,28 @@
 
 This project implements various algorithms on a warehouse domain using multiple
 agent definitions with each learning algorithm, for purpose of comparing it to
-[CCEA](https://github.com/JenJenChung/multiagent_learning).
+[CCEA](https://github.com/Kallinteris-Andreas/Warehouse-Automation-CCEA).
 
-It contains implementations of the following algorithms on the warehouse domain/framework
+It contains implementations of the following algorithms on the warehouse framework
  - ES
  - AdamES
  - Canonical ES
  - (MA)DDPG
  - I-DQN
+
+And it contains the following agent definitions:
+ - Centralized
+ - Intersection
+ - Link
+ - Centralized with last time
+ - Intersection with last time
+ - Link with last time
+ - Centralized with avg time
+ - Intersection with avg time
+ - Link with avg time
+ - Centralized with both time
+ - Intersection with both time
+ - Link with both time
 
 The Analysis of the results can be found in our [paper](https://dl.acm.org/doi/10.1145/3549737.3549773).
 
@@ -77,7 +91,7 @@ cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make && valgrind --tool=callgrind 
 This is repo is a fork of https://github.com/JenJenChung/multiagent_learning
 
 # Cite
-In order the orignal paper:
+In order the orignal [paper](https://dl.acm.org/doi/10.1145/3549737.3549773):
 ```
     @inproceedings{10.1145/3549737.3549773,
     author = {Kallinteris, Andreas and Orfanoudakis, Stavros and Chalkiadakis, Georgios},
