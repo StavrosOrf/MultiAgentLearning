@@ -3,6 +3,7 @@
 #version history
 #v3 added support for new definitons and algos
 #v4 2x2 
+#v5 both time -> both times, avg & max graphs are 4x1 now
 
 import matplotlib.pyplot
 import os
@@ -77,7 +78,8 @@ if PLOT_TYPE == 'violin':
     #fig, axis = matplotlib.pyplot.subplots(1,len(AGV_COUNT))
 else:
     #fig, axis = matplotlib.pyplot.subplots(1,len(AGV_COUNT))
-    fig, axis = matplotlib.pyplot.subplots(2, 2)
+    #fig, axis = matplotlib.pyplot.subplots(2, 2)
+    fig, axis = matplotlib.pyplot.subplots(4,1)
 
 for i in range(len(AGV_COUNT)):
     data_c = read_runs(ALGO + '/C_' + AGV_COUNT[i])
@@ -154,49 +156,49 @@ for i in range(len(AGV_COUNT)):
 
 
     if PLOT_TYPE == 'average':
-        axis[int(i/2)][i%2].set_ylim(Y_LIM_AVE[i][0], Y_LIM_AVE[i][1])
-        axis[int(i/2)][i%2].set_xlim(0,500)
-        axis[int(i/2)][i%2].set_xlabel('Epoch')
-        axis[int(i/2)][i%2].plot(avg_c, label='Centralized', color='green', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_c_t, label='Centralized, last time', color='cyan', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_c_avgt, label='Centralized, avg time', color='orange', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_c_botht, label='Centralized, both time', color='brown', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_i, ls='dotted', label='Intersection', color='yellow', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_i_t, ls='dotted', label='Intersection, last time', color='purple', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_i_avgt, ls='dotted', label='Intersection, avg time', color='pink', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_i_botht, ls='dotted', label='Intersection, both time', color='gray', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_l, ls='dashed', label='Link', color='blue', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_l_t, ls='dashed', label='Link, time', color='red', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_l_avgt, ls='dashed', label='Link, avg time', color='olive', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(avg_l_botht, ls='dashed', label='Link, both time', color='black', linewidth=0.5)
+        axis[i].set_ylim(Y_LIM_AVE[i][0], Y_LIM_AVE[i][1])
+        axis[i].set_xlim(0,500)
+        axis[i].set_xlabel('Epoch')
+        axis[i].plot(avg_c, label='Centralized', color='green', linewidth=0.5)
+        axis[i].plot(avg_c_t, label='Centralized, last time', color='cyan', linewidth=0.5)
+        axis[i].plot(avg_c_avgt, label='Centralized, avg time', color='orange', linewidth=0.5)
+        axis[i].plot(avg_c_botht, label='Centralized, both times', color='brown', linewidth=0.5)
+        axis[i].plot(avg_i, ls='dotted', label='Intersection', color='yellow', linewidth=0.5)
+        axis[i].plot(avg_i_t, ls='dotted', label='Intersection, last time', color='purple', linewidth=0.5)
+        axis[i].plot(avg_i_avgt, ls='dotted', label='Intersection, avg time', color='pink', linewidth=0.5)
+        axis[i].plot(avg_i_botht, ls='dotted', label='Intersection, both times', color='gray', linewidth=0.5)
+        axis[i].plot(avg_l, ls='dashed', label='Link', color='blue', linewidth=0.5)
+        axis[i].plot(avg_l_t, ls='dashed', label='Link, time', color='red', linewidth=0.5)
+        axis[i].plot(avg_l_avgt, ls='dashed', label='Link, avg time', color='olive', linewidth=0.5)
+        axis[i].plot(avg_l_botht, ls='dashed', label='Link, both times', color='black', linewidth=0.5)
         #axis[i].fill_between(x=x, y1=min_c, y2=max_c, color='#90ee90')
         #axis[i].fill_between(x=x, y1=min_c_t, y2=max_c_t, color='#e0ffff')
         #axis[i].fill_between(x=x, y1=min_i, y2=max_c, color='#ffffe0')
         #axis[i].fill_between(x=x, y1=min_i_t, y2=max_c_t, color='#b695c0')
         #axis[i].fill_between(x=x, y1=min_l, y2=max_c, color='#add8e6')
         #axis[i].fill_between(x=x, y1=min_l_t, y2=max_c_t, color='#ff7276')
-        axis[int(i/2)][i%2].set_title(AGV_COUNT[i] + ' AGVs')
-        axis[int(i/2)][i%2].tick_params(which='major', direction='in')
-        axis[0][0].set_ylabel('Total Deliveries')
+        axis[i].set_title(AGV_COUNT[i] + ' AGVs')
+        axis[i].tick_params(which='major', direction='in')
+        axis[0].set_ylabel('Total Deliveries')
     elif PLOT_TYPE == 'max':
-        axis[int(i/2)][i%2].set_ylim(Y_LIM_MAX[i][0], Y_LIM_MAX[i][1])
-        axis[int(i/2)][i%2].set_xlim(0,500)
-        axis[int(i/2)][i%2].set_xlabel('Epoch')
-        axis[int(i/2)][i%2].plot(max_c, label='Centralized', color='green', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_c_t, label='Centralized, last time', color='cyan', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_c_avgt, label='Centralized, avg time', color='orange', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_c_botht, label='Centralized, both time', color='brown', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_i, ls='dotted', label='Intersection', color='yellow', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_i_t, ls='dotted', label='Intersection, last time', color='purple', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_i_avgt, ls='dotted', label='Intersection, avg time', color='pink', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_i_botht, ls='dotted', label='Intersection, both time', color='gray', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_l, ls='dashed', label='Link', color='blue', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_l_t, ls='dashed', label='Link, last time', color='red', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_l_avgt, ls='dashed', label='Link, avg time', color='olive', linewidth=0.5)
-        axis[int(i/2)][i%2].plot(max_l_botht, ls='dashed', label='Link, both time', color='black', linewidth=0.5)
-        axis[int(i/2)][i%2].set_title(AGV_COUNT[i] + ' AGVs')
-        axis[int(i/2)][i%2].tick_params(which='major', direction='in')
-        axis[0][0].set_ylabel('Total Deliveries')
+        axis[i].set_ylim(Y_LIM_MAX[i][0], Y_LIM_MAX[i][1])
+        axis[i].set_xlim(0,500)
+        axis[i].set_xlabel('Epoch')
+        axis[i].plot(max_c, label='Centralized', color='green', linewidth=0.5)
+        axis[i].plot(max_c_t, label='Centralized, last time', color='cyan', linewidth=0.5)
+        axis[i].plot(max_c_avgt, label='Centralized, avg time', color='orange', linewidth=0.5)
+        axis[i].plot(max_c_botht, label='Centralized, both times', color='brown', linewidth=0.5)
+        axis[i].plot(max_i, ls='dotted', label='Intersection', color='yellow', linewidth=0.5)
+        axis[i].plot(max_i_t, ls='dotted', label='Intersection, last time', color='purple', linewidth=0.5)
+        axis[i].plot(max_i_avgt, ls='dotted', label='Intersection, avg time', color='pink', linewidth=0.5)
+        axis[i].plot(max_i_botht, ls='dotted', label='Intersection, both times', color='gray', linewidth=0.5)
+        axis[i].plot(max_l, ls='dashed', label='Link', color='blue', linewidth=0.5)
+        axis[i].plot(max_l_t, ls='dashed', label='Link, last time', color='red', linewidth=0.5)
+        axis[i].plot(max_l_avgt, ls='dashed', label='Link, avg time', color='olive', linewidth=0.5)
+        axis[i].plot(max_l_botht, ls='dashed', label='Link, both times', color='black', linewidth=0.5)
+        axis[i].set_title(AGV_COUNT[i] + ' AGVs')
+        axis[i].tick_params(which='major', direction='in')
+        axis[0].set_ylabel('Total Deliveries')
     elif PLOT_TYPE == 'violin':
         axis[int(i/2)][i%2].set_ylim(Y_LIM_AVE[i][0], Y_LIM_MAX[i][1])
         axis[int(i/2)][i%2].violinplot([last_l, last_l_t, last_l_avgt, last_l_botht, last_i, last_i_t, last_i_avgt, last_i_botht, last_c, last_c_t, last_c_avgt, last_c_botht], showextrema = False)
@@ -240,7 +242,7 @@ for i in range(len(AGV_COUNT)):
         axis[int(i/2)][i%2].scatter(11, statistics.mean(last_c_avgt), marker='+', color='black', zorder=1,s=80)
         axis[int(i/2)][i%2].scatter(12, statistics.mean(last_c_botht), marker='+', color='black', zorder=1,s=80)
 
-        X_LABELS = ['','Link','Link last time','Link avg time','Link both time','Intersection','Intersection last time','Intersection avg time','Intersection both time','Centralized','centralized last time','centralized avg time','centralized both time']
+        X_LABELS = ['','Link','Link last time','Link avg time','Link both times','Intersection','Intersection last time','Intersection avg time','Intersection both times','Centralized','centralized last time','centralized avg time','centralized both times']
         X_LABELS_EMPTY = ['','','','','','','','','','','','','']
         #axis[1][0].set_xticks(ticks=[0,1,2,3,4,5,6,7,8,9,10,11,12], labels=X_LABELS, rotation=90, ha="right")
         axis[1][0].set_xticks(ticks=[0,1,2,3,4,5,6,7,8,9,10,11,12], labels=X_LABELS, transform_rotates_text=True ,rotation=90, ma="right", ha="center")
@@ -335,19 +337,19 @@ for i in range(len(AGV_COUNT)):
 
 if PLOT_TYPE != 'violin':
     #axis[1].legend(loc='upper center', bbox_to_anchor=(1, -0.175), fancybox=True, ncol=6)
-    axis[1][1].legend(loc='upper center', bbox_to_anchor=(-0.10, -0.10), fancybox=True, ncol=5, fontsize="x-large")
-    fig.set_figwidth(14.1*1.1)
-    fig.set_figheight(10*1.1)
+    axis[3].legend(loc='upper center', bbox_to_anchor=(0.50, -0.20), fancybox=True, ncol=4, fontsize="x-large")
+    fig.set_figwidth(10*1.3)
+    fig.set_figheight(14.1*1.3)
 else:
     fig.set_figwidth(11)
     fig.set_figheight(9)
 
 if PLOT_TYPE == 'average':
-    matplotlib.pyplot.savefig(ALGO + '_ave_perf.eps',bbox_inches='tight')
-    matplotlib.pyplot.savefig(ALGO + '_ave_perf.png',bbox_inches='tight')
+    matplotlib.pyplot.savefig(ALGO + '_ave_perf_4x1.eps',bbox_inches='tight')
+    matplotlib.pyplot.savefig(ALGO + '_ave_perf_4x1.png',bbox_inches='tight')
 elif PLOT_TYPE == 'max':
-    matplotlib.pyplot.savefig(ALGO + '_max_perf.eps',bbox_inches='tight')
-    matplotlib.pyplot.savefig(ALGO + '_max_perf.png',bbox_inches='tight')
+    matplotlib.pyplot.savefig(ALGO + '_max_perf_4x1.eps',bbox_inches='tight')
+    matplotlib.pyplot.savefig(ALGO + '_max_perf_4x1.png',bbox_inches='tight')
 elif PLOT_TYPE == 'violin':
     matplotlib.pyplot.savefig(ALGO + '_violin.eps',bbox_inches='tight')
     matplotlib.pyplot.savefig(ALGO + '_violin.png',bbox_inches='tight')
