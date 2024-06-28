@@ -27,6 +27,8 @@ And it contains the following agent definitions:
 
 The Analysis of the results can be found in our [paper](https://dl.acm.org/doi/10.1145/3549737.3549773).
 
+More detailed analysis can be found in our [extended paper](https://link.springer.com/article/10.1007/s10458-024-09662-9).
+
 ## Installation ##
 
 ### Linux ###
@@ -111,3 +113,6 @@ In order the orignal [paper](https://dl.acm.org/doi/10.1145/3549737.3549773):
     series = {SETN '22}
     }
 ```
+
+# Funding
+The research described in this paper was carried out within the framework of the National Recovery and Resilience Plan Greece 2.0, funded by the European Union - NextGenerationEU (Implementation Body: `ΕΛΙΔΕΚ - HFRI` Project name: `DEEP- REBAYES HFRI` Project Number 15430). 
