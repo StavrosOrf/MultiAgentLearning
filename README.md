@@ -114,5 +114,16 @@ In order the orignal [paper](https://dl.acm.org/doi/10.1145/3549737.3549773):
     }
 ```
 
+In order the [extended paper](https://link.springer.com/article/10.1007/s10458-024-09662-9):
+```
+@article{Kallinteris2024ACA,
+  title={A comprehensive analysis of agent factorization and learning algorithms in multiagent systems},
+  author={Andreas Kallinteris and Stavros Orfanoudakis and Georgios Chalkiadakis},
+  journal={Autonomous Agents and Multi-Agent Systems},
+  year={2024},
+  url={https://api.semanticscholar.org/CorpusID:270776293}
+}
+```
+
 # Funding
 The research described in this paper was carried out within the framework of the National Recovery and Resilience Plan Greece 2.0, funded by the European Union - NextGenerationEU (Implementation Body: `ΕΛΙΔΕΚ - HFRI` Project name: `DEEP- REBAYES HFRI` Project Number 15430). 
