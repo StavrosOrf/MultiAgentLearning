@@ -117,11 +117,17 @@ In order the orignal [paper](https://dl.acm.org/doi/10.1145/3549737.3549773):
 In order the [extended paper](https://link.springer.com/article/10.1007/s10458-024-09662-9):
 ```
 @article{Kallinteris2024ACA,
-  title={A comprehensive analysis of agent factorization and learning algorithms in multiagent systems},
-  author={Andreas Kallinteris and Stavros Orfanoudakis and Georgios Chalkiadakis},
-  journal={Autonomous Agents and Multi-Agent Systems},
-  year={2024},
-  url={https://api.semanticscholar.org/CorpusID:270776293}
+	title = {A comprehensive analysis of agent factorization and learning algorithms in multiagent systems},
+	volume = {38},
+	issn = {1573-7454},
+	url = {https://doi.org/10.1007/s10458-024-09662-9},
+	doi = {10.1007/s10458-024-09662-9},
+	number = {2},
+	journal = {Autonomous Agents and Multi-Agent Systems},
+	author = {Kallinteris, Andreas and Orfanoudakis, Stavros and Chalkiadakis, Georgios},
+	month = jun,
+	year = {2024},
+	pages = {27},
 }
 ```
 
