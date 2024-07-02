@@ -1,3 +1,15 @@
+/**************************************************************************************************************************
+* Project: DEEP-REBAYES
+* Author(s): Andreas Kallinteris, Stavros Orfanoudakis
+* Correspondence: akallinteris@tuc.gr, sorfanoudakis@tuc.gr
+* Last Modified: 03/07/2024
+*
+*
+* Code implemented in the context of the DEEP-REBAYES project
+* This project is carried out within the framework of the National Recovery and Resilience Plan Greece 2.0, funded by the
+* European Union - NextGenerationEU (Implementation Body: HFRI)
+**************************************************************************************************************************/
+
 #include <iostream>
 #include <sstream>
 #include <vector>
